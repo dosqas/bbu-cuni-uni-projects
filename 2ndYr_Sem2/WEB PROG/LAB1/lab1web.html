@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamsters</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        .media-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        figure {
+            margin: 20px 0;
+        }
+
+        figcaption {
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+
+        html, body {
+            min-height: 768px;
+            max-height: 1536px;
+            overflow-y: auto;
+	    background-color: #f5f5dc;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <b>I love hamsters very much!<br>They are so fluffy and cute :)</b>
+        <nav>
+            <ul>
+                <li><a href="#hamsterpics">Hamsters being cute</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+        <article>
+            <p>Hamsters are small, nocturnal rodents that are popular as pets due to their cute appearance and relatively low maintenance.</p>
+            <p>They belong to the subfamily Cricetinae and are native to parts of Europe, Asia, and the Middle East. There are several species, with the Syrian hamster and dwarf hamsters being the most common in captivity.</p>
+            <p>Hamsters are known for their cheek pouches, which they use to store and transport food. They are omnivores, eating a diet of seeds, grains, fruits, vegetables, and occasional insects.</p>
+            <p>Providing a spacious cage, a balanced diet, and enrichment activities is essential for their well-being. Hamsters are generally gentle but can bite if startled or mishandled.</p>
+        </article>
+
+        <table>
+            <tr>
+                <th>Hamster Type</th>
+                <th>Size</th>
+                <th>Average Lifespan</th>
+            </tr>
+            <tr>
+                <td>Syrian Hamster</td>
+                <td>15-18 cm</td>
+                <td>2-3 years</td>
+            </tr>
+            <tr>
+                <td>Dwarf Hamster</td>
+                <td>8-10 cm</td>
+                <td>1.5-2 years</td>
+            </tr>
+        </table>
+
+        <aside>
+            <h3>Resources for Hamsters:</h3>
+            <ul>
+                <li><a href="https://www.rspca.org.uk/adviceandwelfare/pets/rodents/hamsters">RSPCA article about keeping Hamsters as pets</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Hamster">Wikipedia link for Hamster info</a></li>
+            </ul>
+        </aside>
+
+        <hr>
+        <section id="hamsterpics" class="media-container">
+            <figure>
+                <img src="hamu.jpg" alt="Very cute :)" width="200">
+                <figcaption>A very cute hamster!</figcaption>
+            </figure>
+            
+            <figure>
+                <audio controls>
+                    <source src="hamusounds.mp3" type="audio/mp3">
+                </audio>
+                <figcaption>Hamster sounds</figcaption>
+            </figure>
+            
+            <figure>
+                <video width="320" height="240" controls>
+                    <source src="hamuvideo.mp4" type="video/mp4">
+                </video>
+                <figcaption>A hamster in action!</figcaption>
+            </figure>
+
+            <figure>
+                <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="80" fill="gold" />
+                    <circle cx="70" cy="80" r="10" fill="black" />
+                    <circle cx="130" cy="80" r="10" fill="black" />
+                    <path d="M60 120 Q100 150 140 120" stroke="black" stroke-width="3" fill="transparent" />
+                </svg>
+                <figcaption>My face when I see Hamsters :)</figcaption>
+            </figure>
+        </section>
+    </div>
+    </main>
+
+    <footer>
+        <p>Made by Soptelea Sebastian 927/1</p>
+    </footer>
+</body>
+</html>
