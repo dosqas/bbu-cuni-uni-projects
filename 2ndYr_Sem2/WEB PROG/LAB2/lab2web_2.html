@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Colored divs</title>
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+
+		.container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		div#div1 {
+			width: 80%;
+			height: 80%;
+			background-color: green;
+		}
+
+		div#div2 {
+			width: 80%;
+			height: 80%;
+			background-color: red;
+		}
+
+		div#div3 {
+			width: 80%;
+			height: 80%;
+			background-color: blue;
+		}
+
+		div#div4 {
+			width: 80%;
+			height: 80%;
+			background-color: orange;
+		}
+
+		div#div4:hover {
+			background-color: purple;
+		}
+
+		div#div1:has(div#div4:hover) {
+			background-color: pink
+		}
+
+		div#div2:has(div#div4:hover) {
+			background-color: brown
+		}
+
+		div#div3:has(div#div4:hover) {
+			background-color: yellow
+		}
+	</style>
+</head>
+<body>
+	<div class="container" id="div1">
+		<div class="container" id="div2">
+			<div class="container" id="div3">
+				<div class="container" id="div4">
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
