@@ -25,7 +25,14 @@ namespace dbmsWF1
 
         private void FillData()
         {
-            conn = new SqlConnection(getConnectionString());
+            try
+            {
+                conn = new SqlConnection(getConnectionString());
+            }
+            catch (SystemException)
+            {
+                Console.WriteLine("Error on initiating database connection");
+            }
 
             queryProgram = "SELECT * FROM Program";
             queryFilm = "SELECT * FROM Film";
@@ -35,8 +42,15 @@ namespace dbmsWF1
 
             dSet = new DataSet();
 
-            daProgram.Fill(dSet, "Program");
-            daFilm.Fill(dSet, "Film");
+            try
+            {
+                daProgram.Fill(dSet, "Program");
+                daFilm.Fill(dSet, "Film");
+            }
+            catch (SystemException)
+            {
+                Console.WriteLine("Error filling the DataSets.");
+            }
 
             cmdBuilder = new SqlCommandBuilder(daProgram);
 
@@ -46,8 +60,7 @@ namespace dbmsWF1
 
             bsFilm = new BindingSource();
             bsFilm.DataSource = dSet.Tables["Film"];
-            bsProgram = new BindingSource();
-            bsProgram.DataSource = new BindingSource(bsFilm, "FilmProgram");
+            bsProgram = new BindingSource(bsFilm, "FilmProgram");
 
             this.dataGridView1.DataSource = bsFilm;
             this.dataGridView2.DataSource = bsProgram;
@@ -62,7 +75,22 @@ namespace dbmsWF1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            daProgram.Update(dSet, "Program");
+            try
+            {
+                daProgram.Update(dSet, "Program");
+            }
+            catch (ArgumentNullException)
+            {
+                Console.WriteLine("Error on updating the database: DataSet is null");
+            }
+            catch (InvalidOperationException)
+            {
+                Console.WriteLine("Error on updating the database: Update operation is invalid");
+            }
+            catch (DBConcurrencyException)
+            {
+                Console.WriteLine("Error on updating the database: Concurrency exception occured");
+            }
         }
     }
 }
