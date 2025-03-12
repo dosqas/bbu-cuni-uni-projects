@@ -100,9 +100,84 @@
                 align-items: center;
                 color: white;
                 font: 14px "Segoe UI", "Segoe UI Midlevel", sans-serif;
-                font-weight: 350;
+                font-weight: 450;
                 margin-right: 25px;
-                margin-top: 25px;
+                margin-top: 20px;
+                margin-left: 115px;
+                gap: 5px;
+            }
+
+            .discover-tab {
+                display: flex;
+                text-align: center;
+                justify-content: center;
+                align-items: center;
+                color: rgb(118, 160, 230); 
+                font-weight: 635;
+                margin-right: 16px;
+                border-radius: 14px;
+                background-color: rgb(58, 58, 58);
+                width: 80px;
+                height: 38px;
+                box-shadow: inset 0px 0px 3px 1px rgb(71, 71, 71);
+            }
+
+            .tab {
+                margin-right: 18px;
+                justify-content: center;
+                align-items: center;
+            }
+
+            main {
+                display: flex;
+                flex-direction: row;
+            }
+
+            .left-column {
+                display: flex;
+                flex-direction: column;
+                margin-left: 115px;
+                margin-top: 10px;
+            }
+
+            .big-news-tab {
+                width: 630px;
+                height: 373px;
+                background-color: rgb(51, 51, 51);
+                border-radius: 5px;
+            }
+
+            .smaller-news-tab {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .small-news-row {
+                display: flex;
+                flex-direction: row;
+            }
+
+            .small-news-tab {
+                width: 307px;
+                height: 100px;
+                background-color: rgb(51, 51, 51);
+                border-radius: 5px;
+                margin-right: 15px;
+                margin-top: 16px;
+            }
+
+            .right-column {
+                display: flex;
+                flex-direction: column;
+                margin-top: 10px;
+            }
+
+            .medium-news-tab {
+                width: 307px;
+                height: 256px;
+                background-color: rgb(51, 51, 51);
+                border-radius: 5px;
             }
 
         </style>
@@ -181,67 +256,66 @@
             </div>
         </header>
         <header class="header3">
-            <div style="margin-right: 68px;">
-                Outlook.com
-            </div>
-            <div style="margin-right: 88px;">
-                Facebook
-            </div>
-            <div style="margin-right: 75px;">
-                        Sports
-            </div>
-            <div style="margin-right: 53px;">
-                Online Games
-            </div>
-            <div style="margin-right: 73px;">
-                Microsoft 365
-            </div>
-            <div style="margin-right: 98px;">
-                Twitter
-            </div>
-            <div style="margin-right: 73px;">
-                Skype
-            </div>
-            <div style="margin-right: 62px;">
-                Microsoft Store
-            </div>
-            <div>
-                OneDrive
-            </div>
+            <div style="margin-right: 68px;">Outlook.com</div>
+            <div style="margin-right: 88px;">Facebook</div>
+            <div style="margin-right: 75px;">Sports</div>
+            <div style="margin-right: 53px;">Online Games</div>
+            <div style="margin-right: 73px;">Microsoft 365</div>
+            <div style="margin-right: 98px;">Twitter</div>
+            <div style="margin-right: 73px;">Skype</div>
+            <div style="margin-right: 62px;">Microsoft Store</div>
+            <div>OneDrive</div>
         </header>
         <header class="header4">
-            <div style="color: rgb(114, 153, 222);">
-                Discover
-            </div>
-            <div>
-                Sports
-            </div>
-            <div>
-                Play
-            </div>
-            <div>
-                Money
-            </div>
-            <div>
-                Gaming
-            </div>
-            <div>
-                Weather
-            </div>
-            <div>
-                Watch
-            </div>
-            <div>
-                Health
-            </div>
-            <div>
-                Travel
-            </div>
-            <div>
-                Traffic
-            </div>
+            <div class="discover-tab">Discover</div>
+            <div class="tab">Sports</div>
+            <div class="tab">Play</div>
+            <div class="tab">Money</div>
+            <div class="tab">Gaming</div>
+            <div class="tab">Weather</div>
+            <div class="tab">Watch</div>
+            <div class="tab">Health</div>
+            <div class="tab">Travel</div>
+            <div class="tab">Traffic</div>
         </header>
         <main>
+            <div class="left-column">
+                <div class="big-news-tab">
 
+                </div>
+                <div class="smaller-news-tabs">
+                    <div class="small-news-row">
+                        <div class="small-news-tab">
+
+                        </div>
+                        <div class="small-news-tab">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="right-column">
+                <div class="medium-news-tab">
+
+                </div>
+                <div class="smaller-news-tabs">
+                    <div class="small-news-row">
+                        <div class="small-news-tab">
+
+                        </div>
+                        <div class="small-news-tab">
+                            
+                        </div>
+                    </div>
+                    <div class="small-news-row">
+                        <div class="small-news-tab">
+
+                        </div>
+                        <div class="small-news-tab">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </body>
