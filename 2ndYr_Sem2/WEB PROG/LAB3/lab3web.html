@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MSN International Edition - World news, Africa news, Asia News, Europe News</title>
+        <style>
+            body {
+                background-color: rgb(36, 36, 36);
+            }
+
+            .header1 {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 18px;
+                padding-left: 90px;
+                padding-right: 115px;
+            }
+
+            .logo {
+                margin-right: 75px;
+            }
+
+            .search-container {
+                display: flex;
+                height: 55px;
+                justify-content: center;
+            }
+
+            .search-button {
+                background-color: rgb(51, 147, 223);
+                height: 43px;
+                width: 70px;
+                border-top-right-radius: 5px;
+                border-bottom-right-radius: 5px;
+                border: 0px;
+            }
+
+            .search-input {
+                background-color: rgb(74, 74, 74);
+                height: 41px;
+                width: 600px;
+                border-top-left-radius: 5px;
+                border-bottom-left-radius: 5px;
+                border: 0px;
+                padding-left: 20px;
+                font-size: 100%;
+                font: 16px "Segoe UI", "Segoe UI Midlevel", sans-serif;
+                font-weight: 400;
+            }
+
+            .search-input::placeholder {
+                color: rgb(206, 206, 206);
+            }
+
+            .user-preferences {
+                display: flex;
+                gap: 20px;
+                justify-content: space-between;
+                align-items: center;
+                color: white;
+                font: 16px "Segoe UI", "Segoe UI Midlevel", sans-serif;
+            }
+
+        </style>
+    </head>
+    <body>
+        <header class="header1">
+            <!--Logo-->
+            <div class="logo">
+                <img src="logo.png" width="80" height="30">
+            </div>
+            <!--Search bar-->
+            <div class="search-container">
+                <!--Input field-->
+                <input type="text" class="search-input" placeholder="Search the web">
+                <!--Search button-->
+                <button class="search-button">
+                    <svg width="20" height="20" viewBox="3 3 14 14" fill="white">
+                        <path d="M8.5 3a5.5 5.5 0 014.23 9.02l4.12 4.13a.5.5 0 01-.63.76l-.07-.06-4.13-4.12A5.5 5.5 0 118.5 3zm0 1a4.5 4.5 0 100 9 4.5 4.5 0 000-9z"></path>
+                    </svg>
+                </button>
+            </div>
+            <!--User preferences-->
+            <div class="user-preferences">
+                <!--Weather-->
+                <div class="weather">
+                    <img src="https://assets.msn.com/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/MostlyCloudyDayV2.svg" alt="Mostly Cloudy Day Icon" width="27" height="27">
+                </div>
+                17°C
+                <!--User icon-->
+                <div class="user-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" stroke="#FFFFFF" width="37" height="37">
+                      <g class="mectrl_stroke" stroke-width="1.9" fill="none">
+                        <circle cx="32" cy="32" r="30.25"/>
+                        <g transform="matrix(1.1 0 0 1.1 8.8 5.61)">
+                          <circle class="mectrl_stroke" cx="20" cy="16" r="7"/>
+                          <path class="mectrl_stroke" d="M30 35h10m-5-5v10M30.833 32.09A11 11 0 009 34"/>
+                        </g>
+                      </g>
+                    </svg>
+                  </div>                  
+                <!--Settings icon-->
+                <div class="settings-icon">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
+                        <path d="M13.93 8.94a.25.25 0 0 0 .15.22l1.67.7c.07.03.13.07.17.13a.37.37 0 0 1 .06.21.68.68 0 0 1-.04.18 3.86 3.86 0 0 1-.11.32l-.16.36a11.13 11.13 0 0 1-.3.71l-.09.2a.33.33 0 0 1-.14.18.36.36 0 0 1-.2.06c-.1 0-.23-.04-.42-.12a23.5 23.5 0 0 1-.56-.25l-.55-.26c-.18-.08-.3-.12-.39-.12a.24.24 0 0 0-.2.1 9.67 9.67 0 0 1-.59.68 5.76 5.76 0 0 1-.67.59.34.34 0 0 0-.08.1.2.2 0 0 0-.03.1c0 .09.04.21.12.38a35.14 35.14 0 0 0 .52 1.12c.07.18.11.31.11.4a.34.34 0 0 1-.07.22.38.38 0 0 1-.17.14 7.75 7.75 0 0 0-.36.16 32.49 32.49 0 0 1-.55.24 17.56 17.56 0 0 1-.86.3.4.4 0 0 1-.2-.06.34.34 0 0 1-.14-.17l-.7-1.68a.25.25 0 0 0-.09-.1.23.23 0 0 0-.14-.05H8.9l-.44.05a6.26 6.26 0 0 1-.44.02 4.58 4.58 0 0 1-.46-.02l-.45-.05h-.04a.25.25 0 0 0-.23.15l-.69 1.67a.34.34 0 0 1-.13.17.37.37 0 0 1-.21.06.8.8 0 0 1-.18-.04 9.9 9.9 0 0 1-.32-.11 50.63 50.63 0 0 0-.36-.15 16.3 16.3 0 0 0-.71-.3 5.45 5.45 0 0 1-.2-.1.34.34 0 0 1-.18-.13.4.4 0 0 1-.06-.21c0-.1.04-.23.11-.4.08-.2.17-.38.26-.57l.26-.56c.08-.17.12-.3.12-.39a.24.24 0 0 0-.1-.2 9.68 9.68 0 0 1-.68-.59 5.76 5.76 0 0 1-.59-.67c-.06-.07-.12-.1-.2-.1-.09 0-.21.03-.39.11a35.14 35.14 0 0 0-1.11.52c-.18.07-.32.11-.4.11a.37.37 0 0 1-.22-.06.43.43 0 0 1-.14-.18 7.79 7.79 0 0 0-.16-.36 32.55 32.55 0 0 1-.24-.54 36.12 36.12 0 0 1-.2-.54c-.07-.16-.1-.27-.1-.32 0-.08.02-.14.06-.2a.33.33 0 0 1 .17-.15l1.68-.7a.25.25 0 0 0 .1-.09.23.23 0 0 0 .05-.14V8.9L2 8.45A6.25 6.25 0 0 1 2 8.01a4.4 4.4 0 0 1 .02-.46l.05-.45v-.04a.25.25 0 0 0-.15-.22l-1.67-.7a.34.34 0 0 1-.17-.13.37.37 0 0 1-.06-.21c0-.04 0-.1.04-.18a53.8 53.8 0 0 1 .26-.68 93.7 93.7 0 0 0 .4-.92.34.34 0 0 1 .13-.17.4.4 0 0 1 .21-.06c.1 0 .23.04.4.12.2.07.38.16.57.25l.56.26c.17.08.3.12.39.12a.24.24 0 0 0 .2-.1 8.08 8.08 0 0 1 1.26-1.27.24.24 0 0 0 .1-.2c0-.09-.03-.21-.11-.38a23.24 23.24 0 0 0-.26-.55l-.26-.56a1.18 1.18 0 0 1-.11-.42c0-.08.02-.15.06-.2A.43.43 0 0 1 4.04.7 7.67 7.67 0 0 0 4.4.55 14.18 14.18 0 0 1 5.8.01c.08 0 .15.02.2.06a.33.33 0 0 1 .15.17l.7 1.68a.31.31 0 0 0 .09.11.26.26 0 0 0 .14.04h.03a6.23 6.23 0 0 1 .44-.05 4.18 4.18 0 0 1 .9 0l.45.05h.04a.25.25 0 0 0 .22-.15l.7-1.67a.34.34 0 0 1 .13-.17.37.37 0 0 1 .21-.06 3.61 3.61 0 0 1 .48.16c.13.04.25.1.38.15a13.75 13.75 0 0 1 .7.3l.22.09c.07.02.13.07.17.14.04.06.06.13.06.2 0 .1-.04.23-.11.42a22.03 22.03 0 0 1-.52 1.11c-.08.18-.12.3-.12.39 0 .08.04.15.1.2a8.08 8.08 0 0 1 1.27 1.26.24.24 0 0 0 .2.1c.09 0 .21-.03.39-.11a22.1 22.1 0 0 0 1.1-.52c.19-.07.32-.11.42-.11.08 0 .15.02.2.07.07.04.12.1.15.17l.16.36a14.18 14.18 0 0 1 .54 1.4c0 .08-.02.15-.06.22a.34.34 0 0 1-.17.13l-1.68.7a.31.31 0 0 0-.11.09.26.26 0 0 0-.04.14v.03l.05.44a4.18 4.18 0 0 1 0 .9l-.05.45v.04ZM8 12c.55 0 1.07-.1 1.55-.31a4.04 4.04 0 0 0 2.14-2.14A3.9 3.9 0 0 0 12 8c0-.55-.1-1.07-.32-1.55a3.92 3.92 0 0 0-.86-1.28A3.95 3.95 0 0 0 8 4a3.83 3.83 0 0 0-1.56.32A4.01 4.01 0 0 0 4.3 6.45 3.9 3.9 0 0 0 4 8a3.9 3.9 0 0 0 1.17 2.84c.37.36.8.64 1.27.85A3.9 3.9 0 0 0 8 12Z" fill-opacity=".83"></path>
+                    </svg>
+                </div>
+            </div>
+        </header>
+        <header class="header2">
+
+        </header>
+        <main>
+
+        </main>
+    </body>
+
+    https://assets.msn.com/staticsb/statics/latest/icons/office-icons/OneDrive_24x.svg
