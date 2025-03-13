@@ -141,10 +141,45 @@
             }
 
             .big-news-tab {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
                 width: 630px;
                 height: 373px;
                 background-color: rgb(51, 51, 51);
                 border-radius: 5px;
+                background-image: url("bigTab.jpg");
+                box-shadow: inset 0px 0px 400px 350px rgba(0, 0, 0, 0.30);
+            }
+
+            .big-tab-author {
+                display: flex;
+                justify-content: left;
+                width: 100%;
+                color: white;
+                font: 12px "Segoe UI", "Segoe UI Midlevel", sans-serif;
+                margin-left: 17px;
+                margin-top: 5px;
+            }
+
+            .big-tab-title {
+                color: white;
+                font: 28px "Segoe UI", "Segoe UI Midlevel", sans-serif;
+                font-weight: 600;
+                margin-left: 17px;
+                margin-bottom: 15px;
+                margin-top: 5px;
+            }
+
+            .big-tab-rating {
+                display: flex;
+                justify-content: left;
+                width: 100%;
+                color: white;
+                font: 12px "Segoe UI", "Segoe UI Midlevel", sans-serif;
+                font-weight: 450;
+                margin-left: 15px;
+                margin-bottom: 15px;
             }
 
             .smaller-news-tab {
@@ -159,12 +194,77 @@
             }
 
             .small-news-tab {
+                display: flex;
+                flex-direction: row;
                 width: 307px;
                 height: 100px;
                 background-color: rgb(51, 51, 51);
                 border-radius: 5px;
                 margin-right: 15px;
                 margin-top: 16px;
+            }
+
+            .left-column-tab {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width: 187px;
+                height: 100px;
+            }
+
+            .small-tab-author-icon {
+                background-color: white;
+                border-radius: 3px;
+                width: 15px;
+                height: 15px;
+                overflow: hidden;
+                margin-right: 10px;
+            }
+
+            .small-tab-author {
+                display: flex;
+                justify-content: left;
+                width: 100%;
+                color: white;
+                font: 12px "Segoe UI", "Segoe UI Midlevel", sans-serif;
+                margin-left: 15px;
+                margin-top: 5px;
+            }
+
+            .small-tab-title {
+                color: white;
+                font: 14px "Segoe UI", "Segoe UI Midlevel", sans-serif;
+                font-weight: 600;
+                margin-left: 10px;
+                margin-bottom: 15px;
+                margin-top: 5px;
+            }
+
+            .small-tab-rating {
+                display: flex;
+                justify-content: left;
+                width: 100%;
+                color: white;
+                font: 12px "Segoe UI", "Segoe UI Midlevel", sans-serif;
+                font-weight: 450;
+                margin-left: 15px;
+            }
+
+            .right-column-tab {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 120px;
+                height: 100px;
+            }
+
+            .small-tab-image {
+                background-color: white;
+                border-radius: 8px;
+                width: 105px;
+                height: 85px;
+                overflow: hidden;
             }
 
             .right-column {
@@ -174,10 +274,45 @@
             }
 
             .medium-news-tab {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
                 width: 307px;
                 height: 256px;
                 background-color: rgb(51, 51, 51);
                 border-radius: 5px;
+                background-image: url("mediumTab.jpg");
+                box-shadow: inset 0px 0px 400px 350px rgba(0, 0, 0, 0.30);
+            }
+
+            .medium-tab-author {
+                display: flex;
+                justify-content: left;
+                width: 100%;
+                color: white;
+                font: 12px "Segoe UI", "Segoe UI Midlevel", sans-serif;
+                margin-left: 17px;
+                margin-top: 5px;
+            }
+
+            .medium-tab-title {
+                color: white;
+                font: 20px "Segoe UI", "Segoe UI Midlevel", sans-serif;
+                font-weight: 600;
+                margin-left: 17px;
+                margin-bottom: 15px;
+                margin-top: 5px;
+            }
+
+            .medium-tab-rating {
+                display: flex;
+                justify-content: left;
+                width: 100%;
+                color: white;
+                font: 12px "Segoe UI", "Segoe UI Midlevel", sans-serif;
+                font-weight: 450;
+                margin-left: 15px;
+                margin-bottom: 15px;
             }
 
         </style>
@@ -281,38 +416,208 @@
         <main>
             <div class="left-column">
                 <div class="big-news-tab">
-
+                    <div class="big-tab-author">
+                        <div class="small-tab-author-icon">
+                            <img src="authorIcon6.jpg" width="100%" height="100%" style="object-fit: cover;">
+                        </div>
+                        loveMONEY
+                    </div>
+                    <div class="big-tab-title">
+                        RANKED: The World's Most Charming Small Towns, Villages
+                    </div>
+                    <div class="big-tab-rating">
+                        <svg width="16" height="16" fill="white" style="margin-right: 3px">
+                            <path d="M8.03 1.92c.21-.52.8-1.08 1.55-.87.6.17.97.52 1.2 1 .2.44.25.96.26 1.46a7.5 7.5 0 01-.24 1.74c-.06.26-.12.51-.19.74h1.38a2 2 0 011.92 2.56l-1.36 4.65a2.5 2.5 0 01-3.15 1.68L4.05 13.2A2 2 0 012.77 12l-.52-1.4a2 2 0 01.86-2.42l1.87-1.1.02-.01.1-.09c.1-.07.23-.2.4-.4.35-.39.82-1.03 1.3-2.04.2-.44.37-.78.53-1.1.25-.5.46-.92.7-1.52zm-2.51 6l-.02.01-1.88 1.11a1 1 0 00-.43 1.22l.52 1.38a1 1 0 00.64.6l5.35 1.68c.8.26 1.65-.2 1.89-1l1.36-4.65A1 1 0 0012 6.99H9.93a.5.5 0 01-.48-.67c.1-.28.26-.77.38-1.3.13-.54.22-1.08.2-1.5 0-.46-.05-.8-.16-1.05a.78.78 0 00-.56-.45c-.04-.02-.1-.01-.16.03a.54.54 0 00-.19.25c-.25.63-.5 1.11-.76 1.65-.16.3-.32.63-.5 1.01a9.52 9.52 0 01-1.45 2.28 5.06 5.06 0 01-.7.66l-.02.01-.01.01zm-.54-.84z"></path>
+                        </svg>
+                        449
+                        <svg width="16" height="16" fill="white" style="margin-left: 15px">
+                            <path d="M10.58 10l.05.45a11 11 0 01-.02 2.68c-.07.44-.2.88-.44 1.23-.25.38-.64.64-1.17.64-.52 0-.83-.37-1.02-.7-.2-.31-.36-.75-.54-1.2l-.01-.03c-.55-1.4-1.3-3.31-3.3-4.65-.31-.2-.6-.36-.86-.46-.7-.3-1.32-1.06-1.16-1.94l.23-1.2a2 2 0 011.43-1.55l4.95-1.38a3.5 3.5 0 014.37 2.73l.46 2.42A2.5 2.5 0 0111.09 10h-.51zm1.53-5.2a2.5 2.5 0 00-3.13-1.94L4.03 4.23a1 1 0 00-.71.78l-.22 1.2c-.06.28.16.66.55.82.31.13.66.31 1.03.55 2.28 1.53 3.13 3.7 3.67 5.11l.01.02c.2.5.33.85.47 1.08A.73.73 0 009 14c.14 0 .25-.05.35-.2.12-.18.22-.46.28-.83a10.06 10.06 0 00-.08-3.12l-.03-.2-.01-.05V9.6A.5.5 0 0110 9h1.09a1.5 1.5 0 001.47-1.78l-.45-2.42z"></path>                                    </svg>
+                    </div>
                 </div>
                 <div class="smaller-news-tabs">
                     <div class="small-news-row">
                         <div class="small-news-tab">
-
+                            <div class="left-column-tab">
+                                <div class="small-tab-author">
+                                    <div class="small-tab-author-icon">
+                                        <img src="authorIcon3.png" width="100%" height="100%" style="object-fit: cover;">
+                                    </div>
+                                    Envols
+                                </div>
+                                <div class="small-tab-title">
+                                    Inside the largest home in the United States, an...
+                                </div>
+                                <div class="small-tab-rating">
+                                    <svg width="16" height="16" fill="white" style="margin-right: 3px">
+                                        <path d="M8.03 1.92c.21-.52.8-1.08 1.55-.87.6.17.97.52 1.2 1 .2.44.25.96.26 1.46a7.5 7.5 0 01-.24 1.74c-.06.26-.12.51-.19.74h1.38a2 2 0 011.92 2.56l-1.36 4.65a2.5 2.5 0 01-3.15 1.68L4.05 13.2A2 2 0 012.77 12l-.52-1.4a2 2 0 01.86-2.42l1.87-1.1.02-.01.1-.09c.1-.07.23-.2.4-.4.35-.39.82-1.03 1.3-2.04.2-.44.37-.78.53-1.1.25-.5.46-.92.7-1.52zm-2.51 6l-.02.01-1.88 1.11a1 1 0 00-.43 1.22l.52 1.38a1 1 0 00.64.6l5.35 1.68c.8.26 1.65-.2 1.89-1l1.36-4.65A1 1 0 0012 6.99H9.93a.5.5 0 01-.48-.67c.1-.28.26-.77.38-1.3.13-.54.22-1.08.2-1.5 0-.46-.05-.8-.16-1.05a.78.78 0 00-.56-.45c-.04-.02-.1-.01-.16.03a.54.54 0 00-.19.25c-.25.63-.5 1.11-.76 1.65-.16.3-.32.63-.5 1.01a9.52 9.52 0 01-1.45 2.28 5.06 5.06 0 01-.7.66l-.02.01-.01.01zm-.54-.84z"></path>
+                                    </svg>
+                                    101
+                                    <svg width="16" height="16" fill="white" style="margin-left: 15px">
+                                        <path d="M10.58 10l.05.45a11 11 0 01-.02 2.68c-.07.44-.2.88-.44 1.23-.25.38-.64.64-1.17.64-.52 0-.83-.37-1.02-.7-.2-.31-.36-.75-.54-1.2l-.01-.03c-.55-1.4-1.3-3.31-3.3-4.65-.31-.2-.6-.36-.86-.46-.7-.3-1.32-1.06-1.16-1.94l.23-1.2a2 2 0 011.43-1.55l4.95-1.38a3.5 3.5 0 014.37 2.73l.46 2.42A2.5 2.5 0 0111.09 10h-.51zm1.53-5.2a2.5 2.5 0 00-3.13-1.94L4.03 4.23a1 1 0 00-.71.78l-.22 1.2c-.06.28.16.66.55.82.31.13.66.31 1.03.55 2.28 1.53 3.13 3.7 3.67 5.11l.01.02c.2.5.33.85.47 1.08A.73.73 0 009 14c.14 0 .25-.05.35-.2.12-.18.22-.46.28-.83a10.06 10.06 0 00-.08-3.12l-.03-.2-.01-.05V9.6A.5.5 0 0110 9h1.09a1.5 1.5 0 001.47-1.78l-.45-2.42z"></path>                                    </svg>
+                                </div>
+                            </div>
+                            <div class="right-column-tab">
+                                <div class="small-tab-image">
+                                    <img src="smallTab1.jpg" width="100%" height="100%" style="object-fit: cover;">
+                                </div>
+                            </div>
                         </div>
                         <div class="small-news-tab">
-                            
+                            <div class="left-column-tab">
+                                <div class="small-tab-author">
+                                    <div class="small-tab-author-icon">
+                                        <img src="authorIcon2.png" width="100%" height="100%" style="object-fit: cover;">
+                                    </div>
+                                    AutoNews
+                                </div>
+                                <div class="small-tab-title">
+                                    The longest streets in the world
+                                </div>
+                                <div class="small-tab-rating">
+                                    <svg width="16" height="16" fill="white" style="margin-right: 3px">
+                                        <path d="M8.03 1.92c.21-.52.8-1.08 1.55-.87.6.17.97.52 1.2 1 .2.44.25.96.26 1.46a7.5 7.5 0 01-.24 1.74c-.06.26-.12.51-.19.74h1.38a2 2 0 011.92 2.56l-1.36 4.65a2.5 2.5 0 01-3.15 1.68L4.05 13.2A2 2 0 012.77 12l-.52-1.4a2 2 0 01.86-2.42l1.87-1.1.02-.01.1-.09c.1-.07.23-.2.4-.4.35-.39.82-1.03 1.3-2.04.2-.44.37-.78.53-1.1.25-.5.46-.92.7-1.52zm-2.51 6l-.02.01-1.88 1.11a1 1 0 00-.43 1.22l.52 1.38a1 1 0 00.64.6l5.35 1.68c.8.26 1.65-.2 1.89-1l1.36-4.65A1 1 0 0012 6.99H9.93a.5.5 0 01-.48-.67c.1-.28.26-.77.38-1.3.13-.54.22-1.08.2-1.5 0-.46-.05-.8-.16-1.05a.78.78 0 00-.56-.45c-.04-.02-.1-.01-.16.03a.54.54 0 00-.19.25c-.25.63-.5 1.11-.76 1.65-.16.3-.32.63-.5 1.01a9.52 9.52 0 01-1.45 2.28 5.06 5.06 0 01-.7.66l-.02.01-.01.01zm-.54-.84z"></path>
+                                    </svg>
+                                    176
+                                    <svg width="16" height="16" fill="white" style="margin-left: 15px">
+                                        <path d="M10.58 10l.05.45a11 11 0 01-.02 2.68c-.07.44-.2.88-.44 1.23-.25.38-.64.64-1.17.64-.52 0-.83-.37-1.02-.7-.2-.31-.36-.75-.54-1.2l-.01-.03c-.55-1.4-1.3-3.31-3.3-4.65-.31-.2-.6-.36-.86-.46-.7-.3-1.32-1.06-1.16-1.94l.23-1.2a2 2 0 011.43-1.55l4.95-1.38a3.5 3.5 0 014.37 2.73l.46 2.42A2.5 2.5 0 0111.09 10h-.51zm1.53-5.2a2.5 2.5 0 00-3.13-1.94L4.03 4.23a1 1 0 00-.71.78l-.22 1.2c-.06.28.16.66.55.82.31.13.66.31 1.03.55 2.28 1.53 3.13 3.7 3.67 5.11l.01.02c.2.5.33.85.47 1.08A.73.73 0 009 14c.14 0 .25-.05.35-.2.12-.18.22-.46.28-.83a10.06 10.06 0 00-.08-3.12l-.03-.2-.01-.05V9.6A.5.5 0 0110 9h1.09a1.5 1.5 0 001.47-1.78l-.45-2.42z"></path>                                    </svg>
+                                </div>
+                            </div>
+                            <div class="right-column-tab">
+                                <div class="small-tab-image">
+                                    <img src="smallTab2.jpg" width="100%" height="100%" style="object-fit: cover;">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="right-column">
                 <div class="medium-news-tab">
-
+                    <div class="medium-tab-author">
+                        <div class="small-tab-author-icon">
+                            <img src="authorIcon6.jpg" width="100%" height="100%" style="object-fit: cover;">
+                        </div>
+                        loveMONEY
+                    </div>
+                    <div class="medium-tab-title">
+                        9 Super-Luxury Homes In The World's Priciest Places
+                    </div>
+                    <div class="medium-tab-rating">
+                        <svg width="16" height="16" fill="white" style="margin-right: 3px">
+                            <path d="M8.03 1.92c.21-.52.8-1.08 1.55-.87.6.17.97.52 1.2 1 .2.44.25.96.26 1.46a7.5 7.5 0 01-.24 1.74c-.06.26-.12.51-.19.74h1.38a2 2 0 011.92 2.56l-1.36 4.65a2.5 2.5 0 01-3.15 1.68L4.05 13.2A2 2 0 012.77 12l-.52-1.4a2 2 0 01.86-2.42l1.87-1.1.02-.01.1-.09c.1-.07.23-.2.4-.4.35-.39.82-1.03 1.3-2.04.2-.44.37-.78.53-1.1.25-.5.46-.92.7-1.52zm-2.51 6l-.02.01-1.88 1.11a1 1 0 00-.43 1.22l.52 1.38a1 1 0 00.64.6l5.35 1.68c.8.26 1.65-.2 1.89-1l1.36-4.65A1 1 0 0012 6.99H9.93a.5.5 0 01-.48-.67c.1-.28.26-.77.38-1.3.13-.54.22-1.08.2-1.5 0-.46-.05-.8-.16-1.05a.78.78 0 00-.56-.45c-.04-.02-.1-.01-.16.03a.54.54 0 00-.19.25c-.25.63-.5 1.11-.76 1.65-.16.3-.32.63-.5 1.01a9.52 9.52 0 01-1.45 2.28 5.06 5.06 0 01-.7.66l-.02.01-.01.01zm-.54-.84z"></path>
+                        </svg>
+                        330
+                        <svg width="16" height="16" fill="white" style="margin-left: 15px">
+                            <path d="M10.58 10l.05.45a11 11 0 01-.02 2.68c-.07.44-.2.88-.44 1.23-.25.38-.64.64-1.17.64-.52 0-.83-.37-1.02-.7-.2-.31-.36-.75-.54-1.2l-.01-.03c-.55-1.4-1.3-3.31-3.3-4.65-.31-.2-.6-.36-.86-.46-.7-.3-1.32-1.06-1.16-1.94l.23-1.2a2 2 0 011.43-1.55l4.95-1.38a3.5 3.5 0 014.37 2.73l.46 2.42A2.5 2.5 0 0111.09 10h-.51zm1.53-5.2a2.5 2.5 0 00-3.13-1.94L4.03 4.23a1 1 0 00-.71.78l-.22 1.2c-.06.28.16.66.55.82.31.13.66.31 1.03.55 2.28 1.53 3.13 3.7 3.67 5.11l.01.02c.2.5.33.85.47 1.08A.73.73 0 009 14c.14 0 .25-.05.35-.2.12-.18.22-.46.28-.83a10.06 10.06 0 00-.08-3.12l-.03-.2-.01-.05V9.6A.5.5 0 0110 9h1.09a1.5 1.5 0 001.47-1.78l-.45-2.42z"></path>                                    </svg>
+                    </div>
                 </div>
                 <div class="smaller-news-tabs">
                     <div class="small-news-row">
                         <div class="small-news-tab">
-
+                            <div class="left-column-tab">
+                                <div class="small-tab-author">
+                                    <div class="small-tab-author-icon">
+                                        <img src="authorIcon3.png" width="100%" height="100%" style="object-fit: cover;">
+                                    </div>
+                                    Envols
+                                </div>
+                                <div class="small-tab-title">
+                                    Dive Into The World's 9 Most Amazing Underwate...
+                                </div>
+                                <div class="small-tab-rating">
+                                    <svg width="16" height="16" fill="white" style="margin-right: 3px">
+                                        <path d="M8.03 1.92c.21-.52.8-1.08 1.55-.87.6.17.97.52 1.2 1 .2.44.25.96.26 1.46a7.5 7.5 0 01-.24 1.74c-.06.26-.12.51-.19.74h1.38a2 2 0 011.92 2.56l-1.36 4.65a2.5 2.5 0 01-3.15 1.68L4.05 13.2A2 2 0 012.77 12l-.52-1.4a2 2 0 01.86-2.42l1.87-1.1.02-.01.1-.09c.1-.07.23-.2.4-.4.35-.39.82-1.03 1.3-2.04.2-.44.37-.78.53-1.1.25-.5.46-.92.7-1.52zm-2.51 6l-.02.01-1.88 1.11a1 1 0 00-.43 1.22l.52 1.38a1 1 0 00.64.6l5.35 1.68c.8.26 1.65-.2 1.89-1l1.36-4.65A1 1 0 0012 6.99H9.93a.5.5 0 01-.48-.67c.1-.28.26-.77.38-1.3.13-.54.22-1.08.2-1.5 0-.46-.05-.8-.16-1.05a.78.78 0 00-.56-.45c-.04-.02-.1-.01-.16.03a.54.54 0 00-.19.25c-.25.63-.5 1.11-.76 1.65-.16.3-.32.63-.5 1.01a9.52 9.52 0 01-1.45 2.28 5.06 5.06 0 01-.7.66l-.02.01-.01.01zm-.54-.84z"></path>
+                                    </svg>
+                                    98
+                                    <svg width="16" height="16" fill="white" style="margin-left: 15px">
+                                        <path d="M10.58 10l.05.45a11 11 0 01-.02 2.68c-.07.44-.2.88-.44 1.23-.25.38-.64.64-1.17.64-.52 0-.83-.37-1.02-.7-.2-.31-.36-.75-.54-1.2l-.01-.03c-.55-1.4-1.3-3.31-3.3-4.65-.31-.2-.6-.36-.86-.46-.7-.3-1.32-1.06-1.16-1.94l.23-1.2a2 2 0 011.43-1.55l4.95-1.38a3.5 3.5 0 014.37 2.73l.46 2.42A2.5 2.5 0 0111.09 10h-.51zm1.53-5.2a2.5 2.5 0 00-3.13-1.94L4.03 4.23a1 1 0 00-.71.78l-.22 1.2c-.06.28.16.66.55.82.31.13.66.31 1.03.55 2.28 1.53 3.13 3.7 3.67 5.11l.01.02c.2.5.33.85.47 1.08A.73.73 0 009 14c.14 0 .25-.05.35-.2.12-.18.22-.46.28-.83a10.06 10.06 0 00-.08-3.12l-.03-.2-.01-.05V9.6A.5.5 0 0110 9h1.09a1.5 1.5 0 001.47-1.78l-.45-2.42z"></path>                                    </svg>
+                                </div>
+                            </div>
+                            <div class="right-column-tab">
+                                <div class="small-tab-image">
+                                    <img src="smallTab3.jpg" width="100%" height="100%" style="object-fit: cover;">
+                                </div>
+                            </div>
                         </div>
                         <div class="small-news-tab">
-                            
+                            <div class="left-column-tab">
+                                <div class="small-tab-author">
+                                    <div class="small-tab-author-icon">
+                                        <img src="authorIcon1.png" width="100%" height="100%" style="object-fit: cover;">
+                                    </div>
+                                    DW
+                                </div>
+                                <div class="small-tab-title">
+                                    10 Coolest Airliners From The Swinging Sixties
+                                </div>
+                                <div class="small-tab-rating">
+                                    <svg width="16" height="16" fill="white" style="margin-right: 3px">
+                                        <path d="M8.03 1.92c.21-.52.8-1.08 1.55-.87.6.17.97.52 1.2 1 .2.44.25.96.26 1.46a7.5 7.5 0 01-.24 1.74c-.06.26-.12.51-.19.74h1.38a2 2 0 011.92 2.56l-1.36 4.65a2.5 2.5 0 01-3.15 1.68L4.05 13.2A2 2 0 012.77 12l-.52-1.4a2 2 0 01.86-2.42l1.87-1.1.02-.01.1-.09c.1-.07.23-.2.4-.4.35-.39.82-1.03 1.3-2.04.2-.44.37-.78.53-1.1.25-.5.46-.92.7-1.52zm-2.51 6l-.02.01-1.88 1.11a1 1 0 00-.43 1.22l.52 1.38a1 1 0 00.64.6l5.35 1.68c.8.26 1.65-.2 1.89-1l1.36-4.65A1 1 0 0012 6.99H9.93a.5.5 0 01-.48-.67c.1-.28.26-.77.38-1.3.13-.54.22-1.08.2-1.5 0-.46-.05-.8-.16-1.05a.78.78 0 00-.56-.45c-.04-.02-.1-.01-.16.03a.54.54 0 00-.19.25c-.25.63-.5 1.11-.76 1.65-.16.3-.32.63-.5 1.01a9.52 9.52 0 01-1.45 2.28 5.06 5.06 0 01-.7.66l-.02.01-.01.01zm-.54-.84z"></path>
+                                    </svg>
+                                    233
+                                    <svg width="16" height="16" fill="white" style="margin-left: 15px">
+                                        <path d="M10.58 10l.05.45a11 11 0 01-.02 2.68c-.07.44-.2.88-.44 1.23-.25.38-.64.64-1.17.64-.52 0-.83-.37-1.02-.7-.2-.31-.36-.75-.54-1.2l-.01-.03c-.55-1.4-1.3-3.31-3.3-4.65-.31-.2-.6-.36-.86-.46-.7-.3-1.32-1.06-1.16-1.94l.23-1.2a2 2 0 011.43-1.55l4.95-1.38a3.5 3.5 0 014.37 2.73l.46 2.42A2.5 2.5 0 0111.09 10h-.51zm1.53-5.2a2.5 2.5 0 00-3.13-1.94L4.03 4.23a1 1 0 00-.71.78l-.22 1.2c-.06.28.16.66.55.82.31.13.66.31 1.03.55 2.28 1.53 3.13 3.7 3.67 5.11l.01.02c.2.5.33.85.47 1.08A.73.73 0 009 14c.14 0 .25-.05.35-.2.12-.18.22-.46.28-.83a10.06 10.06 0 00-.08-3.12l-.03-.2-.01-.05V9.6A.5.5 0 0110 9h1.09a1.5 1.5 0 001.47-1.78l-.45-2.42z"></path>                                    </svg>
+                                </div>
+                            </div>
+                            <div class="right-column-tab">
+                                <div class="small-tab-image">
+                                    <img src="smallTab4.jpg" width="100%" height="100%" style="object-fit: cover;">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="small-news-row">
                         <div class="small-news-tab">
-
+                            <div class="left-column-tab">
+                                <div class="small-tab-author">
+                                    <div class="small-tab-author-icon">
+                                        <img src="authorIcon4.png" width="100%" height="100%" style="object-fit: cover;">
+                                    </div>
+                                    LoveFood
+                                </div>
+                                <div class="small-tab-title">
+                                    14 Brands That Killed Their Famous Catchphrases
+                                </div>
+                                <div class="small-tab-rating">
+                                    <svg width="16" height="16" fill="white" style="margin-right: 3px">
+                                        <path d="M8.03 1.92c.21-.52.8-1.08 1.55-.87.6.17.97.52 1.2 1 .2.44.25.96.26 1.46a7.5 7.5 0 01-.24 1.74c-.06.26-.12.51-.19.74h1.38a2 2 0 011.92 2.56l-1.36 4.65a2.5 2.5 0 01-3.15 1.68L4.05 13.2A2 2 0 012.77 12l-.52-1.4a2 2 0 01.86-2.42l1.87-1.1.02-.01.1-.09c.1-.07.23-.2.4-.4.35-.39.82-1.03 1.3-2.04.2-.44.37-.78.53-1.1.25-.5.46-.92.7-1.52zm-2.51 6l-.02.01-1.88 1.11a1 1 0 00-.43 1.22l.52 1.38a1 1 0 00.64.6l5.35 1.68c.8.26 1.65-.2 1.89-1l1.36-4.65A1 1 0 0012 6.99H9.93a.5.5 0 01-.48-.67c.1-.28.26-.77.38-1.3.13-.54.22-1.08.2-1.5 0-.46-.05-.8-.16-1.05a.78.78 0 00-.56-.45c-.04-.02-.1-.01-.16.03a.54.54 0 00-.19.25c-.25.63-.5 1.11-.76 1.65-.16.3-.32.63-.5 1.01a9.52 9.52 0 01-1.45 2.28 5.06 5.06 0 01-.7.66l-.02.01-.01.01zm-.54-.84z"></path>
+                                    </svg>
+                                    7
+                                    <svg width="16" height="16" fill="white" style="margin-left: 15px">
+                                        <path d="M10.58 10l.05.45a11 11 0 01-.02 2.68c-.07.44-.2.88-.44 1.23-.25.38-.64.64-1.17.64-.52 0-.83-.37-1.02-.7-.2-.31-.36-.75-.54-1.2l-.01-.03c-.55-1.4-1.3-3.31-3.3-4.65-.31-.2-.6-.36-.86-.46-.7-.3-1.32-1.06-1.16-1.94l.23-1.2a2 2 0 011.43-1.55l4.95-1.38a3.5 3.5 0 014.37 2.73l.46 2.42A2.5 2.5 0 0111.09 10h-.51zm1.53-5.2a2.5 2.5 0 00-3.13-1.94L4.03 4.23a1 1 0 00-.71.78l-.22 1.2c-.06.28.16.66.55.82.31.13.66.31 1.03.55 2.28 1.53 3.13 3.7 3.67 5.11l.01.02c.2.5.33.85.47 1.08A.73.73 0 009 14c.14 0 .25-.05.35-.2.12-.18.22-.46.28-.83a10.06 10.06 0 00-.08-3.12l-.03-.2-.01-.05V9.6A.5.5 0 0110 9h1.09a1.5 1.5 0 001.47-1.78l-.45-2.42z"></path>                                    </svg>
+                                </div>
+                            </div>
+                            <div class="right-column-tab">
+                                <div class="small-tab-image">
+                                    <img src="smallTab5.jpg" width="100%" height="100%" style="object-fit: cover;">
+                                </div>
+                            </div>
                         </div>
                         <div class="small-news-tab">
-                            
+                            <div class="left-column-tab">
+                                <div class="small-tab-author">
+                                    <div class="small-tab-author-icon">
+                                        <img src="authorIcon5.png" width="100%" height="100%" style="object-fit: cover;">
+                                    </div>
+                                    ArtaSoft
+                                </div>
+                                <div class="small-tab-title">
+                                    The face of unemployment: 0 jobs in 8 months!
+                                </div>
+                                <div class="small-tab-rating">
+                                    <svg width="16" height="16" fill="white" style="margin-right: 3px">
+                                        <path d="M8.03 1.92c.21-.52.8-1.08 1.55-.87.6.17.97.52 1.2 1 .2.44.25.96.26 1.46a7.5 7.5 0 01-.24 1.74c-.06.26-.12.51-.19.74h1.38a2 2 0 011.92 2.56l-1.36 4.65a2.5 2.5 0 01-3.15 1.68L4.05 13.2A2 2 0 012.77 12l-.52-1.4a2 2 0 01.86-2.42l1.87-1.1.02-.01.1-.09c.1-.07.23-.2.4-.4.35-.39.82-1.03 1.3-2.04.2-.44.37-.78.53-1.1.25-.5.46-.92.7-1.52zm-2.51 6l-.02.01-1.88 1.11a1 1 0 00-.43 1.22l.52 1.38a1 1 0 00.64.6l5.35 1.68c.8.26 1.65-.2 1.89-1l1.36-4.65A1 1 0 0012 6.99H9.93a.5.5 0 01-.48-.67c.1-.28.26-.77.38-1.3.13-.54.22-1.08.2-1.5 0-.46-.05-.8-.16-1.05a.78.78 0 00-.56-.45c-.04-.02-.1-.01-.16.03a.54.54 0 00-.19.25c-.25.63-.5 1.11-.76 1.65-.16.3-.32.63-.5 1.01a9.52 9.52 0 01-1.45 2.28 5.06 5.06 0 01-.7.66l-.02.01-.01.01zm-.54-.84z"></path>
+                                    </svg>
+                                    869
+                                    <svg width="16" height="16" fill="white" style="margin-left: 15px">
+                                        <path d="M10.58 10l.05.45a11 11 0 01-.02 2.68c-.07.44-.2.88-.44 1.23-.25.38-.64.64-1.17.64-.52 0-.83-.37-1.02-.7-.2-.31-.36-.75-.54-1.2l-.01-.03c-.55-1.4-1.3-3.31-3.3-4.65-.31-.2-.6-.36-.86-.46-.7-.3-1.32-1.06-1.16-1.94l.23-1.2a2 2 0 011.43-1.55l4.95-1.38a3.5 3.5 0 014.37 2.73l.46 2.42A2.5 2.5 0 0111.09 10h-.51zm1.53-5.2a2.5 2.5 0 00-3.13-1.94L4.03 4.23a1 1 0 00-.71.78l-.22 1.2c-.06.28.16.66.55.82.31.13.66.31 1.03.55 2.28 1.53 3.13 3.7 3.67 5.11l.01.02c.2.5.33.85.47 1.08A.73.73 0 009 14c.14 0 .25-.05.35-.2.12-.18.22-.46.28-.83a10.06 10.06 0 00-.08-3.12l-.03-.2-.01-.05V9.6A.5.5 0 0110 9h1.09a1.5 1.5 0 001.47-1.78l-.45-2.42z"></path>                                    </svg>
+                                </div>
+                            </div>
+                            <div class="right-column-tab">
+                                <div class="small-tab-image">
+                                    <img src="smallTab6.jpg" width="100%" height="100%" style="object-fit: cover;">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
