@@ -1,2 +1,7 @@
-Here you will find all of the work I have done over the years at university. Hope it helps!
-Contact me anytime if you wish for help or have any questions on LinkedIn at https://www.linkedin.com/in/sebastian-soptelea/ or at sebastian.soptelea@proton.me and I will gladly reply :)
+Welcome! Here, you'll find all the work I've completed during my university years. I hope it’s helpful!
+
+💡 Need help or have questions? Feel free to reach out:
+📩 Email: sebastian.soptelea@proton.me
+🔗 LinkedIn: Sebastian Soptelea
+
+I’ll be happy to assist! 😊
