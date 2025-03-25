@@ -1,95 +1,128 @@
 using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
 using System.Data;
+using System.Configuration;
 
-namespace dbmsWF1
+namespace LAB2
 {
     public partial class Form1 : Form
     {
-        SqlConnection conn;
-        SqlDataAdapter daProgram;
-        SqlDataAdapter daFilm;
-        DataSet dSet;
-        BindingSource bsProgram;
-        BindingSource bsFilm;
+        SqlConnection? _conn;
+        SqlDataAdapter? _daMaster;
+        SqlDataAdapter? _daDetail;
+        DataSet? _dSet;
+        BindingSource? _bsMaster;
+        BindingSource? _bsDetail;
 
-        SqlCommandBuilder cmdBuilder;
+        SqlCommandBuilder? _cmdBuilder;
 
-        string queryProgram;
-        string queryFilm;
+        Config? _config;
 
         public Form1()
         {
             InitializeComponent();
-            FillData();
+            string configName = ConfigurationManager.AppSettings["CurrentConfigName"]!;
+            FillData(configName!);
         }
 
-        private void FillData()
+        private Config? LoadConfig(string configName)
         {
+            string configContent;
             try
             {
-                conn = new SqlConnection(getConnectionString());
+                configContent = File.ReadAllText("config.json");
+                var configs = JsonConvert.DeserializeObject<List<Config>>(configContent);
+                return configs!.FirstOrDefault(c => c.ConfigName == configName);
             }
-            catch (SystemException)
+            catch (Exception ex)
             {
-                Console.WriteLine("Error on initiating database connection");
+                Console.WriteLine($"Failure reading the config file: {ex.Message}");
+                Environment.Exit(-1);
             }
 
-            queryProgram = "SELECT * FROM Program";
-            queryFilm = "SELECT * FROM Film";
-
-            daProgram = new SqlDataAdapter(queryProgram, conn);
-            daFilm = new SqlDataAdapter(queryFilm, conn);
-
-            dSet = new DataSet();
-
-            try
-            {
-                daProgram.Fill(dSet, "Program");
-                daFilm.Fill(dSet, "Film");
-            }
-            catch (SystemException)
-            {
-                Console.WriteLine("Error filling the DataSets.");
-            }
-
-            cmdBuilder = new SqlCommandBuilder(daProgram);
-
-            dSet.Relations.Add("FilmProgram",
-                dSet.Tables["Film"]!.Columns["IDFilm"]!,
-                dSet.Tables["Program"]!.Columns["IDFilm"]!);
-
-            bsFilm = new BindingSource();
-            bsFilm.DataSource = dSet.Tables["Film"];
-            bsProgram = new BindingSource(bsFilm, "FilmProgram");
-
-            this.dataGridView1.DataSource = bsFilm;
-            this.dataGridView2.DataSource = bsProgram;
-
-            cmdBuilder.GetUpdateCommand();
+            return null;
         }
 
-        private string getConnectionString()
+        private void FillData(string configName)
         {
-            return "Server=localhost\\SQLEXPRESS;Database=CinemaDB;Trusted_Connection=True;TrustServerCertificate=True;";
+            _config = LoadConfig(configName);
+            if (_config == null)
+            {
+                Console.WriteLine("Configuration not found or failed to load.");
+                Environment.Exit(-1);
+            }
+
+            try
+            {
+                _conn = new SqlConnection(ConfigurationManager.ConnectionStrings["CinemaDB"].ConnectionString);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error on initiating database connection: {ex.Message}");
+                Environment.Exit(-1);
+            }
+
+            _daMaster = new SqlDataAdapter(_config.MasterQuery, _conn);
+            _daDetail = new SqlDataAdapter(_config.DetailQuery, _conn);
+
+            _dSet = new DataSet();
+
+            try
+            {
+                _daMaster.Fill(_dSet, _config.MasterTableName!);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error filling the Master DataSet: {ex.Message}");
+                Environment.Exit(-1);
+            }
+
+            try
+            {
+                _daDetail.Fill(_dSet, _config.DetailTableName!);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error filling the Detail DataSet: {ex.Message}");
+                Environment.Exit(-1);
+            }
+
+            _cmdBuilder = new SqlCommandBuilder(_daDetail);
+
+            try
+            {
+                _dSet.Relations.Add(_config.ConfigName,
+                    _dSet.Tables[_config.MasterTableName]!.Columns[_config.Relation!.MasterColumnName!]!,
+                    _dSet.Tables[_config.DetailTableName]!.Columns[_config.Relation.DetailColumnName!]!);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding the master-detail relation to the DataSet: {ex.Message}");
+                Environment.Exit(-1);
+            }
+
+            _bsMaster = new BindingSource();
+            _bsMaster.DataSource = _dSet.Tables[_config.MasterTableName];
+            _bsDetail = new BindingSource(_bsMaster, _config.ConfigName);
+
+            this.MasterDataGridView.DataSource = _bsMaster;
+            this.MasterTableNameLabel.Text = _config.MasterTableName;
+
+            this.DetailDataGridView.DataSource = _bsDetail;
+            this.DetailTableNameLabel.Text = _config.DetailTableName;
+
+            _cmdBuilder.GetUpdateCommand();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             try
             {
-                daProgram.Update(dSet, "Program");
+                _daDetail!.Update(_dSet!, _config!.DetailTableName!);
             }
-            catch (ArgumentNullException)
+            catch (Exception ex)
             {
-                Console.WriteLine("Error on updating the database: DataSet is null");
-            }
-            catch (InvalidOperationException)
-            {
-                Console.WriteLine("Error on updating the database: Update operation is invalid");
-            }
-            catch (DBConcurrencyException)
-            {
-                Console.WriteLine("Error on updating the database: Concurrency exception occured");
+                Console.WriteLine($"Error on updating the Detail database: {ex.Message}");
             }
         }
     }

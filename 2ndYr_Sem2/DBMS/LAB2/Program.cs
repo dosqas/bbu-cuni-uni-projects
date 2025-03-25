@@ -1,4 +1,4 @@
-namespace dbmsWF1
+namespace LAB2
 {
     internal static class Program
     {
