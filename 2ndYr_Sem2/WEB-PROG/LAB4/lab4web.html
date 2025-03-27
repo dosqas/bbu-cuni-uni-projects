@@ -3,12 +3,12 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>X-0 Game</title>
+        <title>Tic-Tac-Toe</title>
         <style>
             html {
                 background-color: #666;
             }
-            .main-label {
+            .label {
                 text-align: center;
                 color: #ccc;
             }
@@ -31,7 +31,10 @@
         </style>
     </head>
     <body>
-        <h1 class="main-label">X-0 Game</h1>
+        <h1 class="label">Tic-Tac-Toe</h1>
+        <h2 class="label">Player: X</h2>
+        <h2 class="label">Computer: O</h2>
+        <h3 class="label">Press a cell and the computer will respond!</h3>
         <table class="gameBoard">
             <tr>
                 <td class="boardCell"></td>
@@ -50,7 +53,102 @@
             </tr>
         </table>
         <script>
+            const board = [
+                ['', '', ''],
+                ['', '', ''],
+                ['', '', ''],
+            ];
 
+            const player = 'X';
+            const computer = 'O';
+
+            const table = document.getElementsByClassName('gameBoard')[0];
+
+            table.addEventListener('click', (event) => {
+                const cell = event.target;
+                const row = cell.parentElement.rowIndex;
+                const col = cell.cellIndex;
+
+                if (cell.tagName === 'TD' && board[row][col] === '') {
+                    makeMove(row, col, player);
+                    if (!checkWinner(player)) {
+                        computerMove();
+                        checkWinner(computer);
+                    }
+                }
+            });
+
+            function makeMove(row, col, currentPlayer) {
+                board[row][col] = currentPlayer;
+                const cell = table.rows[row].cells[col];
+                cell.textContent = currentPlayer;
+                cell.classList.add('taken');
+            }
+
+            function computerMove() {
+                const emptyCells = [];
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        if (board[i][j] === '') {
+                            emptyCells.push({ row: i, col: j});
+                        }
+                    }
+                }
+
+                if (emptyCells.length > 0) {
+                    const move = emptyCells[Math.floor(emptyCells.length * Math.random())];
+                    makeMove(move.row, move.col, computer);
+                }
+            }
+
+            function checkWinner(currentPlayer) {
+                for (let i = 0; i < 3 ; i++) {
+                    if (board[i][0] === currentPlayer && board[i][1] === currentPlayer && board[i][2] == currentPlayer) {
+                        endGame(`${currentPlayer} wins!`);
+                        return true;
+                    }
+
+                    if (board[0][i] === currentPlayer && board[1][i] === currentPlayer && board[2][i] == currentPlayer) {
+                        endGame(`${currentPlayer} wins!`);
+                        return true;
+                    }
+                }
+
+                if (board[0][0] === currentPlayer && board[1][1] === currentPlayer && board[2][2] == currentPlayer) {
+                    endGame(`${currentPlayer} wins!`);
+                    return true;
+                }
+
+                if (board[0][2] === currentPlayer && board[1][1] === currentPlayer && board[2][0] == currentPlayer) {
+                    endGame(`${currentPlayer} wins!`);
+                    return true;
+                }
+
+                if (board.flat().every(cell => cell !== '')) {
+                    endGame('It\'s a draw!');
+                    return true;
+                }
+
+                return false;
+            }
+
+            function endGame(message) {
+                setTimeout(() => {
+                    alert(message);
+                    resetGame();
+                }, 100);
+            }
+
+            function resetGame() {
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        board[i][j] = '';
+                        const cell = table.rows[i].cells[j];
+                        cell.textContent = '';
+                        cell.classList.remove('taken');
+                    }
+                }
+            }
         </script>
     </body>
 </html>
