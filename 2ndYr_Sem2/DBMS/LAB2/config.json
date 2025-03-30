@@ -1,0 +1,26 @@
+﻿[
+  {
+    "ConfigName": "FilmPrograms",
+    "FormCaption": "Master-Detail Form - Film:Programs",
+    "MasterQuery": "SELECT * FROM Film",
+    "DetailQuery": "SELECT * FROM Program",
+    "MasterTableName": "Film",
+    "DetailTableName": "Program",
+    "Relation": {
+      "MasterColumnName": "IDFilm",
+      "DetailColumnName": "IDFilm"
+    }
+  },
+  {
+    "ConfigName": "CinemaHalls",
+    "FormCaption": "Master-Detail Form - Cinema:Halls",
+    "MasterQuery": "SELECT * FROM Cinema",
+    "DetailQuery": "SELECT * FROM Hall",
+    "MasterTableName": "Cinema",
+    "DetailTableName": "Halls",
+    "Relation": {
+      "MasterColumnName": "IDCinema",
+      "DetailColumnName": "IDCinema"
+    }
+  }
+]
