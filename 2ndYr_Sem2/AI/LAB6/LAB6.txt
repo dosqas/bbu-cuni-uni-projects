@@ -1,0 +1,1129 @@
+
+
+A.I. Assignment 6 Building Classification Models With Pytorch
+
+Learning Goals
+
+First we assume a basic understanding of and suggest recommendations
+for: * Python * Numpy
+(https://github.com/keineahnung2345/Deep-Learning-Andrew-Ng/blob/master/Course1-Neural%20Networks%20and%20Deep%20Learning/Week2%20-%20Neural%20Networks%20Basics/Python+Basics+With+Numpy+v3.ipynb) *
+Torch (https://www.learnpytorch.io/00_pytorch_fundamentals/) * Neural
+Networks Fundamentals (https://cs231n.github.io/neural-networks-1/) *
+Linear Algebra and Gradients Intuitions
+(https://www.youtube.com/watch?v=IHZwWFHWa-w&t=8s)
+
+We will use this concepts for everything we do from now on.
+
+By the end of this lab, you should be able to:
+
+Task
+
+-   Standard Pytorch Worflow
+-   Deep Dive in Linear Classification
+-   Go through the recap of a linear model/simple models
+-   Build a simple classsifier on non liniar data with a liniar model
+    (first attempt)
+-   Build a simple classsifier using non liniar activation function
+-   Build a multiclass classifier
+
+This one will be more intense and all 9 exercises are 1 point each.
+
+Standard Pytorch Workflow When Takling a task
+
+[image.png] Source : https://www.learnpytorch.io/01_pytorch_workflow/
+
+1 Prepare your data by loading the dataset and transforming it into a
+format that can be used for training and testing your model. This may
+include data cleaning, splitting the data into training and validation
+sets, and applying any necessary data augmentation techniques.
+
+2 Define your model architecture using PyTorch's neural network modules.
+This involves creating the layers of your model, specifying their sizes
+and activation functions, and connecting them together.
+
+-   2.1 Choose an optimizer and a loss function for your model. The
+    optimizer determines how the model's weights are updated during
+    training, while the loss function measures how well the model is
+    performing on the training data.
+
+-   2.2 Develop a training loop that iterates over your training data in
+    batches, applies the model to each batch, calculates the loss, and
+    updates the model's weights using the optimizer.
+
+3 Evaluate your model's performance on the validation set. This involves
+applying the model to the validation data, calculating the model's
+predictions, and comparing them to the actual labels.
+
+4 Make any necessary adjustments to your model, such as changing the
+optimizer, adding regularization, or adjusting the learning rate, and
+retrain the model if necessary.
+
+Once your model is trained and validated, use it to make predictions on
+new data.
+
+5 Finally, save your trained model for later use or deployment in a
+production environment.
+
+[image.png]!
+
+Understanding various ML Problems
+
+[image.png]!roblem type What is it? Example Binary classification Target
+can be one of two options, e.g. yes or no Predict whether or not someone
+has heart disease based on their health parameters. Multi-class
+classification Target can be one of more than two options Decide whether
+a photo of is of food, a person or a dog. Multi-label classification
+Target can be assigned more than one option Predict what categories
+should be assigned to a Wikipedia article (e.g. mathematics, science &
+philosohpy).
+
+Source : https://www.learnpytorch.io/01_pytorch_workflow/
+
+  ------------------------------------------------------------------------------
+  Problem type     What is it?                  Example
+  ---------------- ---------------------------- --------------------------------
+  Binary           Target can be one of two     Predict whether or not someone
+  classification   options, e.g. yes or no      has heart disease based on their
+                                                health parameters.
+
+  Multi-class      Target can be one of more    Decide whether a photo is of
+  classification   than two options             food, a person or a dog.
+
+  Multi-label      Target can be assigned more  Predict what categories should
+  classification   than one option              be assigned to a Wikipedia
+                                                article (e.g. mathematics,
+                                                science & philosohpy).
+  ------------------------------------------------------------------------------
+
+Today we will be looking into binary classification and touch upon
+multiclass classification
+
+To better understand simple neural netowrks check out:
+
+https://playground.tensorflow.org/
+
+It has the circle data we are going to use now
+
+Small Recap
+
+    # Import PyTorch and matplotlib
+    import torch
+    from torch import nn # nn contains all of PyTorch's building blocks for neural networks
+    import matplotlib.pyplot as plt
+
+    # Check PyTorch version
+    torch.__version__
+
+    '2.5.1'
+
+Are we using a GPU ?
+
+    # Setup device agnostic code
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"Using device: {device}")
+
+    Using device: cpu
+
+Let's look at the perceptron from lab 04 as an example for all the steps
+
+As a reminder here we are making a neural network that acts like an OR
+gate
+
+1 Prepare Data
+
+    x = torch.tensor([[0, 0], [0, 1], [1, 0], [1, 1]], dtype=torch.float32)
+    y = torch.tensor([[0], [0], [0], [1]], dtype=torch.float32)
+
+    if x.shape[0] == y.shape[0]:
+        print("The shapes of our data match !")
+
+    The shapes of our data match !
+
+2 Define Model
+
+Firstly, the code defines a subclass of nn.Module, which is a superclass
+that almost all PyTorch models inherit from.
+
+The class constructor creates two nn.Linear layers with the capacity to
+handle the input and output shapes of the input features X and target
+labels y.
+
+Next, the forward() method is defined, which contains the computations
+for the forward pass of the model.
+
+Finally, an instance of the model class is created and sent to the
+designated device for computation.
+
+    class Perceptron(torch.nn.Module):
+        def __init__(self, input_dim, output_dim):
+            super(Perceptron, self).__init__()
+            self.linear = torch.nn.Linear(input_dim, output_dim) # takes in {input_dim}  features (X), produces {output_dim} features
+            self.activation = torch.nn.Sigmoid()
+            
+        def forward(self, x):
+            # x = self.linear(x)
+            # x = self.activation(x)
+            ## The upper line and lower are equivalent
+            x =self.activation(self.linear(x)) #Takes in the computation through the linear layer and the resulting features of the linear layer through the activation
+            return x
+
+    # Example usage:
+    model = Perceptron(2, 1)
+
+2.1 Chose appropriate optimizer
+
+    criterion = torch.nn.BCELoss()
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.2)
+
+2.2 Create Training Loop
+
+    num_epochs = 4000
+    loss_values = []
+    for epoch in range(num_epochs):
+        optimizer.zero_grad()
+        y_pred = model(x)
+        loss = criterion(y_pred, y)
+        loss.backward()
+        optimizer.step()
+        # Print the loss every 100 epochs
+        loss_values.append(loss.item()) # This is so that we can look at an image of our loss
+        if (epoch + 1) % 100 == 0:
+            print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
+
+    Epoch [100/4000], Loss: 0.3505
+    Epoch [200/4000], Loss: 0.2526
+    Epoch [300/4000], Loss: 0.1996
+    Epoch [400/4000], Loss: 0.1654
+    Epoch [500/4000], Loss: 0.1412
+    Epoch [600/4000], Loss: 0.1231
+    Epoch [700/4000], Loss: 0.1090
+    Epoch [800/4000], Loss: 0.0977
+    Epoch [900/4000], Loss: 0.0885
+    Epoch [1000/4000], Loss: 0.0809
+    Epoch [1100/4000], Loss: 0.0744
+    Epoch [1200/4000], Loss: 0.0688
+    Epoch [1300/4000], Loss: 0.0640
+    Epoch [1400/4000], Loss: 0.0598
+    Epoch [1500/4000], Loss: 0.0562
+    Epoch [1600/4000], Loss: 0.0529
+    Epoch [1700/4000], Loss: 0.0500
+    Epoch [1800/4000], Loss: 0.0473
+    Epoch [1900/4000], Loss: 0.0450
+    Epoch [2000/4000], Loss: 0.0428
+    Epoch [2100/4000], Loss: 0.0409
+    Epoch [2200/4000], Loss: 0.0391
+    Epoch [2300/4000], Loss: 0.0374
+    Epoch [2400/4000], Loss: 0.0359
+    Epoch [2500/4000], Loss: 0.0345
+    Epoch [2600/4000], Loss: 0.0332
+    Epoch [2700/4000], Loss: 0.0320
+    Epoch [2800/4000], Loss: 0.0309
+    Epoch [2900/4000], Loss: 0.0299
+    Epoch [3000/4000], Loss: 0.0289
+    Epoch [3100/4000], Loss: 0.0280
+    Epoch [3200/4000], Loss: 0.0271
+    Epoch [3300/4000], Loss: 0.0263
+    Epoch [3400/4000], Loss: 0.0255
+    Epoch [3500/4000], Loss: 0.0248
+    Epoch [3600/4000], Loss: 0.0241
+    Epoch [3700/4000], Loss: 0.0235
+    Epoch [3800/4000], Loss: 0.0229
+    Epoch [3900/4000], Loss: 0.0223
+    Epoch [4000/4000], Loss: 0.0217
+
+Create a function to plot our loss curve
+
+    from typing import List
+    def plot_loss(loss_values: List[float]):
+        plt.plot(loss_values)
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title('Training Loss Curve')
+        plt.show()
+
+    plot_loss(loss_values)
+
+[]
+
+4 Evaluate Your Model
+
+    # Test the model on new data
+    test_input = torch.tensor([[0, 0], [0, 1], [1, 0], [1, 1]], dtype=torch.float32)
+    test_output = model(test_input)
+    print(test_output)
+
+    tensor([[2.4409e-05],
+            [2.5185e-02],
+            [2.5185e-02],
+            [9.6472e-01]], grad_fn=<SigmoidBackward0>)
+
+5 Make necessary adjustments
+
+In this case we don't understand exactly what e-01 e-02 values mean so
+we decide on a threshold and we
+
+    output = (test_output > 0.5).float()
+
+    print(output)
+
+    tensor([[0.],
+            [0.],
+            [0.],
+            [1.]])
+
+6 Save the Model
+
+    from pathlib import Path
+
+    # 1. Create models directory 
+    MODEL_PATH = Path("models")
+    MODEL_PATH.mkdir(parents=True, exist_ok=True)
+
+
+    # 2. Create model save path 
+    MODEL_NAME = "01_pytorch_perceptron.pth"
+    MODEL_SAVE_PATH = MODEL_PATH / MODEL_NAME
+
+    print(f"Saving model to: {MODEL_SAVE_PATH}")
+    torch.save(obj=model.state_dict(), # only saving the state_dict() only saves the models learned parameters
+               f=MODEL_SAVE_PATH)
+
+    Saving model to: models\01_pytorch_perceptron.pth
+
+Deep Dive Classification problems
+
+Architecture of a classification neural network
+
+Courtesy of https://www.learnpytorch.io/01_pytorch_workflow/
+
+Before we get into writing code, let's look at the general architecture
+of a classification neural network.
+
+  ----------------------------------------------------------------------------
+  Hyperparameter          Binary Classification   Multiclass classification
+  ----------------------- ----------------------- ----------------------------
+  Input layer shape       Same as number of       Same as binary
+  (in_features)           features (e.g. 5 for    classification
+                          age, sex, height,       
+                          weight, smoking status  
+                          in heart disease        
+                          prediction)             
+
+  Hidden layer(s)         Problem specific,       Same as binary
+                          minimum = 1, maximum =  classification
+                          unlimited               
+
+  Neurons per hidden      Problem specific,       Same as binary
+  layer                   generally 10 to 512     classification
+
+  Output layer shape      1 (one class or the     1 per class (e.g. 3 for
+  (out_features)          other)                  food, person or dog photo)
+
+  Hidden layer activation Usually ReLU (rectified Same as binary
+                          linear unit) but can be classification
+                          many others             
+
+  Output activation       Sigmoid (torch.sigmoid  Softmax (torch.softmax in
+                          in PyTorch)             PyTorch)
+
+  Loss function           Binary crossentropy     Cross entropy
+                          (torch.nn.BCELoss in    (torch.nn.CrossEntropyLoss
+                          PyTorch)                in PyTorch)
+
+  Optimizer               SGD (stochastic         Same as binary
+                          gradient descent), Adam classification
+                          (see torch.optim for    
+                          more options)           
+  ----------------------------------------------------------------------------
+
+Of course, this ingredient list of classification neural network
+components will vary depending on the problem you're working on.
+
+But it's more than enough to get started.
+
+We're going to gets hands-on with this setup throughout this notebook.
+
+We provided an accuracy function to be on the same boat with everyone
+
+    # Calculate accuracy (a classification metric)
+    def accuracy_fn(y_true, y_pred):
+        correct = torch.eq(y_true, y_pred).sum().item() # torch.eq() calculates where two tensors are equal
+        acc = (correct / len(y_pred)) * 100 
+        return acc
+
+Let's Make our own circles dataset
+
+1 Data
+
+    from sklearn.datasets import make_circles
+
+
+    # Make 2000 samples 
+    n_samples = 2000
+
+    # Create circles
+    X, y = make_circles(n_samples,
+                        noise=0.05, # a little bit of noise to the dots
+                        random_state=42) # keep random state so we get the same values
+
+    # Turn data into tensors
+    # Otherwise this causes issues with computations later on
+    X = torch.from_numpy(X).type(torch.float)
+    y = torch.from_numpy(y).type(torch.float)
+
+    print(f"Last 5 X features:\n{X[5:]}") #Wink wink numpy slicing
+    print(f"Last 5 y labels:\n{y[5:]}")
+
+    Last 5 X features:
+    tensor([[-0.1930,  0.7703],
+            [ 1.0001, -0.3373],
+            [-0.1127, -0.8118],
+            ...,
+            [ 0.6222, -0.7182],
+            [-0.7904,  0.1368],
+            [ 0.5993,  0.5590]])
+    Last 5 y labels:
+    tensor([1., 0., 1.,  ..., 0., 1., 1.])
+
+Vizualize the dataset
+
+Extra : Vary the noise to observe different dataset generation
+
+    # Visualize with a plot
+    import matplotlib.pyplot as plt
+    plt.scatter(x=X[:, 0], 
+                y=X[:, 1], 
+                c=y, 
+                cmap=plt.cm.RdYlBu);
+
+[]
+
+Ex 1
+
+Analyse the data: print the shape of our toy dataset
+
+What's the second dimension on X?
+
+Print some values of the toy dataset
+
+    print("1. Shape of our dataset:")
+    print(f"   - X shape: {X.shape}")  
+    print(f"   - y shape: {y.shape}")  
+
+    print("\n2. The second dimension of X:")
+    print(f"   - X.shape[1]: {X.shape[1]}")  
+
+    print("\n3. First 5 values of X:")
+    print(X[:5])
+
+    print("\n4. First 5 values of y:")
+    print(y[:5])
+
+    1. Shape of our dataset:
+       - X shape: torch.Size([2000, 2])
+       - y shape: torch.Size([2000])
+
+    2. The second dimension of X:
+       - X.shape[1]: 2
+
+    3. First 5 values of X:
+    tensor([[ 0.4452, -0.5584],
+            [-0.6263,  0.8151],
+            [-0.4009,  0.7175],
+            [ 0.8309, -0.6262],
+            [-0.1443,  0.7514]])
+
+    4. First 5 values of y:
+    tensor([1., 0., 1., 0., 1.])
+
+Ex 2 :
+
+In the next step, we need to prepare the data to be compatible with
+PyTorch and for modelling. To achieve this, we have two tasks to
+complete:
+
+Convert our data from NumPy arrays to PyTorch tensors as PyTorch works
+more efficiently with tensors. Create a split between the training and
+testing sets. The model is trained on the training set to learn the
+relationships between X and y. Afterward, the model's learned patterns
+are evaluated on the test dataset.
+
+    from sklearn.model_selection import train_test_split
+
+    n_samples = 2000
+    X, y = make_circles(n_samples, noise=0.05, random_state=42)
+
+    X = torch.from_numpy(X).type(torch.float)
+    y = torch.from_numpy(y).type(torch.float)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, 
+                                                        y, 
+                                                        test_size=0.2, # 20% test, 80% train
+                                                        random_state=42) # make the random split reproducible
+
+    print(f"X_train shape: {X_train.shape}")
+    print(f"X_test shape: {X_test.shape}")
+    print(f"y_train shape: {y_train.shape}")
+    print(f"y_test shape: {y_test.shape}")
+
+    X_train shape: torch.Size([1600, 2])
+    X_test shape: torch.Size([400, 2])
+    y_train shape: torch.Size([1600])
+    y_test shape: torch.Size([400])
+
+2 Baseline (Dumb) Model
+
+Ex 3 Build a model similar to the perceptron with 2 linear layers (no
+activation function) Please be mindfull of your model names (distinct
+names) If capable move your model to the gpu
+
+    class PerceptronV2(torch.nn.Module):
+        def __init__(self, input_dim, hidden_dim, output_dim):
+            super(PerceptronV2, self).__init__()
+            self.layer1 = torch.nn.Linear(input_dim, hidden_dim)  
+            self.layer2 = torch.nn.Linear(hidden_dim, output_dim)
+        
+        def forward(self, x):
+            x = self.layer1(x)  
+            x = self.layer2(x) 
+            return x
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model_perceptronv2 = PerceptronV2(input_dim=2, hidden_dim=4, output_dim=1).to(device)
+
+    print(model_perceptronv2)
+    print(device)
+
+    PerceptronV2(
+      (layer1): Linear(in_features=2, out_features=4, bias=True)
+      (layer2): Linear(in_features=4, out_features=1, bias=True)
+    )
+    cpu
+
+Equivalent of the circle model using nn sequential
+
+    # model_circle = nn.Sequential(
+    #     nn.Linear(in_features=2, out_features=5),
+    #     nn.Linear(in_features=5, out_features=1)
+    # ).to(device)
+
+    # model_circle
+
+2.1 Setup loss function and optimizer
+
+For a binary classification problem you'll often use binary cross
+entropy as the loss function.
+
+However, the same optimizer function can often be used across different
+problem spaces.
+
+For example, the stochastic gradient descent optimizer (SGD,
+torch.optim.SGD()) can be used for a range of problems, so can too the
+Adam optimizer (torch.optim.Adam()).
+
+  ----------------------------------------------------------------------------
+  Loss function/Optimizer Problem type            PyTorch Code
+  ----------------------- ----------------------- ----------------------------
+  Stochastic Gradient     Classification,         torch.optim.SGD()
+  Descent (SGD) optimizer regression, many        
+                          others.                 
+
+  Adam Optimizer          Classification,         torch.optim.Adam()
+                          regression, many        
+                          others.                 
+
+  Binary cross entropy    Binary classification   torch.nn.BCELossWithLogits
+  loss                                            or torch.nn.BCELoss
+
+  Cross entropy loss      Mutli-class             torch.nn.CrossEntropyLoss
+                          classification          
+
+  Mean absolute error     Regression              torch.nn.L1Loss
+  (MAE) or L1 Loss                                
+
+  Mean squared error      Regression              torch.nn.MSELoss
+  (MSE) or L2 Loss                                
+  ----------------------------------------------------------------------------
+
+Table of various loss functions and optimizers, there are more but these
+some common ones you'll see.
+
+Since we're working with a binary classification problem, let's use a
+binary cross entropy loss function.
+
+  Note: Recall a loss function is what measures how wrong your model
+  predictions are, the higher the loss, the worse your model.
+
+Therefore, torch.nn.BCEWithLogitsLoss() is recommended for binary
+classification tasks. However, for more advanced usage, one may choose
+to separate the nn.Sigmoid and torch.nn.BCELoss() components, though
+that is beyond the scope of this notebook. We will now create a loss
+function and an optimizer.
+
+For the optimizer we'll use torch.optim.SGD() to optimize the model
+parameters with learning rate 0.1.
+
+    # Ex 4 Create the recommended loss_fn and optimizer
+
+    loss_fn = torch.nn.BCEWithLogitsLoss()  
+
+    optimizer = torch.optim.SGD(model_perceptronv2.parameters(), lr=0.1)
+
+    print(f"Loss function: {loss_fn}")
+    print(f"Optimizer: {optimizer}")
+
+    Loss function: BCEWithLogitsLoss()
+    Optimizer: SGD (
+    Parameter Group 0
+        dampening: 0
+        differentiable: False
+        foreach: None
+        fused: None
+        lr: 0.1
+        maximize: False
+        momentum: 0
+        nesterov: False
+        weight_decay: 0
+    )
+
+    # 3 Evaluate Model
+
+    from utils import plot_decision_boundary
+
+    def evaluate(model, X_test, y_test, loss_fn):
+        model.eval() 
+        with torch.no_grad():  
+            y_pred = model(X_test)
+
+            loss = loss_fn(y_pred.squeeze(), y_test)
+
+            predicted_labels = torch.round(torch.sigmoid(y_pred)) 
+            accuracy = (predicted_labels == y_test).float().mean()
+
+        return loss.item(), accuracy.item()
+
+    test_loss, test_accuracy = evaluate(model_perceptronv2, X_test, y_test, loss_fn)
+    print(f"Test Loss (before training): {test_loss:.4f}")
+    print(f"Test Accuracy (before training): {test_accuracy * 100:.2f}%")
+
+    plt.figure(figsize=(8,6))
+    plot_decision_boundary(model_perceptronv2, X_test, y_test)
+    plt.title("Decision Boundary (Before Training)")
+    plt.show()
+
+    Test Loss (before training): 0.7148
+    Test Accuracy (before training): 50.20%
+
+[]
+
+2.2 Training Loop
+
+    # Ex 5 Build the training loop
+    # Every 10 epochs rint the loss and the accuracy and save them in a loss_curve, acc_curve
+    # Also plot them
+
+    loss_curve = []
+    train_acc_curve = []
+    test_acc_curve = []
+
+    model_perceptronv2.train()
+
+    epochs = 100
+    batch_size = 32
+
+    for epoch in range(epochs):
+        model_perceptronv2.train()
+        epoch_loss = 0
+        correct_train = 0
+        total_train = 0
+
+        perm = torch.randperm(X_train.size(0))
+        X_train_shuffled = X_train[perm]
+        y_train_shuffled = y_train[perm]
+
+        for i in range(0, len(X_train), batch_size):
+            X_batch = X_train_shuffled[i:i+batch_size]
+            y_batch = y_train_shuffled[i:i+batch_size]
+
+            optimizer.zero_grad()
+            y_pred = model_perceptronv2(X_batch)
+            loss = loss_fn(y_pred.squeeze(), y_batch)
+            loss.backward()
+            optimizer.step()
+
+            epoch_loss += loss.item()
+            
+            with torch.no_grad():
+                preds = torch.sigmoid(y_pred) > 0.5
+                correct_train += (preds.squeeze() == y_batch).sum().item()
+                total_train += y_batch.size(0)
+
+        train_acc = correct_train / total_train
+        train_acc_curve.append(train_acc)
+
+        if (epoch + 1) % 10 == 0:
+            model_perceptronv2.eval()
+            with torch.no_grad():
+                y_pred_test = model_perceptronv2(X_test)
+                test_loss = loss_fn(y_pred_test.squeeze(), y_test)
+                pred_labels = (torch.sigmoid(y_pred_test) > 0.5).float()
+                test_acc = (pred_labels.squeeze() == y_test).float().mean()
+
+                y_pred_train = model_perceptronv2(X_train)
+                train_loss = loss_fn(y_pred_train.squeeze(), y_train)
+
+            print(
+                f"Epoch [{epoch+1}/{epochs}], "
+                f"Train Loss: {epoch_loss/(i+1):.4f}, "
+                f"Test Loss: {test_loss:.4f}, "
+                f"Train Acc: {train_acc * 100:.2f}%, "
+                f"Test Acc: {test_acc * 100:.2f}%"
+            )
+            
+            loss_curve.append(test_loss.item())
+            test_acc_curve.append(test_acc.item())
+
+        model_perceptronv2.train() 
+
+    plt.figure(figsize=(12, 6))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(range(10, epochs+1, 10), loss_curve, 'r-', label='Test Loss')
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.title("Test Loss")
+    plt.grid(True)
+
+    plt.subplot(1, 2, 2)
+    plt.plot(range(10, epochs+1, 10), test_acc_curve, 'b-', label='Test Accuracy')
+    plt.plot(range(1, epochs+1), train_acc_curve, 'g--', label='Train Accuracy', alpha=0.5)
+    plt.xlabel("Epochs")
+    plt.ylabel("Accuracy")
+    plt.title("Training vs Test Accuracy")
+    plt.legend()
+    plt.grid(True)
+
+    plt.tight_layout()
+    plt.show()
+
+    Epoch [10/100], Train Loss: 0.0221, Test Loss: 0.6935, Train Acc: 48.69%, Test Acc: 39.75%
+    Epoch [20/100], Train Loss: 0.0221, Test Loss: 0.6933, Train Acc: 50.06%, Test Acc: 50.00%
+    Epoch [30/100], Train Loss: 0.0221, Test Loss: 0.6933, Train Acc: 48.56%, Test Acc: 43.00%
+    Epoch [40/100], Train Loss: 0.0221, Test Loss: 0.6933, Train Acc: 49.12%, Test Acc: 49.25%
+    Epoch [50/100], Train Loss: 0.0221, Test Loss: 0.6932, Train Acc: 47.25%, Test Acc: 51.00%
+    Epoch [60/100], Train Loss: 0.0221, Test Loss: 0.6937, Train Acc: 49.81%, Test Acc: 49.25%
+    Epoch [70/100], Train Loss: 0.0221, Test Loss: 0.6932, Train Acc: 50.50%, Test Acc: 51.75%
+    Epoch [80/100], Train Loss: 0.0221, Test Loss: 0.6932, Train Acc: 47.94%, Test Acc: 50.75%
+    Epoch [90/100], Train Loss: 0.0221, Test Loss: 0.6933, Train Acc: 48.44%, Test Acc: 47.25%
+    Epoch [100/100], Train Loss: 0.0221, Test Loss: 0.6933, Train Acc: 47.44%, Test Acc: 46.25%
+
+[]
+
+3 Evaluate plots
+
+    # Plot decision boundaries for training and test sets
+    plt.figure(figsize=(12, 6))
+    plt.subplot(1, 2, 1)
+    plt.title("Train")
+    plot_decision_boundary(model_perceptronv2, X_train, y_train)
+    plt.subplot(1, 2, 2)
+    plt.title("Test")
+    plot_decision_boundary(model_perceptronv2, X_test, y_test)
+
+[]
+
+It can be observed that the model's capability is limited to splitting
+the data into two parts, which is due to its linearity. This fact
+accounts for the 50% accuracy rate, as our circular data can only be cut
+in half by a straight line at best.
+
+In machine learning terminology, we say that our model is underfitting,
+indicating that it is unable to learn the predictive patterns from the
+data.
+
+What are some ways to enhance the model's performance?
+
+How can we improve a model?
+
+  -----------------------------------------------------------------------
+  Model improvement technique*        What does it do?
+  ----------------------------------- -----------------------------------
+  Add more layers                     Each layer potentially increases
+                                      the learning capabilities of the
+                                      model with each layer being able to
+                                      learn some kind of new pattern in
+                                      the data, more layers is often
+                                      referred to as making your neural
+                                      network deeper.
+
+  Add more hidden units               Similar to the above, more hidden
+                                      units per layer means a potential
+                                      increase in learning capabilities
+                                      of the model, more hidden units is
+                                      often referred to as making your
+                                      neural network wider.
+
+  Fitting for longer (more epochs)    Your model might learn more if it
+                                      had more opportunities to look at
+                                      the data.
+
+  Changing the activation functions   Some data just can't be fit with
+                                      only straight lines (like what
+                                      we've seen), using non-linear
+                                      activation functions can help with
+                                      this (hint, hint).
+
+  Change the learning rate            Less model specific, but still
+                                      related, the learning rate of the
+                                      optimizer decides how much a model
+                                      should change its parameters each
+                                      step, too much and the model
+                                      overcorrects, too little and it
+                                      doesn't learn enough.
+
+  Change the loss function            Again, less model specific but
+                                      still important, different problems
+                                      require different loss functions.
+                                      For example, a binary cross entropy
+                                      loss function won't work with a
+                                      multi-class classification problem.
+  -----------------------------------------------------------------------
+
+Even if we add more layers/ change activation the proposed first model is still liniar
+
+Extra excercise (Not mandatory) build a circle_02 model with said improvements
+
+Introduce non-liniarity in the model
+
+hat do you think will happen when we introduce the capability for our
+model to use non-linear actviation functions?
+
+Well let's see.
+
+PyTorch has a bunch of ready-made non-linear activation functions that
+do similiar but different things.
+
+One of the most common and best performing is
+[ReLU](https://en.wikipedia.org/wiki/Rectifier_(neural_networks)
+(rectified linear-unit, torch.nn.ReLU()).
+
+Rather than talk about it, let's put it in our neural network between
+the hidden layers in the forward pass and see what happens.
+
+    # Create a toy tensor (similar to the data going into our model(s))
+    input_dummy = torch.arange(-10, 10, 1, dtype=torch.float32)
+    input_dummy
+
+    tensor([-10.,  -9.,  -8.,  -7.,  -6.,  -5.,  -4.,  -3.,  -2.,  -1.,   0.,   1.,
+              2.,   3.,   4.,   5.,   6.,   7.,   8.,   9.])
+
+    def relu(x):
+      return torch.maximum(torch.tensor(0), x) # inputs must be tensors
+
+    # Pass toy tensor through ReLU function
+    relu(input_dummy)
+
+    tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 2., 3., 4., 5., 6., 7.,
+            8., 9.])
+
+    plt.plot(relu(input_dummy))
+
+    [<matplotlib.lines.Line2D at 0x1630739f470>]
+
+[]
+
+    # Ex 6 Recreate the model with some none linear activation functions
+
+    class PerceptronWithNonlinearActivation(torch.nn.Module):
+        def __init__(self, input_dim, output_dim):
+            super(PerceptronWithNonlinearActivation, self).__init__()
+            self.linear1 = torch.nn.Linear(input_dim, 128)
+            self.relu1 = torch.nn.ReLU()
+            self.linear2 = torch.nn.Linear(128, 64)
+            self.relu2 = torch.nn.ReLU()
+            self.linear3 = torch.nn.Linear(64, output_dim)
+        
+        def forward(self, x):
+            x = self.relu1(self.linear1(x))
+            x = self.relu2(self.linear2(x))
+            x = self.linear3(x)
+            return x
+
+    model_nonlinear = PerceptronWithNonlinearActivation(input_dim=2, output_dim=1)
+
+    if torch.cuda.is_available():
+        model_nonlinear = model_nonlinear.cuda()
+
+    # Ex 7 Recreate the optimizer and training loop
+
+    optimizer = torch.optim.SGD(model_nonlinear.parameters(), lr=0.1)
+    loss_fn = torch.nn.BCEWithLogitsLoss()
+
+    loss_curve = []
+    acc_curve = []
+    train_loss_curve = []
+    train_acc_curve = []
+
+    for epoch in range(100):
+        model_nonlinear.train()
+        epoch_loss = 0
+        correct = 0
+        total = 0
+        
+        perm = torch.randperm(X_train.size(0))
+        X_train_shuffled = X_train[perm]
+        y_train_shuffled = y_train[perm]
+
+        for i in range(0, len(X_train), 32):
+            X_batch = X_train_shuffled[i:i+32]
+            y_batch = y_train_shuffled[i:i+32]
+
+            optimizer.zero_grad()
+            y_pred = model_nonlinear(X_batch)
+            loss = loss_fn(y_pred.squeeze(), y_batch)
+            loss.backward()
+            optimizer.step()
+            
+            epoch_loss += loss.item()
+            predicted = torch.sigmoid(y_pred) > 0.5
+            correct += (predicted.squeeze() == y_batch).sum().item()
+            total += y_batch.size(0)
+
+        train_acc = correct / total
+        train_loss_curve.append(epoch_loss / (i + 1))
+        train_acc_curve.append(train_acc)
+
+        if (epoch + 1) % 10 == 0:
+            model_nonlinear.eval()
+            with torch.no_grad():
+                y_pred = model_nonlinear(X_test)
+                test_loss = loss_fn(y_pred.squeeze(), y_test)
+                
+                probabilities = torch.sigmoid(y_pred)
+                predicted_labels = (probabilities > 0.5).float()
+                correct = (predicted_labels.squeeze() == y_test).sum().item()
+                accuracy = correct / y_test.size(0)
+
+            print(f"Epoch [{epoch+1}/100], "
+                  f"Train Loss: {epoch_loss/(i+1):.4f}, "
+                  f"Test Loss: {test_loss:.4f}, "
+                  f"Train Acc: {train_acc * 100:.2f}%, "
+                  f"Test Acc: {accuracy * 100:.2f}%")
+
+            loss_curve.append(test_loss.item())
+            acc_curve.append(accuracy)
+            
+            model_nonlinear.train()
+
+    plt.figure(figsize=(12, 6))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(range(10, 101, 10), loss_curve, 'r-', label='Test Loss')
+    plt.plot(range(10, 101, 10), train_loss_curve[9::10], 'b-', label='Train Loss')
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.title("Training vs Test Loss")
+    plt.legend()
+    plt.grid(True)
+
+    plt.subplot(1, 2, 2)
+    plt.plot(range(10, 101, 10), acc_curve, 'g-', label='Test Accuracy')
+    plt.plot(range(10, 101, 10), train_acc_curve[9::10], 'm-', label='Train Accuracy')
+    plt.xlabel("Epochs")
+    plt.ylabel("Accuracy")
+    plt.title("Training vs Test Accuracy")
+    plt.legend()
+    plt.grid(True)
+
+    plt.tight_layout()
+    plt.show()
+
+    Epoch [10/100], Train Loss: 0.0102, Test Loss: 0.2643, Train Acc: 88.44%, Test Acc: 93.25%
+    Epoch [20/100], Train Loss: 0.0037, Test Loss: 0.1613, Train Acc: 95.75%, Test Acc: 94.75%
+    Epoch [30/100], Train Loss: 0.0032, Test Loss: 0.0712, Train Acc: 95.94%, Test Acc: 97.50%
+    Epoch [40/100], Train Loss: 0.0025, Test Loss: 0.0788, Train Acc: 97.25%, Test Acc: 97.00%
+    Epoch [50/100], Train Loss: 0.0025, Test Loss: 0.2504, Train Acc: 96.69%, Test Acc: 90.00%
+    Epoch [60/100], Train Loss: 0.0025, Test Loss: 0.0673, Train Acc: 96.94%, Test Acc: 97.50%
+    Epoch [70/100], Train Loss: 0.0025, Test Loss: 0.0622, Train Acc: 96.94%, Test Acc: 97.25%
+    Epoch [80/100], Train Loss: 0.0020, Test Loss: 0.1079, Train Acc: 97.50%, Test Acc: 96.25%
+    Epoch [90/100], Train Loss: 0.0027, Test Loss: 0.0601, Train Acc: 96.31%, Test Acc: 97.75%
+    Epoch [100/100], Train Loss: 0.0024, Test Loss: 0.1235, Train Acc: 97.19%, Test Acc: 95.25%
+
+[]
+
+    # Ex 8 Evaluate vizual
+
+    plt.figure(figsize=(12, 6))
+    plt.subplot(1, 2, 1)
+    plt.title("Train")
+    plot_decision_boundary(model_nonlinear, X_train, y_train)
+    plt.subplot(1, 2, 2)
+    plt.title("Test")
+    plot_decision_boundary(model_nonlinear, X_test, y_test)
+
+[]
+
+Multiclass classification
+
+We will create a dataset using make blobs method. The centers are the
+number of classes we are targeting in this case 4. In our final model
+the number of clusters is the number of output features for our final
+layer nn.Linear(in_features=hidden_units, out_features=4)
+
+    # Import dependencies
+    import torch
+    import matplotlib.pyplot as plt
+    from sklearn.datasets import make_blobs
+    from sklearn.model_selection import train_test_split
+
+    # Set the hyperparameters for data creation
+    NUM_CLASSES = 4
+    NUM_FEATURES = 2
+    RANDOM_SEED = 42
+
+    # 1. Create multi-class data
+    X_blob, y_blob = make_blobs(n_samples=1000,
+        n_features=NUM_FEATURES, # X features
+        centers=NUM_CLASSES, # y labels 
+        cluster_std=1.5, # give the clusters a little shake up (try changing this to 1.0, the default)
+        random_state=RANDOM_SEED
+    )
+
+    # 2. Turn data into tensors
+    X_blob = torch.from_numpy(X_blob).type(torch.float)
+    y_blob = torch.from_numpy(y_blob).type(torch.LongTensor)
+    print(X_blob[:5], y_blob[:5])
+
+    # 3. Split into train and test sets
+    X_blob_train, X_blob_test, y_blob_train, y_blob_test = train_test_split(X_blob,
+        y_blob,
+        test_size=0.2,
+        random_state=RANDOM_SEED
+    )
+
+    # 4. Plot data
+    plt.figure(figsize=(10, 7))
+    plt.scatter(X_blob[:, 0], X_blob[:, 1], c=y_blob, cmap=plt.cm.RdYlBu);
+
+    tensor([[-8.4134,  6.9352],
+            [-5.7665, -6.4312],
+            [-6.0421, -6.7661],
+            [ 3.9508,  0.6984],
+            [ 4.2505, -0.2815]]) tensor([3, 2, 2, 1, 1])
+
+[]
+
+    # Ex 9 (For grade 10): Create a pytorch flow to do multi class classification as instructed in the previos examples
+
+    # Tip since the data presents itself as a having liniar relationships no relu/sigmoid activation are required.
+
+    class BlobModel(nn.Module):
+        def __init__(self, input_features, output_features):
+            super().__init__()
+            self.linear = nn.Linear(input_features, output_features)
+        
+        def forward(self, x):
+            return self.linear(x)
+
+    model_blob = BlobModel(input_features=NUM_FEATURES, 
+                     output_features=NUM_CLASSES)
+
+    loss_fn = nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(model_blob.parameters(), lr=0.1)
+
+    epochs = 100
+    train_loss_history = []
+    test_loss_history = []
+    accuracy_history = []
+
+    for epoch in range(epochs):
+        model_blob.train()
+        optimizer.zero_grad()
+        train_logits = model_blob(X_blob_train)
+        train_loss = loss_fn(train_logits, y_blob_train)
+        train_loss.backward()
+        optimizer.step()
+        train_loss_history.append(train_loss.item())
+        
+        model_blob.eval()
+        with torch.no_grad():
+            test_logits = model_blob(X_blob_test)
+            test_loss = loss_fn(test_logits, y_blob_test)
+            test_loss_history.append(test_loss.item())
+            
+            test_preds = test_logits.argmax(dim=1)
+            test_acc = (test_preds == y_blob_test).float().mean().item()
+            accuracy_history.append(test_acc)
+            
+        if epoch % 10 == 0 or epoch == epochs-1:
+            print(f"Epoch: {epoch:3d} | "
+                  f"Train Loss: {train_loss:.4f} | "
+                  f"Test Loss: {test_loss:.4f} | "
+                  f"Test Acc: {test_acc*100:.2f}%")
+
+    plt.figure(figsize=(12, 5))
+    plt.subplot(1, 2, 1)
+    plt.plot(train_loss_history, label='Train Loss')
+    plt.plot(test_loss_history, label='Test Loss')
+    plt.title("Loss Curves")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    plt.plot(accuracy_history)
+    plt.title("Test Accuracy")
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy")
+
+    plt.tight_layout()
+    plt.show()
+
+    def plot_decision_boundary(model, X, y):
+        x_min, x_max = X[:, 0].min()-0.5, X[:, 0].max()+0.5
+        y_min, y_max = X[:, 1].min()-0.5, X[:, 1].max()+0.5
+        xx, yy = torch.meshgrid(torch.linspace(x_min, x_max, 100),
+                               torch.linspace(y_min, y_max, 100))
+        grid = torch.cat((xx.reshape(-1, 1), yy.reshape(-1, 1)), dim=1)
+        
+        model.eval()
+        with torch.no_grad():
+            preds = torch.softmax(model(grid), dim=1).argmax(dim=1)
+        
+        plt.figure(figsize=(10, 7))
+        plt.contourf(xx, yy, preds.reshape(xx.shape), alpha=0.3, cmap=plt.cm.RdYlBu)
+        plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.RdYlBu, edgecolors='black')
+        plt.title("Decision Boundary")
+        plt.show()
+
+    plot_decision_boundary(model_blob, X_blob, y_blob)
+
+    Epoch:   0 | Train Loss: 3.7722 | Test Loss: 1.1130 | Test Acc: 60.50%
+    Epoch:  10 | Train Loss: 0.1952 | Test Loss: 0.1873 | Test Acc: 98.50%
+    Epoch:  20 | Train Loss: 0.1415 | Test Loss: 0.1386 | Test Acc: 99.00%
+    Epoch:  30 | Train Loss: 0.1172 | Test Loss: 0.1141 | Test Acc: 99.00%
+    Epoch:  40 | Train Loss: 0.1022 | Test Loss: 0.0989 | Test Acc: 99.00%
+    Epoch:  50 | Train Loss: 0.0920 | Test Loss: 0.0883 | Test Acc: 99.50%
+    Epoch:  60 | Train Loss: 0.0844 | Test Loss: 0.0804 | Test Acc: 99.50%
+    Epoch:  70 | Train Loss: 0.0786 | Test Loss: 0.0743 | Test Acc: 99.50%
+    Epoch:  80 | Train Loss: 0.0739 | Test Loss: 0.0694 | Test Acc: 99.50%
+    Epoch:  90 | Train Loss: 0.0701 | Test Loss: 0.0653 | Test Acc: 99.50%
+    Epoch:  99 | Train Loss: 0.0672 | Test Loss: 0.0622 | Test Acc: 99.50%
+
+[]
+
+[]
+
+Further Reading
+
+Deep Learning
+
+https://www.youtube.com/watch?v=7sB052Pz0sQ
+
+Torch
+
+-   https://pytorch.org/tutorials/beginner/nn_tutorial.html
+
+    Gradients& Linear Algebra
+
+-   https://towardsdatascience.com/gradient-descent-algorithm-a-deep-dive-cf04e8115f21

@@ -1,0 +1,100 @@
+
+
+Preparing the data
+
+Exercises
+
+1.  Import with pandas the file iris_teach_2.csv into the pandas
+    DataFrame with the name df_iris.
+
+    # your code here
+    df_iris = pd.read_csv('iris_teach_2.csv')
+
+------------------------------------------------------------------------
+
+1.  use the method isnull() from the class DataFrame to check if there
+    are empty cells in the dataset. (Hint: check the documentation and
+    use this method with respect to your DataFrame object; use the
+    method .sum() to the result to count the empty cells on columns)
+
+    # your code here
+
+    df_iris.isnull().sum()
+
+    sepal length (cm)    1
+    sepal width (cm)     1
+    petal length (cm)    0
+    petal width (cm)     1
+    iris_name            1
+    dtype: int64
+
+1.  We see that we have some empty cells on some rows. Delete these rows
+    (hint: use the method dropna() from pandas.DataFrame class, with the
+    argument inplace=True). Check the documentation why we use that
+    argument
+    (https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.dropna.html)!
+
+    # your code here
+    df_iris.dropna(inplace=True)
+
+1.  Divide the dataset in two parts: a set X for features and y for
+    target.
+
+    # your code here
+
+    X = df_iris[["sepal length (cm)", "sepal width (cm)",	"petal length (cm)",	"petal width (cm)"]]
+
+    y = df_iris["iris_name"]
+
+1.  Create a LabelEncoder object to encode the classes from the target.
+    Fit it with the y list, and encode y with it.
+    (https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html#sklearn.preprocessing.LabelEncoder)
+
+    # your code here
+    encoder = LabelEncoder()
+
+    y = encoder.fit_transform(y)
+
+1.  Divide the dataset in a training and a testing set as we did it in
+    the previous laboratory with the sklearn function train_test_split.
+    Check the documentation why we use for random_state a fixed value
+    here!
+    (https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html)
+
+    # your code here
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+Exercises
+
+1.  Drop the petal width column from the database and create a decision
+    tree in a similar way with the example.
+
+2.  Find the proper depth and evaluate the score for the decision tree
+    model that you build.
+
+    # your code here
+
+    # X = X.drop("petal width (cm)", axis=1)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    tree_clf_reduced = DecisionTreeClassifier(criterion='entropy', random_state=42)
+    tree_clf_reduced.fit(X_train, y_train)
+
+    param_grid = {"max_depth": range(1, 10)}
+    grid_search = GridSearchCV(DecisionTreeClassifier(criterion='entropy', random_state=42), param_grid, cv=5)
+    grid_search.fit(X_train, y_train)
+
+    best_depth = grid_search.best_params_["max_depth"]
+    print("Best max_depth:", best_depth)
+
+    tree_clf_tuned = DecisionTreeClassifier(criterion='entropy', max_depth=best_depth, random_state=42)
+    tree_clf_tuned.fit(X_train, y_train)
+
+    y_pred = tree_clf_tuned.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print("Optimized Decision Tree Accuracy: {:.2f}".format(accuracy))
+
+    Best max_depth: 4
+    Optimized Decision Tree Accuracy: 0.97

@@ -1,0 +1,75 @@
+
+
+Task 6 -- An application: Simulate an unfair probability spinner
+
+Conside an unfair probability spinner with n slots. Each slot has a
+probabilty P_(n) ∈ [0,1] and $\sum_{i=0}^{n-1}P_i = 1$.
+
+Write a function that random generate an index i with the probability
+P_(i) from the set {0, 1, ..., n}.
+
+    import numpy as np
+
+    def spinner(probabilityDistribution):
+        total = sum(probabilityDistribution)
+        probabilityDistribution = [x / total for x in probabilityDistribution] 
+        
+        return np.random.choice(len(probabilityDistribution), p=probabilityDistribution)
+
+    test = [45.0, 85.0, 70.0, 150.0]
+    print(test[spinner(test)])
+
+    70.0
+
+The same problem but instead of a distribution of probability the input
+is a list of natural numbers that holds how many degrees has the center
+angle θ_(i) corespondent to index i.
+
+Example:
+
+Consider we have a wheel with 4 slots as in Figure
+
+[]
+
+When we spin the wheel we get for example blue index with 12.86%
+chances.
+
+Task 7 -- Determine some outcomes using Monte Carlo Simulations
+
+Consider a large pipe with a radius R = 30cm that has the opening
+pointing straight up, as in the figure. Around this pipe is a
+rectangular wall with an edge l = 1m. Balls of radius r = 1cm fall down
+uniformly from above inside the square yard. Compute, using a Monte
+Carlo simulation, the probability that a ball falls inside the pipe.
+Compare the results with the mathematically deduced probability.
+
+[]
+
+    import numpy as np
+
+    K = 1000000
+
+    def determineIfInCircle(x, y):
+        return pow(x, 2) + pow(y, 2) <= 900
+
+    def determineOutcomeMonteCarlo():
+        fallenInHoleCount = 0;
+        
+        for i in range(K):
+            x = np.random.uniform() * 100 - 50
+            y = np.random.uniform() * 100 - 50
+            if (determineIfInCircle(x, y)): 
+                fallenInHoleCount += 1
+
+        return fallenInHoleCount / K
+
+
+    print(determineOutcomeMonteCarlo())
+    # Result is ~28.26%. (varies a bit per run) 
+    # Mathematically deducing the result, we get a probability of 
+    # (100 * 100) *  p / 100 = pi * r ^ 2
+    # 100 * p = 3.14 * 900
+    # 100 * p = 2826
+    # p = 28.26
+
+    0.282722

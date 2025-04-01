@@ -1,0 +1,566 @@
+
+
+A.I. Assignment 4
+
+Learning Goals
+
+By the end of this lab, you should be able to:
+
+-   Get familiar with tensors in pytorch
+-   Get familiar with the activation functions for ANN
+-   Create a simple perceptron model with pytorch
+
+Common activation functions for ANN:
+
+Sigmoid:
+
+The sigmoid function is a popular choice for activation functions in
+neural networks. It has an S − shaped curve:
+$$f(x) = \frac{1}{1+e^{-x}}.$$
+
+It has a number of appealing qualities:
+
+1.  Nonlinearity: Because the sigmoid function is nonlinear, it enables
+    the neural network to simulate nonlinear interactions between inputs
+    and outputs. A neural network would simply be a linear model without
+    a nonlinear activation function like sigmoid, which would
+    significantly restrict its capacity to describe complex
+    relationships.
+
+2.  Smoothness: As the sigmoid function is differentiable and smooth,
+    its derivative exist at every point. This is significant because it
+    makes it possible for neural network training techniques based on
+    gradients (such as backpropagation) to perform well.
+
+3.  Boundedness: The sigmoid function is bounded between 0 and 1, it
+    means its outputs can be interpreted as probabilities. It is most
+    useful in applications like binary classification, where the goal is
+    to predict whether an input belongs to one of two classes.
+
+4.  Monotonicity: The sigmoid function is monotonic, which means that
+    its outputs are always increasing or always decreasing with respect
+    to its inputs. This makes it easy to interpret the effect of changes
+    in input variables on the output of the network.
+
+ReLU (Rectified Linear Unit):
+
+The ReLU function is defined as
+f(x) = max(0,x).
+
+It is a widely used activation function in deep learning due to its
+simplicity and effectiveness.
+
+Tanh (Hyperbolic Tangent):
+
+The tanh  function is similar to the sigmoid function but produces
+outputs in the interval [−1,1]:
+$$f(x) = \frac{e^{x}-e^{-x}}{e^{x}+e^{-x}}.$$
+
+Softmax:
+
+The softmax function is commonly used in the output layer of a neural
+network for multi-class classification problems. It normalizes the
+output into a probability distribution over the classes.
+
+Given a vector z⃗ of n real numbers, the softmax function calculates a
+vector s⃗ of n real numbers with the components:
+$$s_j = \frac{e^{z_j}}{\sum_{k=1}^{n} {e^{z_k}}}.$$
+
+Leaky ReLU:
+
+The Leaky ReLU is a variation of the ReLU function that introduces a
+small non-zero gradient for negative inputs. It is defined as
+f(x) = max(0.01⋅x,x).
+
+ELU (Exponential Linear Unit):
+
+The ELU function is another variation of the ReLU function that
+introduces a small negative saturation value for negative inputs. It is
+defined as
+
+$$ f(x) = \biggl\{ \begin{matrix} x, & for & x > 0 \\
+                      \alpha \cdot (e^{x} - 1), & for & x \leq 0 \end{matrix}$$
+where α is a hyperparameter.
+
+Swish:
+
+The Swish function is a recent activation function that is a smooth
+approximation of the ReLU function. It is defined as f(x) = x *
+sigmoid(x).
+
+    import torch
+    torch.cuda.is_available()
+
+    False
+
+create a tensor with requires_grad=True to tell PyTorch to track
+gradients for this tensor:
+
+    x = torch.tensor([2.0], requires_grad=True)
+    print(x)
+
+    tensor([2.], requires_grad=True)
+
+You can perform any operations on this tensor as usual:
+
+    y = x ** 2 + 2 * x + 1
+    print(y)
+
+    tensor([9.], grad_fn=<AddBackward0>)
+
+To compute the gradients of y with respect to x, you need to call
+backward() on y:
+
+    y.backward()
+
+    x.grad
+
+    tensor([6.])
+
+    import torch
+
+    # Create a tensor with requires_grad=True
+    x = torch.tensor([1., 2., 3.], requires_grad=True)
+
+    # Compute a function of x
+    y = x.sum()
+
+    # Compute gradients of y with respect to x
+    y.backward()
+
+    # Print gradients of x
+    print(x.grad)
+
+    tensor([1., 1., 1.])
+
+Exercise 1.
+
+Compute the gradient for the sigmoid activation function in 2 points
+using pytorch and check it with the known explicit formula
+
+    # your code here
+
+    def sigmoid(x):
+        return 1 / (1 + torch.exp(-x))
+
+    x1 = torch.tensor([-1.], requires_grad=True)
+    x2 = torch.tensor([1.], requires_grad=True)
+
+    sigmoid_x1 = sigmoid(x1)
+    sigmoid_x2 = sigmoid(x2)
+
+    sigmoid_x1.backward()
+    sigmoid_x2.backward()
+
+    grad_x1 = x1.grad.item()
+    grad_x2 = x2.grad.item()
+
+    explicit_grad_x1 = sigmoid_x1.item() * (1 - sigmoid_x1.item())
+    explicit_grad_x2 = sigmoid_x2.item() * (1 - sigmoid_x2.item())
+
+    print(f"[x1] Sigmoid = {sigmoid_x1.item()}, Gradient = {grad_x1}, Explicit gradient = {explicit_grad_x1}")
+    print(f"[x2] Sigmoid = {sigmoid_x2.item()}, Gradient = {grad_x2}, Explicit gradient = {explicit_grad_x2}")
+
+    # Basically the same, difference arises from flaoting-point precision
+
+    [x1] Sigmoid = 0.2689414322376251, Gradient = 0.1966119408607483, Explicit gradient = 0.19661193826360002
+    [x2] Sigmoid = 0.7310585975646973, Gradient = 0.1966119408607483, Explicit gradient = 0.19661192449143527
+
+Exercise 2.
+
+Compute the gradient for the linear activation function in 2 points
+using pytorch and check it with the known explicit formula
+
+    # your code here
+
+    def linear_activation(x):
+        return x
+
+    x1 = torch.tensor([-1.], requires_grad=True)
+    x2 = torch.tensor([1.], requires_grad=True)
+
+    linear_activation_x1 = linear_activation(x1)
+    linear_activation_x2 = linear_activation(x2)
+
+    linear_activation_x1.backward()
+    linear_activation_x2.backward()
+
+    grad_x1 = x1.grad.item()
+    grad_x2 = x2.grad.item()
+
+    explicit_grad_x1 = explicit_grad_x2 = 1.
+
+    print(f"[x1] Linear activation = {linear_activation_x1.item()}, Gradient = {grad_x1}, Explicit gradient = {explicit_grad_x1}")
+    print(f"[x2] Linear activation = {linear_activation_x2.item()}, Gradient = {grad_x2}, Explicit gradient = {explicit_grad_x2}")
+
+    # The same
+
+    [x1] Linear activation = -1.0, Gradient = 1.0, Explicit gradient = 1.0
+    [x2] Linear activation = 1.0, Gradient = 1.0, Explicit gradient = 1.0
+
+Execise 3.
+
+Compute the gradient for the relu activation function in 2 points using
+pytorch and check it with the known explicit formula.
+
+    # your code here
+    import torch.nn.functional as F
+
+    def relu(x):
+        return F.relu(x)
+
+    x1 = torch.tensor([-1.], requires_grad=True)
+    x2 = torch.tensor([1.], requires_grad=True)
+
+    relu_x1 = relu(x1)
+    relu_x2 = relu(x2)
+
+    relu_x1.backward()
+    relu_x2.backward()
+
+    grad_x1 = x1.grad.item()
+    grad_x2 = x2.grad.item()
+
+    explicit_grad_x1 = 1. if x1.item() > 0 else 0.
+    explicit_grad_x2 = 1. if x2.item() > 0 else 0.
+
+    print(f"[x1] ReLU = {relu_x1.item()}, Gradient = {grad_x1}, Explicit gradient = {explicit_grad_x1}")
+    print(f"[x2] ReLU = {relu_x2.item()}, Gradient = {grad_x2}, Explicit gradient = {explicit_grad_x2}")
+
+    # Results are the same
+
+    [x1] ReLU = 0.0, Gradient = 0.0, Explicit gradient = 0.0
+    [x2] ReLU = 1.0, Gradient = 1.0, Explicit gradient = 1.0
+
+Exercise 4.
+
+Write in python a function to plot the sigmoid activation function and
+its gradient using matplotlib
+
+    # your code here
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    def sigmoid(x):
+        return 1 / (1 + np.exp(-x))
+
+    def sigmoid_derivative(x):
+        return sigmoid(x) * (1 - sigmoid(x))
+
+    x = np.linspace(-10, 10, 400)
+    y = sigmoid(x)  
+    dy = sigmoid_derivative(x) 
+
+    plt.figure(figsize=(10, 6))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(x, y, label='Sigmoid', color='b')
+    plt.title("Sigmoid Activation Function")
+    plt.xlabel("x")
+    plt.ylabel("Sigmoid(x)")
+    plt.grid(True)
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    plt.plot(x, dy, label='Gradient of Sigmoid', color='r')
+    plt.title("Sigmoid Gradient")
+    plt.xlabel("x")
+    plt.ylabel("Sigmoid'(x)")
+    plt.grid(True)
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+[]
+
+Exercise 5.
+
+Write in python a function to plot the ReLU activation function and its
+gradient using matplotlib.
+
+    # your code here
+
+    import torch
+    import matplotlib.pyplot as plt
+
+    def relu(x):
+        return torch.relu(x)
+
+    def relu_derivative(x):
+        return torch.where(x > 0, torch.tensor(1.0), torch.tensor(0.0))
+
+    x = torch.linspace(-10, 10, 400)
+
+    y = relu(x)
+    dy = relu_derivative(x)
+
+    plt.figure(figsize=(10, 6))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(x.numpy(), y.numpy(), label='ReLU', color='b')
+    plt.title("ReLU Activation Function")
+    plt.xlabel("x")
+    plt.ylabel("ReLU(x)")
+    plt.grid(True)
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    plt.plot(x.numpy(), dy.numpy(), label='Gradient of ReLU', color='r')
+    plt.title("ReLU Gradient")
+    plt.xlabel("x")
+    plt.ylabel("ReLU'(x)")
+    plt.grid(True)
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+[]
+
+Exercise 6.
+
+Write in python a function to plot the tanh activation function and its
+gradient using matplotlib.
+
+    # your code here
+
+    import torch
+    import matplotlib.pyplot as plt
+
+    def tanh(x):
+        return torch.tanh(x)
+
+    def tanh_derivative(x):
+        return 1 - torch.tanh(x) ** 2
+
+    x = torch.linspace(-5, 5, 400)
+
+    y = tanh(x)
+    dy = tanh_derivative(x)
+
+    plt.figure(figsize=(10, 6))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(x.numpy(), y.numpy(), label='Tanh', color='b')
+    plt.title("Tanh Activation Function")
+    plt.xlabel("x")
+    plt.ylabel("tanh(x)")
+    plt.grid(True)
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    plt.plot(x.numpy(), dy.numpy(), label="Gradient of Tanh", color="r")
+    plt.title("Tanh Gradient")
+    plt.xlabel("x")
+    plt.ylabel("tanh'(x)")
+    plt.grid(True)
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+[]
+
+Exercise 7.
+
+Write in python a function to plot the leaky ReLU activation function
+and its gradient using matplotlib.
+
+    # your code here
+
+    import torch
+    import matplotlib.pyplot as plt
+
+    ALPHA = 0.01
+
+    def leaky_relu(x):
+        return torch.where(x > 0, x, ALPHA * x)
+
+    def leaky_relu_derivative(x):
+        return torch.where(x > 0, torch.tensor(1.0), torch.tensor(ALPHA))
+
+    x = torch.linspace(-10, 10, 400)
+
+    y = leaky_relu(x)
+    dy = leaky_relu_derivative(x)
+
+    plt.figure(figsize=(10, 6))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(x.numpy(), y.numpy(), label="Leaky ReLU", color="b")
+    plt.title("Leaky ReLU Activation Function")
+    plt.xlabel("x")
+    plt.ylabel("Leaky ReLU(x)")
+    plt.grid(True)
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    plt.plot(x.numpy(), dy.numpy(), label="Gradient of Leaky ReLU", color="r")
+    plt.title("Leaky ReLU Gradient")
+    plt.xlabel("x")
+    plt.ylabel("Leaky ReLU'(x)")
+    plt.grid(True)
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+[]
+
+Perceptron
+
+We define a class called Perceptron that inherits from torch.nn.Module.
+
+In the constructor, we define a single fully-connected linear layer with
+input_(d)im inputs and output_(d)im outputs, and a sigmoid activation
+function. In the forward method, we apply the linear transformation to
+the input x, and then apply the sigmoid activation function to the
+output.
+
+    import torch
+    import torch.nn as nn
+
+    input_size = 2
+    output_size = 1
+
+    class Perceptron(torch.nn.Module):
+        def __init__(self, input_dim, output_dim):
+            super(Perceptron, self).__init__()
+            self.linear = torch.nn.Linear(input_dim, output_dim)
+            self.activation = torch.nn.Sigmoid()
+            
+        def forward(self, x):
+            x = self.linear(x)
+            x = self.activation(x)
+            return x
+
+We create an instance of this model and use it to make predictions like
+this:
+
+    perceptron = Perceptron(input_size, output_size)
+    x = torch.tensor([0.5, 0.2])
+    y = perceptron(x)
+    print(y)
+
+    tensor([0.4361], grad_fn=<SigmoidBackward0>)
+
+
+    # Define the loss function and optimizer
+    criterion = nn.BCELoss()  # Binary cross-entropy loss
+    optimizer = torch.optim.SGD(perceptron.parameters(), lr=0.1)  # Stochastic gradient descent optimizer
+
+    # Generate some random input data and labels
+    input_data = torch.randn((10, input_size))
+    labels = torch.randint(0, 2, (10, output_size)).float()
+
+    # Train the model
+    num_epochs = 1000
+    for epoch in range(num_epochs):
+        # Forward pass
+        outputs = perceptron(input_data)
+        loss = criterion(outputs, labels)
+
+        # Backward pass and optimization
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        # Print the loss every 100 epochs
+        if (epoch + 1) % 100 == 0:
+            print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
+
+    Epoch [100/1000], Loss: 0.5657
+    Epoch [200/1000], Loss: 0.5587
+    Epoch [300/1000], Loss: 0.5574
+    Epoch [400/1000], Loss: 0.5571
+    Epoch [500/1000], Loss: 0.5570
+    Epoch [600/1000], Loss: 0.5570
+    Epoch [700/1000], Loss: 0.5570
+    Epoch [800/1000], Loss: 0.5570
+    Epoch [900/1000], Loss: 0.5570
+    Epoch [1000/1000], Loss: 0.5570
+
+Exercise 8:
+
+Implement a binary classification model using the Perceptron class in
+PyTorch for the logic OR.
+
+Your task is to create a Perceptron instance and train it using a proper
+dataset and the binary cross-entropy loss with stochastic gradient
+descent optimizer.
+
+Here are the steps you can follow:
+
+Define a Perceptron class that inherits from torch.nn.Module and
+implements a binary classification model.
+
+Define a binary cross-entropy loss function using the
+torch.nn.BCEWithLogitsLoss module.
+
+Define a stochastic gradient descent optimizer using the torch.optim.SGD
+module.
+
+Train the Perceptron model on the training set using the binary
+cross-entropy loss and stochastic gradient descent optimizer.
+
+Evaluate the trained model compute the accuracy.
+
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+
+    class Perceptron(nn.Module):
+        def __init__(self, input_dim, output_dim):
+            super(Perceptron, self).__init__()
+            self.linear = nn.Linear(input_dim, output_dim)
+            
+        def forward(self, x):
+            return self.linear(x)  
+
+    X_train = torch.tensor([[0, 0], [0, 1], [1, 0], [1, 1]], dtype=torch.float32) 
+    y_train = torch.tensor([[0], [1], [1], [1]], dtype=torch.float32)
+
+    input_size = 2
+    output_size = 1
+
+    perceptron = Perceptron(input_size, output_size)
+
+    criterion = nn.BCEWithLogitsLoss() 
+    optimizer = optim.SGD(perceptron.parameters(), lr=0.1)  
+
+    num_epochs = 1000
+
+    for epoch in range(num_epochs):
+        optimizer.zero_grad()  
+        outputs = perceptron(X_train)  
+        loss = criterion(outputs, y_train)  
+        loss.backward()  
+        optimizer.step() 
+
+        if (epoch + 1) % 100 == 0:
+            print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
+
+    with torch.no_grad(): 
+        test_outputs = perceptron(X_train)
+        predictions = torch.sigmoid(test_outputs)  
+        predicted_labels = (predictions >= 0.5).float()  
+
+        accuracy = (predicted_labels == y_train).float().mean() * 100
+        print(f'Final Accuracy: {accuracy.item():.2f}%')
+
+        print("Predictions:", predicted_labels.squeeze().tolist())
+
+    Epoch [100/1000], Loss: 0.3286
+    Epoch [200/1000], Loss: 0.2577
+    Epoch [300/1000], Loss: 0.2109
+    Epoch [400/1000], Loss: 0.1777
+    Epoch [500/1000], Loss: 0.1531
+    Epoch [600/1000], Loss: 0.1342
+    Epoch [700/1000], Loss: 0.1192
+    Epoch [800/1000], Loss: 0.1071
+    Epoch [900/1000], Loss: 0.0971
+    Epoch [1000/1000], Loss: 0.0887
+    Final Accuracy: 100.00%
+    Predictions: [0.0, 1.0, 1.0, 1.0]

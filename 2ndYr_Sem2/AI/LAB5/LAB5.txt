@@ -1,0 +1,149 @@
+
+
+A.I. Assignment 5
+
+Learning Goals
+
+By the end of this lab, you should be able to:
+
+-   Get more familiar with tensors in pytorch
+-   Create a simple multilayer perceptron model with pytorch
+-   Visualise the parameters
+
+Task
+
+Build a fully connected feed forward network that adds two bits.
+Determine the a propper achitecture for this network (what database you
+use for this problem? how many layers? how many neurons on each layer?
+what is the activation function? what is the loss function? etc)
+
+Create at least 3 such networks and compare their performance (how
+accurate they are?, how farst they are trained to get at 1 accuracy?)
+
+Display for the best one the weights for each layer.
+
+    import torch
+    import torch.nn as nn
+    from collections import OrderedDict
+
+    architectures = [
+        nn.Sequential(OrderedDict([
+            ('hidden', nn.Linear(2, 4)),    # 2 input features, 4 output features
+            ('activation1', nn.ReLU()),     # ReLU activation function
+            ('output', nn.Linear(4, 2)),    # 4 input features, 2 output feature
+            ('sigmoid', nn.Sigmoid())       # Sigmoid activation function
+        ])),
+        nn.Sequential(OrderedDict([
+            ('hidden1', nn.Linear(2, 8)),   # 2 input features, 8 output features
+            ('activation1', nn.ReLU()),     # ReLU activation function
+            ('hidden2', nn.Linear(8, 4)),   # 8 input features, 4 output features
+            ('activation2', nn.ReLU()),     # ReLU activation function
+            ('output', nn.Linear(4, 2)),    # 4 input features, 2 output feature
+            ('sigmoid', nn.Sigmoid())       # Sigmoid activation function
+        ])),
+        nn.Sequential(OrderedDict([
+            ('hidden1', nn.Linear(2, 16)),  # 2 input features, 16 output features
+            ('activation1', nn.Tanh()),     # Tanh activation function
+            ('hidden2', nn.Linear(16, 8)),  # 16 input features, 8 output features
+            ('activation2', nn.Tanh()),     # Tanh activation function
+            ('output', nn.Linear(8, 2)),    # 8 input features, 2 output feature
+            ('sigmoid', nn.Sigmoid())       # Sigmoid activation function
+        ]))
+    ]
+
+    print(architectures)
+
+    [Sequential(
+      (hidden): Linear(in_features=2, out_features=4, bias=True)
+      (activation1): ReLU()
+      (output): Linear(in_features=4, out_features=1, bias=True)
+      (sigmoid): Sigmoid()
+    ), Sequential(
+      (hidden1): Linear(in_features=2, out_features=8, bias=True)
+      (activation1): ReLU()
+      (hidden2): Linear(in_features=8, out_features=4, bias=True)
+      (activation2): ReLU()
+      (output): Linear(in_features=4, out_features=1, bias=True)
+      (sigmoid): Sigmoid()
+    ), Sequential(
+      (hidden1): Linear(in_features=2, out_features=16, bias=True)
+      (activation1): Tanh()
+      (hidden2): Linear(in_features=16, out_features=8, bias=True)
+      (activation2): Tanh()
+      (output): Linear(in_features=8, out_features=1, bias=True)
+      (sigmoid): Sigmoid()
+    )]
+
+    data_in = torch.tensor([[0, 0], [0, 1], [1, 0], [1, 1]], dtype=torch.float32)
+    print(data_in)
+
+    tensor([[0., 0.],
+            [0., 1.],
+            [1., 0.],
+            [1., 1.]])
+
+    data_target = torch.tensor([[0, 0], [0, 1], [0, 1], [1, 0]], dtype=torch.float32)
+    print(data_target)
+
+    tensor([[0., 0.],
+            [0., 1.],
+            [0., 1.],
+            [1., 0.]])
+
+    results = []
+    loss_history = []  
+
+    for i, model in enumerate(architectures):
+        criterion = nn.BCELoss()
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+        
+        epochs = 10000
+        model_loss_history = [] 
+        
+        for epoch in range(epochs):
+            optimizer.zero_grad()
+            output = model(data_in)
+            loss = criterion(output, data_target)
+            loss.backward()
+            optimizer.step()
+            
+            model_loss_history.append(loss.item()) 
+
+        accuracy = ((output > 0.5).float() == data_target).float().mean().item()
+        results.append((i, loss.item(), accuracy))
+        
+        print(f"Model {i+1}: Loss = {loss.item()}, Accuracy = {accuracy}")
+        
+        loss_history.append(model_loss_history) 
+
+    Model 1: Loss = 0.0001161274267360568, Accuracy = 1.0
+    Model 2: Loss = 2.5596071282052435e-05, Accuracy = 1.0
+    Model 3: Loss = 0.0001884732919279486, Accuracy = 1.0
+
+    import matplotlib.pyplot as plt
+    import torch
+
+    plt.figure(figsize=(10, 6))
+
+    for i, loss_values in enumerate(loss_history):
+        plt.plot(loss_values, label=f'Model {i+1}')
+
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.title('Loss Function Convergence')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+[]
+
+    best_model_index = max(results, key=lambda x: x[2])[0]
+    print(f"Best Model: Model {best_model_index + 1}")
+    print(f"Best Model Weights: {architectures[best_model_index].state_dict()}")
+
+    Best Model: Model 1
+    Best Model Weights: OrderedDict({'hidden.weight': tensor([[-3.4002,  3.3801],
+            [ 1.3572, -3.2524],
+            [ 2.2033,  3.1196],
+            [-2.8650, -2.8650]]), 'hidden.bias': tensor([ 0.0202,  1.8952, -2.1581,  2.8650]), 'output.weight': tensor([[-3.2010, -2.8401,  3.3331, -0.7751],
+            [ 3.5139,  2.6839, -2.7817, -4.8423]]), 'output.bias': tensor([-1.6342, -0.0178])})
