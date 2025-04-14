@@ -69,6 +69,7 @@
             height: 90%; 
         }
         .bar {
+            position: relative;
             width: 20px;
             background-color: #333;
             margin: 0 5px;
@@ -131,6 +132,29 @@
                     setTimeout(() => {
                         bar.css('height', barHeight + '%');
                     }, 250);
+
+                    bar.on('mousedown', function(e) {
+                        const barElement = $(this);
+                        const startX = e.pageX;
+                        const startY = e.pageY;
+                        const startLeft = parseInt(barElement.css('left')) || 0;
+                        const startTop = parseInt(barElement.css('top')) || 0;
+
+                        $(document).on('mousemove.draggable', function(e) {
+                            const newLeft = startLeft + (e.pageX - startX);
+                            const newTop = startTop + (e.pageY - startY);
+                            barElement.css({
+                                left: newLeft + 'px',
+                                top: newTop + 'px',
+                            });
+                        });
+
+                        $(document).on('mouseup.draggable', function() {
+                            $(document).off('.draggable');
+                        });
+
+                        e.preventDefault();
+                    });
 
                     const numberDiv = $('<div class="number"></div>').text(number);
                     $('.numbers').append(numberDiv);
