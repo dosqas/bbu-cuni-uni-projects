@@ -1,0 +1,1373 @@
+
+
+A.I. Assignment 7
+
+Learning Goals
+
+By the end of this lab, you should be able to:
+
+-   Get more familiar with computer vision concepts
+-   Understand Convolutions
+-   Understand and trainsimple models
+-   Undertstand pooling and train convolutional model
+
+Task
+
+In the context of image processing, a kernel is a small matrix of
+numbers that is applied to an image to perform operations such as
+blurring, sharpening, edge detection, and more. The kernel is usually a
+square matrix with odd dimensions, such as 3x3 or 5x5.
+
+We will train simple models using liniear layers and non linear layers
+that we learned how to use in the previous labs and then train a
+convolutional neural network and compare the results
+
+Computer Vision Intro
+
+Computer vision is the art of teaching a computer to see.
+
+For example, it could involve building a model to classify whether a
+photo is of a cat or a dog (binary classification).
+
+Or whether a photo is of a cat, dog or chicken (multi-class
+classification).
+
+Or identifying where a car appears in a video frame (object detection).
+
+Or figuring out where different objects in an image can be separated
+(panoptic segmentation).
+
+[example computer vision problems] Example computer vision problems for
+binary classification, multiclass classification, object detection and
+segmentation.
+
+What we're going to cover
+
+We're going to apply the PyTorch Workflow we've been learning in the
+past couple of sections to computer vision.
+
+[a PyTorch workflow with a computer vision focus]
+
+Storing Images in PyTorch
+
+In PyTorch, images are typically stored as tensors, which are
+multi-dimensional arrays. For example, a grayscale image with dimensions
+128 x 128 pixels would be represented as a tensor with shape (1, 128,
+128), where the first dimension represents the number of color channels
+(in this case 1 for grayscale), and the remaining dimensions represent
+the height and width of the image.
+
+Similarly, a color image with dimensions 128 x 128 pixels would be
+represented as a tensor with shape (3, 128, 128), where the first
+dimension represents the number of color channels (in this case 3 for
+red, green, and blue), and the remaining dimensions represent the height
+and width of the image.
+
+    import torch
+    import torchvision
+    import matplotlib.pyplot as plt
+    from PIL import Image
+
+    # Load an image file into a PyTorch tensor
+    image = torchvision.io.read_image('corgi.jpg')
+
+    # Create a grid of images
+    grid = torchvision.utils.make_grid(image)
+
+    # Display the grid using matplotlib
+    plt.imshow(grid.permute(1, 2, 0))
+    plt.show()
+
+[]
+
+Images in numpy
+
+    import numpy as np
+
+    # Load an image file into a Python array
+    image = Image.open('corgi.jpg')
+    image_array = np.array(image)
+
+    # Display the image using matplotlib
+    plt.imshow(image_array)
+    plt.show()
+
+[]
+
+What is a convolution ?
+
+Problems with the Fully-connected nn
+
+Fully-Connected = What we did with linear layers and activations
+
+-   Do you need to consider all the relations between the features?
+
+-   Fully connected nn are big and so very computationally inefficient
+
+-   They have so many parameters, and so overfit
+
+    Main idea of CNN
+
+-   Units are connected with only a few units from the previous layer
+
+-   Units share weights
+
+    Main Idea
+
+    [image.png]!
+
+    Convolving operation
+
+    [image.png]!
+
+    Resulting activation map
+
+    [image.png]!
+
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+    import torchvision
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    plt.rcParams['figure.figsize'] = (8, 8)
+
+    images = torch.rand(10, 1, 28, 28)
+
+    # Build 6 conv. filters
+    conv_filters = nn.Conv2d(in_channels=1, out_channels=6, kernel_size=(3, 3), stride=1, padding=1)
+
+    # Convolve the image with the filters
+    output_feature = conv_filters(images)
+    print(output_feature.shape)
+
+    torch.Size([10, 6, 28, 28])
+
+    # Applying the convolution we get 6 filters
+
+Let's apply the convolution on the corgi
+
+    # Load an image file into a PyTorch tensor
+    image = torchvision.io.read_image('corgi.jpg').float()
+
+    # Normalize the pixel values to be between 0 and 1
+    image /= 255.0
+
+    # Define a convolutional filter with 3 input channels, 10 output channels, and a kernel size of 3
+    conv_filter = nn.Conv2d(3, 10, kernel_size=3)
+
+    print(image.shape)
+
+    torch.Size([3, 334, 515])
+
+    output = conv_filter(image)
+
+    # Create a grid of images
+    grid = torchvision.utils.make_grid(output)
+    # Display the grid using matplotlib
+    plt.imshow(output.detach()[2]) # One 0 is the batch and one is the signal (RGB)
+    plt.show()
+
+    #This is just 1 random filter
+
+[]
+
+    # Ex 1: Look at some other channels
+    plt.imshow(output.detach()[3]) # One 0 is the batch and one is the signal (RGB)
+    plt.show()
+
+    plt.imshow(output.detach()[4]) # One 0 is the batch and one is the signal (RGB)
+    plt.show()
+
+    plt.imshow(output.detach()[5]) # One 0 is the batch and one is the signal (RGB)
+    plt.show()
+
+[]
+
+[]
+
+[]
+
+Computer vision libraries in PyTorch
+
+Before we get started writing code, let's talk about some PyTorch
+computer vision libraries you should be aware of.
+
+  -----------------------------------------------------------------------
+  PyTorch module                      What does it do?
+  ----------------------------------- -----------------------------------
+  torchvision                         Contains datasets, model
+                                      architectures and image
+                                      transformations often used for
+                                      computer vision problems.
+
+  torchvision.datasets                Here you'll find many example
+                                      computer vision datasets for a
+                                      range of problems from image
+                                      classification, object detection,
+                                      image captioning, video
+                                      classification and more. It also
+                                      contains a series of base classes
+                                      for making custom datasets.
+
+  torchvision.models                  This module contains
+                                      well-performing and commonly used
+                                      computer vision model architectures
+                                      implemented in PyTorch, you can use
+                                      these with your own problems.
+
+  torchvision.transforms              Often images need to be transformed
+                                      (turned into
+                                      numbers/processed/augmented) before
+                                      being used with a model, common
+                                      image transformations are found
+                                      here.
+
+  torch.utils.data.Dataset            Base dataset class for PyTorch.
+
+  torch.utils.data.DataLoader         Creates a Python iteralbe over a
+                                      dataset (created with
+                                      torch.utils.data.Dataset).
+  -----------------------------------------------------------------------
+
+  Note: The torch.utils.data.Dataset and torch.utils.data.DataLoader
+  classes aren't only for computer vision in PyTorch, they are capable
+  of dealing with many different types of data.
+
+Now we've covered some of the most important PyTorch computer vision
+libraries, let's import the relevant dependencies.
+
+1. Getting a dataset
+
+To begin working on a computer vision problem, let's get a computer
+vision dataset.
+
+We're going to start with FashionMNIST.
+
+MNIST stands for Modified National Institute of Standards and
+Technology.
+
+The original MNIST dataset contains thousands of examples of handwritten
+digits (from 0 to 9) and was used to build computer vision models to
+identify numbers for postal services.
+
+FashionMNIST, made by Zalando Research, is a similar setup.
+
+Except it contains grayscale images of 10 different kinds of clothing.
+
+[example image of FashionMNIST] torchvision.datasets contains a lot of
+example datasets you can use to practice writing computer vision code
+on. FashionMNIST is one of those datasets. And since it has 10 different
+image classes (different types of clothing), it's a multi-class
+classification problem.
+
+Later, we'll be building a computer vision neural network to identify
+the different styles of clothing in these images.
+
+PyTorch has a bunch of common computer vision datasets stored in
+torchvision.datasets.
+
+Including FashionMNIST in torchvision.datasets.FashionMNIST().
+
+To download it, we provide the following parameters:
+
+-   root: str - which folder do you want to download the data to?
+-   train: Bool - do you want the training or test split?
+-   download: Bool - should the data be downloaded?
+-   transform: torchvision.transforms - what transformations would you
+    like to do on the data?
+-   target_transform - you can transform the targets (labels) if you
+    like too.
+
+Many other datasets in torchvision have these parameter options.
+
+    import torchvision
+    from torchvision import datasets
+    from torchvision.transforms import ToTensor
+
+    # Setup training data
+    train_data = datasets.FashionMNIST(
+        root="data", # where to download data to?
+        train=True, # get training data
+        download=True, # download data if it doesn't exist on disk
+        transform=ToTensor(), # images come as PIL format, we want to turn into Torch tensors
+        target_transform=None # you can transform labels as well
+    )
+
+    # Setup testing data
+    test_data = datasets.FashionMNIST(
+        root="data",
+        train=False, # get test data
+        download=True,
+        transform=ToTensor()
+    )
+
+    # See first training sample
+    image, label = train_data[0]
+    image, label
+
+    (tensor([[[0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0039, 0.0000, 0.0000, 0.0510,
+               0.2863, 0.0000, 0.0000, 0.0039, 0.0157, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0039, 0.0039, 0.0000],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0118, 0.0000, 0.1412, 0.5333,
+               0.4980, 0.2431, 0.2118, 0.0000, 0.0000, 0.0000, 0.0039, 0.0118,
+               0.0157, 0.0000, 0.0000, 0.0118],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0235, 0.0000, 0.4000, 0.8000,
+               0.6902, 0.5255, 0.5647, 0.4824, 0.0902, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0471, 0.0392, 0.0000],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.6078, 0.9255,
+               0.8118, 0.6980, 0.4196, 0.6118, 0.6314, 0.4275, 0.2510, 0.0902,
+               0.3020, 0.5098, 0.2824, 0.0588],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0039, 0.0000, 0.2706, 0.8118, 0.8745,
+               0.8549, 0.8471, 0.8471, 0.6392, 0.4980, 0.4745, 0.4784, 0.5725,
+               0.5529, 0.3451, 0.6745, 0.2588],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0039, 0.0039, 0.0039, 0.0000, 0.7843, 0.9098, 0.9098,
+               0.9137, 0.8980, 0.8745, 0.8745, 0.8431, 0.8353, 0.6431, 0.4980,
+               0.4824, 0.7686, 0.8980, 0.0000],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.7176, 0.8824, 0.8471,
+               0.8745, 0.8941, 0.9216, 0.8902, 0.8784, 0.8706, 0.8784, 0.8667,
+               0.8745, 0.9608, 0.6784, 0.0000],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.7569, 0.8941, 0.8549,
+               0.8353, 0.7765, 0.7059, 0.8314, 0.8235, 0.8275, 0.8353, 0.8745,
+               0.8627, 0.9529, 0.7922, 0.0000],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0039, 0.0118, 0.0000, 0.0471, 0.8588, 0.8627, 0.8314,
+               0.8549, 0.7529, 0.6627, 0.8902, 0.8157, 0.8549, 0.8784, 0.8314,
+               0.8863, 0.7725, 0.8196, 0.2039],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0235, 0.0000, 0.3882, 0.9569, 0.8706, 0.8627,
+               0.8549, 0.7961, 0.7765, 0.8667, 0.8431, 0.8353, 0.8706, 0.8627,
+               0.9608, 0.4667, 0.6549, 0.2196],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0157, 0.0000, 0.0000, 0.2157, 0.9255, 0.8941, 0.9020,
+               0.8941, 0.9412, 0.9098, 0.8353, 0.8549, 0.8745, 0.9176, 0.8510,
+               0.8510, 0.8196, 0.3608, 0.0000],
+              [0.0000, 0.0000, 0.0039, 0.0157, 0.0235, 0.0275, 0.0078, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.9294, 0.8863, 0.8510, 0.8745,
+               0.8706, 0.8588, 0.8706, 0.8667, 0.8471, 0.8745, 0.8980, 0.8431,
+               0.8549, 1.0000, 0.3020, 0.0000],
+              [0.0000, 0.0118, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.2431, 0.5686, 0.8000, 0.8941, 0.8118, 0.8353, 0.8667,
+               0.8549, 0.8157, 0.8275, 0.8549, 0.8784, 0.8745, 0.8588, 0.8431,
+               0.8784, 0.9569, 0.6235, 0.0000],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0706, 0.1725, 0.3216, 0.4196,
+               0.7412, 0.8941, 0.8627, 0.8706, 0.8510, 0.8863, 0.7843, 0.8039,
+               0.8275, 0.9020, 0.8784, 0.9176, 0.6902, 0.7373, 0.9804, 0.9725,
+               0.9137, 0.9333, 0.8431, 0.0000],
+              [0.0000, 0.2235, 0.7333, 0.8157, 0.8784, 0.8667, 0.8784, 0.8157,
+               0.8000, 0.8392, 0.8157, 0.8196, 0.7843, 0.6235, 0.9608, 0.7569,
+               0.8078, 0.8745, 1.0000, 1.0000, 0.8667, 0.9176, 0.8667, 0.8275,
+               0.8627, 0.9098, 0.9647, 0.0000],
+              [0.0118, 0.7922, 0.8941, 0.8784, 0.8667, 0.8275, 0.8275, 0.8392,
+               0.8039, 0.8039, 0.8039, 0.8627, 0.9412, 0.3137, 0.5882, 1.0000,
+               0.8980, 0.8667, 0.7373, 0.6039, 0.7490, 0.8235, 0.8000, 0.8196,
+               0.8706, 0.8941, 0.8824, 0.0000],
+              [0.3843, 0.9137, 0.7765, 0.8235, 0.8706, 0.8980, 0.8980, 0.9176,
+               0.9765, 0.8627, 0.7608, 0.8431, 0.8510, 0.9451, 0.2549, 0.2863,
+               0.4157, 0.4588, 0.6588, 0.8588, 0.8667, 0.8431, 0.8510, 0.8745,
+               0.8745, 0.8784, 0.8980, 0.1137],
+              [0.2941, 0.8000, 0.8314, 0.8000, 0.7569, 0.8039, 0.8275, 0.8824,
+               0.8471, 0.7255, 0.7725, 0.8078, 0.7765, 0.8353, 0.9412, 0.7647,
+               0.8902, 0.9608, 0.9373, 0.8745, 0.8549, 0.8314, 0.8196, 0.8706,
+               0.8627, 0.8667, 0.9020, 0.2627],
+              [0.1882, 0.7961, 0.7176, 0.7608, 0.8353, 0.7725, 0.7255, 0.7451,
+               0.7608, 0.7529, 0.7922, 0.8392, 0.8588, 0.8667, 0.8627, 0.9255,
+               0.8824, 0.8471, 0.7804, 0.8078, 0.7294, 0.7098, 0.6941, 0.6745,
+               0.7098, 0.8039, 0.8078, 0.4510],
+              [0.0000, 0.4784, 0.8588, 0.7569, 0.7020, 0.6706, 0.7176, 0.7686,
+               0.8000, 0.8235, 0.8353, 0.8118, 0.8275, 0.8235, 0.7843, 0.7686,
+               0.7608, 0.7490, 0.7647, 0.7490, 0.7765, 0.7529, 0.6902, 0.6118,
+               0.6549, 0.6941, 0.8235, 0.3608],
+              [0.0000, 0.0000, 0.2902, 0.7412, 0.8314, 0.7490, 0.6863, 0.6745,
+               0.6863, 0.7098, 0.7255, 0.7373, 0.7412, 0.7373, 0.7569, 0.7765,
+               0.8000, 0.8196, 0.8235, 0.8235, 0.8275, 0.7373, 0.7373, 0.7608,
+               0.7529, 0.8471, 0.6667, 0.0000],
+              [0.0078, 0.0000, 0.0000, 0.0000, 0.2588, 0.7843, 0.8706, 0.9294,
+               0.9373, 0.9490, 0.9647, 0.9529, 0.9569, 0.8667, 0.8627, 0.7569,
+               0.7490, 0.7020, 0.7137, 0.7137, 0.7098, 0.6902, 0.6510, 0.6588,
+               0.3882, 0.2275, 0.0000, 0.0000],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.1569,
+               0.2392, 0.1725, 0.2824, 0.1608, 0.1373, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000],
+              [0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+               0.0000, 0.0000, 0.0000, 0.0000]]]),
+     9)
+
+The shape of the image tensor is [1, 28, 28] or more specifically:
+
+    [color_channels=1, height=28, width=28]
+
+Having color_channels=1 means the image is grayscale.
+
+[example input and output shapes of the fashionMNIST problem] Various
+problems will have various input and output shapes. But the premise
+reamins: encode data into numbers, build a model to find patterns in
+those numbers, convert those patterns into something meaningful.
+
+If color_channels=3, the image comes in pixel values for red, green and
+blue (this is also known a the RGB color model).
+
+The order of our current tensor is often referred to as CHW (Color
+Channels, Height, Width).
+
+There's debate on whether images should be represented as CHW (color
+channels first) or HWC (color channels last).
+
+  Note: You'll also see NCHW and NHWC formats where N stands for number
+  of images. For example if you have a batch_size=32, your tensor shape
+  may be [32, 1, 28, 28]. We'll cover batch sizes later.
+
+PyTorch generally accepts NCHW (channels first) as the default for many
+operators.
+
+    # See classes
+    class_names = train_data.classes
+    class_names
+
+    ['T-shirt/top',
+     'Trouser',
+     'Pullover',
+     'Dress',
+     'Coat',
+     'Sandal',
+     'Shirt',
+     'Sneaker',
+     'Bag',
+     'Ankle boot']
+
+    # Ex 1 Print the len of the train and test datasets
+
+    print(f"Number of training samples: {len(train_data)}")
+    print(f"Number of testing samples: {len(test_data)}")
+
+    Number of training samples: 60000
+    Number of testing samples: 10000
+
+    import matplotlib.pyplot as plt
+    image, label = train_data[0]
+    print(f"Image shape: {image.shape}")
+    plt.imshow(image.squeeze()) # image shape is [1, 28, 28] (colour channels, height, width)
+    plt.title(label);
+
+    Image shape: torch.Size([1, 28, 28])
+
+[]
+
+    # Now let's look at some random images
+    # Ex 3 Access some random data from train_data
+    import random
+
+    for i in range(5):
+        image, label = train_data[random.randint(0, 60000 + 1)]
+        plt.imshow(image.squeeze())
+        plt.title(label)
+        plt.show()
+
+[]
+
+[]
+
+[]
+
+[]
+
+[]
+
+    # Plot more images
+    torch.manual_seed(42)
+    fig = plt.figure(figsize=(9, 9))
+    rows, cols = 4, 4
+    for i in range(1, rows * cols + 1):
+        random_idx = torch.randint(0, len(train_data), size=[1]).item()
+        # Ex 3 here
+        img, label = train_data[random_idx]
+        fig.add_subplot(rows, cols, i)
+        plt.imshow(img.squeeze(), cmap="gray")
+        plt.title(class_names[label])
+        plt.axis(False);
+
+[]
+
+2. Prepare DataLoader
+
+Now we've got a dataset ready to go.
+
+The next step is to prepare it with a torch.utils.data.DataLoader or
+DataLoader for short.
+
+The DataLoader does what you think it might do.
+
+It helps load data into a model.
+
+For training and for inference.
+
+It turns a large Dataset into a Python iterable of smaller chunks.
+
+These smaller chunks are called batches or mini-batches and can be set
+by the batch_size parameter.
+
+Why do this?
+
+Because it's more computationally efficient.
+
+In an ideal world you could do the forward pass and backward pass across
+all of your data at once.
+
+But once you start using really large datasets, unless you've got
+infinite computing power, it's easier to break them up into batches.
+
+It also gives your model more opportunities to improve.
+
+With mini-batches (small portions of the data), gradient descent is
+performed more often per epoch (once per mini-batch rather than once per
+epoch).
+
+What's a good batch size?
+
+32 is a good place to start for a fair amount of problems.
+
+But since this is a value you can set (a hyperparameter) you can try all
+different kinds of values, though generally powers of 2 are used most
+often (e.g. 32, 64, 128, 256, 512).
+
+    from torch.utils.data import DataLoader
+
+    # Setup the batch size hyperparameter
+    BATCH_SIZE = 32
+
+    # Turn datasets into iterables (batches)
+    train_dataloader = DataLoader(train_data, # dataset to turn into iterable
+        batch_size=BATCH_SIZE, # how many samples per batch? 
+        shuffle=True # shuffle data every epoch?
+    )
+
+    test_dataloader = DataLoader(test_data,
+        batch_size=BATCH_SIZE,
+        shuffle=False # don't necessarily have to shuffle the testing data
+    )
+
+    # Let's check out what we've created
+    print(f"Dataloaders: {train_dataloader, test_dataloader}") 
+    print(f"Length of train dataloader: {len(train_dataloader)} batches of {BATCH_SIZE}")
+    print(f"Length of test dataloader: {len(test_dataloader)} batches of {BATCH_SIZE}")
+
+    Dataloaders: (<torch.utils.data.dataloader.DataLoader object at 0x000001E55D5387D0>, <torch.utils.data.dataloader.DataLoader object at 0x000001E55D5E2D20>)
+    Length of train dataloader: 1875 batches of 32
+    Length of test dataloader: 313 batches of 32
+
+First Dumb Model
+
+Data loaded and prepared!
+
+Time to build a baseline model by subclassing nn.Module.
+
+A baseline model is one of the simplest models you can imagine.
+
+You use the baseline as a starting point and try to improve upon it with
+subsequent, more complicated models.
+
+    # Check out what's inside the training dataloader
+    # This is how we get some random samples
+    train_features_batch, train_labels_batch = next(iter(train_dataloader))
+    train_features_batch.shape, train_labels_batch.shape
+
+    (torch.Size([32, 1, 28, 28]), torch.Size([32]))
+
+    # Ex 4 Use Flatten + 2x Linear layer for the base model
+
+    from torch import nn
+    class FashionMNISTModelV0(nn.Module):
+        def __init__(self, input_shape: int, hidden_units: int, output_shape: int):
+            super().__init__()
+            self.layer_stack = nn.Sequential(
+                #Ex 4 here
+                nn.Flatten(),
+                nn.Linear(input_shape, hidden_units),
+                nn.Linear(hidden_units, output_shape)
+            )
+            
+        def forward(self, x):
+            return self.layer_stack(x)
+
+    torch.manual_seed(42)
+
+    # Need to setup model with input parameters
+    model_0 = FashionMNISTModelV0(input_shape=784, # one for every pixel (28x28)
+        hidden_units=10, # how many units in the hiden layer
+        output_shape=len(class_names) # one for every class
+    )
+
+    def accuracy_fn(y_true, y_pred):
+        """Calculates accuracy between truth labels and predictions.
+
+        Args:
+            y_true (torch.Tensor): Truth labels for predictions.
+            y_pred (torch.Tensor): Predictions to be compared to predictions.
+
+        Returns:
+            [torch.float]: Accuracy value between y_true and y_pred, e.g. 78.45
+        """
+        correct = torch.eq(y_true, y_pred).sum().item()
+        acc = (correct / len(y_pred)) * 100
+        return acc
+
+    # Ex 5 Define the loss as Cross Entropy loss and the sgd optimizer
+    from torch import optim
+
+    loss_fn = nn.CrossEntropyLoss()
+
+    optimizer = optim.SGD(params=model_0.parameters(), lr=0.1)
+
+    from timeit import default_timer as timer 
+    def print_train_time(start: float, end: float, device: torch.device = None):
+        """Prints difference between start and end time.
+
+        Args:
+            start (float): Start time of computation (preferred in timeit format). 
+            end (float): End time of computation.
+            device ([type], optional): Device that compute is running on. Defaults to None.
+
+        Returns:
+            float: time between start and end in seconds (higher is longer).
+        """
+        total_time = end - start
+        print(f"Train time on {device}: {total_time:.3f} seconds")
+        return total_time
+
+    # Ex 6 Create a loss_values_arr and plot it after the training loop
+
+    # Ex 7 Finish the training loop instructions
+
+    from timeit import default_timer as timer
+    import matplotlib.pyplot as plt
+    from tqdm.auto import tqdm
+
+    # Track training loss values
+    loss_values_arr = []
+
+    # Set seed and start timer
+    torch.manual_seed(42)
+    train_time_start_on_cpu = timer()
+
+    # Number of epochs
+    epochs = 3
+
+    # Training and Testing Loop
+    for epoch in tqdm(range(epochs)):
+        print(f"Epoch: {epoch}\n-------")
+        
+        ### Training
+        train_loss = 0
+        for batch, (X, y) in enumerate(train_dataloader):
+            model_0.train()
+
+            # 1. Forward pass
+            y_pred = model_0(X)
+
+            # 2. Calculate loss
+            loss = loss_fn(y_pred, y)
+            train_loss += loss.item()
+
+            # 3. Optimizer zero grad
+            optimizer.zero_grad()
+
+            # 4. Backward pass
+            loss.backward()
+
+            # 5. Optimizer step
+            optimizer.step()
+
+            # Print sample info
+            if batch % 400 == 0:
+                print(f"Looked at {batch * len(X)}/{len(train_dataloader.dataset)} samples")
+        
+        # Store avg train loss
+        avg_train_loss = train_loss / len(train_dataloader)
+        loss_values_arr.append(avg_train_loss)
+
+        ### Testing
+        test_loss, test_acc = 0, 0
+        model_0.eval()
+        with torch.inference_mode():
+            for X, y in test_dataloader:
+                # 1. Forward pass
+                test_pred = model_0(X)
+
+                # 2. Loss
+                test_loss += loss_fn(test_pred, y).item()
+
+                # 3. Accuracy
+                test_acc += accuracy_fn(y_true=y, y_pred=test_pred.argmax(dim=1))
+
+            # Average over batches
+            test_loss /= len(test_dataloader)
+            test_acc /= len(test_dataloader)
+
+        print(f"\nTrain loss: {avg_train_loss:.5f} | Test loss: {test_loss:.5f}, Test acc: {test_acc:.2f}%\n")
+
+    # Calculate training time
+    train_time_end_on_cpu = timer()
+    total_train_time_model_0 = train_time_end_on_cpu - train_time_start_on_cpu
+    print(f"Total training time: {total_train_time_model_0:.2f} seconds")
+
+    # Plot loss
+    plt.plot(loss_values_arr)
+    plt.title("Training Loss per Epoch")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.grid(True)
+    plt.show()
+
+    {"model_id":"00cb97f555a34642aa4af0751e858957","version_major":2,"version_minor":0}
+
+    Epoch: 0
+    -------
+    Looked at 0/60000 samples
+    Looked at 12800/60000 samples
+    Looked at 25600/60000 samples
+    Looked at 38400/60000 samples
+    Looked at 51200/60000 samples
+
+    Train loss: 0.59039 | Test loss: 0.50954, Test acc: 82.04%
+
+    Epoch: 1
+    -------
+    Looked at 0/60000 samples
+    Looked at 12800/60000 samples
+    Looked at 25600/60000 samples
+    Looked at 38400/60000 samples
+    Looked at 51200/60000 samples
+
+    Train loss: 0.47633 | Test loss: 0.47989, Test acc: 83.20%
+
+    Epoch: 2
+    -------
+    Looked at 0/60000 samples
+    Looked at 12800/60000 samples
+    Looked at 25600/60000 samples
+    Looked at 38400/60000 samples
+    Looked at 51200/60000 samples
+
+    Train loss: 0.45503 | Test loss: 0.47664, Test acc: 83.43%
+
+    Total training time: 124.14 seconds
+
+[]
+
+    # The model is looking good
+
+Evaluate baseline model
+
+    torch.manual_seed(42)
+    def eval_model(model: torch.nn.Module, 
+                   data_loader: torch.utils.data.DataLoader, 
+                   loss_fn: torch.nn.Module, 
+                   accuracy_fn):
+        """Returns a dictionary containing the results of model predicting on data_loader.
+
+        Args:
+            model (torch.nn.Module): A PyTorch model capable of making predictions on data_loader.
+            data_loader (torch.utils.data.DataLoader): The target dataset to predict on.
+            loss_fn (torch.nn.Module): The loss function of model.
+            accuracy_fn: An accuracy function to compare the models predictions to the truth labels.
+
+        Returns:
+            (dict): Results of model making predictions on data_loader.
+        """
+        loss, acc = 0, 0
+        model.eval()
+        with torch.inference_mode():
+            for X, y in data_loader:
+                # Make predictions with the model
+                y_pred = model(X)
+                
+                # Accumulate the loss and accuracy values per batch
+                loss += loss_fn(y_pred, y)
+                acc += accuracy_fn(y_true=y, 
+                                    y_pred=y_pred.argmax(dim=1)) # For accuracy, need the prediction labels (logits -> pred_prob -> pred_labels)
+            
+            # Scale loss and acc to find the average loss/acc per batch
+            loss /= len(data_loader)
+            acc /= len(data_loader)
+            
+        return {"model_name": model.__class__.__name__, # only works when model was created with a class
+                "model_loss": loss.item(),
+                "model_acc": acc}
+
+    # Calculate model 0 results on test dataset
+    model_0_results = eval_model(model=model_0, data_loader=test_dataloader,
+        loss_fn=loss_fn, accuracy_fn=accuracy_fn
+    )
+    model_0_results
+
+    {'model_name': 'FashionMNISTModelV0',
+     'model_loss': 0.4766388535499573,
+     'model_acc': 83.42651757188499}
+
+Setup device agnostic code
+
+import torch device = "cuda" if torch.cuda.is_available() else "cpu"
+device
+
+Task 9 : Recreate the model by adding non linearities
+
+The model needs again to flatten the image to a 1 D array and then add in between the linear layers ReLU
+
+At the end you will have Flatten + Linear + ReLU + Linear + ReLU
+
+We also try to speed up thing
+
+    # Setup device agnostic code
+    import torch
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device
+
+    'cpu'
+
+    from torch import nn
+    class FashionMNISTModelV1(nn.Module):
+        def __init__(self, input_shape: int, hidden_units: int, output_shape: int):
+            super().__init__()
+            self.layer_stack = nn.Sequential(
+                #Ex 9 here
+                nn.Flatten(),
+                nn.Linear(input_shape, hidden_units),
+                nn.ReLU(),
+                nn.Linear(hidden_units, output_shape),
+            )
+            
+        def forward(self, x):
+            return self.layer_stack(x)
+
+    torch.manual_seed(42)
+    model_1 = FashionMNISTModelV1(input_shape=784, # number of input features
+        hidden_units=10,
+        output_shape=len(class_names) # number of output classes desired
+    ).to(device) # send model to GPU if it's available
+    next(model_1.parameters()).device # check model device
+
+    device(type='cpu')
+
+    # Task 10 Create the same loss + Optimizer as for V0
+
+    ## Make sure to use after the for loop if you are using a gpu      
+    # Send data to GPU
+    # X, y = X.to(device), y.to(device) 
+
+    loss_fn = nn.CrossEntropyLoss()
+
+    optimizer = torch.optim.SGD(params=model_1.parameters(), lr=0.1)
+
+    # Task 11 Train And Test it as before
+
+    # Track training loss values
+    loss_values_arr = []
+
+    # Set seed and start timer
+    torch.manual_seed(42)
+    train_time_start_on_cpu = timer()
+
+    # Number of epochs
+    epochs = 3
+
+    # Training and Testing Loop
+    for epoch in tqdm(range(epochs)):
+        print(f"Epoch: {epoch}\n-------")
+        
+        ### Training
+        train_loss = 0
+        for batch, (X, y) in enumerate(train_dataloader):
+            model_1.train()
+
+            # 1. Forward pass
+            y_pred = model_1(X)
+
+            # 2. Calculate loss
+            loss = loss_fn(y_pred, y)
+            train_loss += loss.item()
+
+            # 3. Optimizer zero grad
+            optimizer.zero_grad()
+
+            # 4. Backward pass
+            loss.backward()
+
+            # 5. Optimizer step
+            optimizer.step()
+
+            # Print sample info
+            if batch % 400 == 0:
+                print(f"Looked at {batch * len(X)}/{len(train_dataloader.dataset)} samples")
+        
+        # Store avg train loss
+        avg_train_loss = train_loss / len(train_dataloader)
+        loss_values_arr.append(avg_train_loss)
+
+        ### Testing
+        test_loss, test_acc = 0, 0
+        model_1.eval()
+        with torch.inference_mode():
+            for X, y in test_dataloader:
+                # 1. Forward pass
+                test_pred = model_1(X)
+
+                # 2. Loss
+                test_loss += loss_fn(test_pred, y).item()
+
+                # 3. Accuracy
+                test_acc += accuracy_fn(y_true=y, y_pred=test_pred.argmax(dim=1))
+
+            # Average over batches
+            test_loss /= len(test_dataloader)
+            test_acc /= len(test_dataloader)
+
+        print(f"\nTrain loss: {avg_train_loss:.5f} | Test loss: {test_loss:.5f}, Test acc: {test_acc:.2f}%\n")
+
+    # Calculate training time
+    train_time_end_on_cpu = timer()
+    total_train_time_model_1 = train_time_end_on_cpu - train_time_start_on_cpu
+    print(f"Total training time: {total_train_time_model_1:.2f} seconds")
+
+    # Plot loss
+    plt.plot(loss_values_arr)
+    plt.title("Training Loss per Epoch")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.grid(True)
+    plt.show()
+
+    {"model_id":"8528616e0b7746939371e6c3d953d463","version_major":2,"version_minor":0}
+
+    Epoch: 0
+    -------
+    Looked at 0/60000 samples
+    Looked at 12800/60000 samples
+    Looked at 25600/60000 samples
+    Looked at 38400/60000 samples
+    Looked at 51200/60000 samples
+
+    Train loss: 0.64607 | Test loss: 0.53855, Test acc: 80.76%
+
+    Epoch: 1
+    -------
+    Looked at 0/60000 samples
+    Looked at 12800/60000 samples
+    Looked at 25600/60000 samples
+    Looked at 38400/60000 samples
+    Looked at 51200/60000 samples
+
+    Train loss: 0.48094 | Test loss: 0.49390, Test acc: 82.46%
+
+    Epoch: 2
+    -------
+    Looked at 0/60000 samples
+    Looked at 12800/60000 samples
+    Looked at 25600/60000 samples
+    Looked at 38400/60000 samples
+    Looked at 51200/60000 samples
+
+    Train loss: 0.44689 | Test loss: 0.45746, Test acc: 83.99%
+
+    Total training time: 129.64 seconds
+
+[]
+
+Building a Convolutional Neural Network
+
+Alright, time to step things up a notch.
+
+It's time to create a Convolutional Neural Network (CNN or ConvNet).
+
+CNN's are known for their capabilities to find patterns in visual data.
+
+And since we're dealing with visual data, let's see if using a CNN model
+can improve upon our baseline.
+
+The CNN model we're going to be using is known as TinyVGG from the CNN
+Explainer website.
+
+It follows the typical structure of a convolutional neural network:
+
+Input layer -> [Convolutional layer -> activation layer -> pooling layer] -> Output layer
+
+Where the contents of
+[Convolutional layer -> activation layer -> pooling layer] can be
+upscaled and repeated multiple times, depending on requirements.
+
+What model should I use?
+
+  Question: Wait, you say CNN's are good for images, are there any other
+  model types I should be aware of?
+
+Good question.
+
+This table is a good general guide for which model to use (though there
+are exceptions).
+
+  -----------------------------------------------------------------------
+  Problem type            Model to use            Code example
+                          (generally)             
+  ----------------------- ----------------------- -----------------------
+  Structured data (Excel  Gradient boosted        sklearn.ensemble,
+  spreadsheets, row and   models, Random Forests, XGBoost library
+  column data)            XGBoost                 
+
+  Unstructured data       Convolutional Neural    torchvision.models,
+  (images, audio,         Networks, Transformers  HuggingFace
+  language)                                       Transformers
+  -----------------------------------------------------------------------
+
+  Note: The table above is only for reference, the model you end up
+  using will be highly dependant on the problem you're wor
+
+    # Setup device agnostic code
+    import torch
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device
+
+    'cpu'
+
+Let's create an example nn.Conv2d() with various parameters:
+
+-   in_channels (int) - Number of channels in the input image.
+-   out_channels (int) - Number of channels produced by the convolution.
+-   kernel_size (int or tuple) - Size of the convolving kernel/filter.
+-   stride (int or tuple, optional) - How big of a step the convolving
+    kernel takes at a time. Default: 1.
+-   padding (int, tuple, str) - Padding added to all four sides of
+    input. Default: 0.
+
+[example of going through the different parameters of a Conv2d layer]
+
+    torch.manual_seed(42)
+
+    # Create sample batch of random numbers with same size as image batch
+    images = torch.randn(size=(32, 3, 64, 64)) # [batch_size, color_channels, height, width]
+    test_image = images[0] # get a single image for testing
+
+    torch.manual_seed(42)
+
+    # Create a convolutional layer with same dimensions as TinyVGG 
+    # (try changing any of the parameters and see what happens)
+    conv_layer = nn.Conv2d(in_channels=3,
+                           out_channels=10,
+                           kernel_size=3,
+                           stride=1,
+                           padding=0) # also try using "valid" or "same" here 
+
+    # Pass the data through the convolutional layer
+    conv_layer(test_image) # Note: If running PyTorch <1.11.0, this will error because of shape issues (nn.Conv.2d() expects a 4d tensor as input) 
+
+    tensor([[[ 1.5396,  0.0516,  0.6454,  ..., -0.3673,  0.8711,  0.4256],
+             [ 0.3662,  1.0114, -0.5997,  ...,  0.8983,  0.2809, -0.2741],
+             [ 1.2664, -1.4054,  0.3727,  ..., -0.3409,  1.2191, -0.0463],
+             ...,
+             [-0.1541,  0.5132, -0.3624,  ..., -0.2360, -0.4609, -0.0035],
+             [ 0.2981, -0.2432,  1.5012,  ..., -0.6289, -0.7283, -0.5767],
+             [-0.0386, -0.0781, -0.0388,  ...,  0.2842,  0.4228, -0.1802]],
+
+            [[-0.2840, -0.0319, -0.4455,  ..., -0.7956,  1.5599, -1.2449],
+             [ 0.2753, -0.1262, -0.6541,  ..., -0.2211,  0.1999, -0.8856],
+             [-0.5404, -1.5489,  0.0249,  ..., -0.5932, -1.0913, -0.3849],
+             ...,
+             [ 0.3870, -0.4064, -0.8236,  ...,  0.1734, -0.4330, -0.4951],
+             [-0.1984, -0.6386,  1.0263,  ..., -0.9401, -0.0585, -0.7833],
+             [-0.6306, -0.2052, -0.3694,  ..., -1.3248,  0.2456, -0.7134]],
+
+            [[ 0.4414,  0.5100,  0.4846,  ..., -0.8484,  0.2638,  1.1258],
+             [ 0.8117,  0.3191, -0.0157,  ...,  1.2686,  0.2319,  0.5003],
+             [ 0.3212,  0.0485, -0.2581,  ...,  0.2258,  0.2587, -0.8804],
+             ...,
+             [-0.1144, -0.1869,  0.0160,  ..., -0.8346,  0.0974,  0.8421],
+             [ 0.2941,  0.4417,  0.5866,  ..., -0.1224,  0.4814, -0.4799],
+             [ 0.6059, -0.0415, -0.2028,  ...,  0.1170,  0.2521, -0.4372]],
+
+            ...,
+
+            [[-0.2560, -0.0477,  0.6380,  ...,  0.6436,  0.7553, -0.7055],
+             [ 1.5595, -0.2209, -0.9486,  ..., -0.4876,  0.7754,  0.0750],
+             [-0.0797,  0.2471,  1.1300,  ...,  0.1505,  0.2354,  0.9576],
+             ...,
+             [ 1.1065,  0.6839,  1.2183,  ...,  0.3015, -0.1910, -0.1902],
+             [-0.3486, -0.7173, -0.3582,  ...,  0.4917,  0.7219,  0.1513],
+             [ 0.0119,  0.1017,  0.7839,  ..., -0.3752, -0.8127, -0.1257]],
+
+            [[ 0.3841,  1.1322,  0.1620,  ...,  0.7010,  0.0109,  0.6058],
+             [ 0.1664,  0.1873,  1.5924,  ...,  0.3733,  0.9096, -0.5399],
+             [ 0.4094, -0.0861, -0.7935,  ..., -0.1285, -0.9932, -0.3013],
+             ...,
+             [ 0.2688, -0.5630, -1.1902,  ...,  0.4493,  0.5404, -0.0103],
+             [ 0.0535,  0.4411,  0.5313,  ...,  0.0148, -1.0056,  0.3759],
+             [ 0.3031, -0.1590, -0.1316,  ..., -0.5384, -0.4271, -0.4876]],
+
+            [[-1.1865, -0.7280, -1.2331,  ..., -0.9013, -0.0542, -1.5949],
+             [-0.6345, -0.5920,  0.5326,  ..., -1.0395, -0.7963, -0.0647],
+             [-0.1132,  0.5166,  0.2569,  ...,  0.5595, -1.6881,  0.9485],
+             ...,
+             [-0.0254, -0.2669,  0.1927,  ..., -0.2917,  0.1088, -0.4807],
+             [-0.2609, -0.2328,  0.1404,  ..., -0.1325, -0.8436, -0.7524],
+             [-1.1399, -0.1751, -0.8705,  ...,  0.1589,  0.3377,  0.3493]]],
+           grad_fn=<SqueezeBackward1>)
+
+    # Extra Ex : Play with kernal size and stride and see what happens to the shapes
+
+    # Create a convolutional neural network 
+    class FashionMNISTModelV2(nn.Module):
+        """
+        Model architecture copying TinyVGG from: 
+        https://poloclub.github.io/cnn-explainer/
+        """
+        def __init__(self, input_shape: int, hidden_units: int, output_shape: int):
+            super().__init__()
+            self.block_1 = nn.Sequential(
+                nn.Conv2d(in_channels=input_shape, 
+                          out_channels=hidden_units, 
+                          kernel_size=3, # how big is the square that's going over the image?
+                          stride=1, # default
+                          padding=1),# options = "valid" (no padding) or "same" (output has same shape as input) or int for specific number 
+                nn.ReLU(),
+                nn.Conv2d(in_channels=hidden_units, 
+                          out_channels=hidden_units,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1),
+                nn.ReLU(),
+                nn.MaxPool2d(kernel_size=2,
+                             stride=2) # default stride value is same as kernel_size
+            )
+            self.block_2 = nn.Sequential(
+                nn.Conv2d(hidden_units, hidden_units, 3, padding=1),
+                nn.ReLU(),
+                nn.Conv2d(hidden_units, hidden_units, 3, padding=1),
+                nn.ReLU(),
+                nn.MaxPool2d(2)
+            )
+            self.classifier = nn.Sequential(
+                nn.Flatten(),
+                # Where did this in_features shape come from? 
+                # It's because each layer of our network compresses and changes the shape of our inputs data.
+                nn.Linear(in_features=hidden_units*7*7, 
+                          out_features=output_shape)
+            )
+        
+        def forward(self, x: torch.Tensor):
+            x = self.block_1(x)
+            # print(x.shape)
+            x = self.block_2(x)
+            # print(x.shape)
+            x = self.classifier(x)
+            # print(x.shape)
+            return x
+
+    torch.manual_seed(42)
+    model_2 = FashionMNISTModelV2(input_shape=1, 
+        hidden_units=10, 
+        output_shape=len(class_names)).to(device)
+    model_2
+
+    FashionMNISTModelV2(
+      (block_1): Sequential(
+        (0): Conv2d(1, 10, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): ReLU()
+        (2): Conv2d(10, 10, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): ReLU()
+        (4): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+      )
+      (block_2): Sequential(
+        (0): Conv2d(10, 10, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (1): ReLU()
+        (2): Conv2d(10, 10, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (3): ReLU()
+        (4): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+      )
+      (classifier): Sequential(
+        (0): Flatten(start_dim=1, end_dim=-1)
+        (1): Linear(in_features=490, out_features=10, bias=True)
+      )
+    )
+
+What is pooling?
+
+nn.MaxPool2d() is a function in PyTorch that performs 2D max pooling
+over an input signal. Max pooling is a form of down-sampling that
+reduces the spatial size of an input tensor while retaining important
+information about its features.
+
+Here's how nn.MaxPool2d() works:
+
+First, the input tensor is divided into non-overlapping rectangular
+regions of a specified size, called "pools". For example, if the input
+tensor has a shape of (batch_size, num_channels, height, width), and the
+pooling kernel size is set to (2, 2), then the input tensor will be
+divided into pools of size (2, 2) along the height and width dimensions.
+
+Next, the maximum value of each pool is computed, and the resulting
+values are placed into a new output tensor at the corresponding spatial
+location. [image.png]!
+
+[image.png]!
+
+    import torch
+    import torch.nn as nn
+
+    # Create a random 2D tensor of shape (1, 1, 4, 4)
+    input_tensor = torch.rand(1, 1, 4, 4)
+
+    # Define a max pooling layer with a kernel size of (2, 2)
+    maxpool_layer = nn.MaxPool2d(kernel_size=(2, 2))
+
+    # Apply the max pooling layer to the input tensor
+    output_tensor = maxpool_layer(input_tensor)
+
+    # Print the input and output tensor shapes
+    print("Input shape:", input_tensor.shape)
+    print("Output shape:", output_tensor.shape)
+
+    Input shape: torch.Size([1, 1, 4, 4])
+    Output shape: torch.Size([1, 1, 2, 2])
+
+    # EX 12 Train and evaluate this model 
+    # When training convert output from logits like
+        # # Do the forward pass
+        # y_logit = model_2(X)
+        # # Turn predictions from logits -> prediction probabilities -> predictions labels
+        # y_pred = torch.softmax(y_logit, dim=1).argmax(dim=1)
+
+    # Setup
+    torch.manual_seed(42)
+    train_time_start_model_2 = timer()
+
+    # Loss and optimizer
+    loss_fn = nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(model_2.parameters(), lr=0.1)
+
+    # Track training loss
+    loss_values_model_2 = []
+
+    # Train model_2
+    epochs = 3
+
+    for epoch in tqdm(range(epochs)):
+        print(f"Epoch: {epoch}\n-------")
+
+        ### Training
+        train_loss = 0
+        model_2.train()
+        for batch, (X, y) in enumerate(train_dataloader):
+            X, y = X.to(device), y.to(device)
+
+            # Forward
+            y_pred = model_2(X)
+            loss = loss_fn(y_pred, y)
+            train_loss += loss.item()
+
+            # Backpropagation
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            if batch % 400 == 0:
+                print(f"Looked at {batch * len(X)}/{len(train_dataloader.dataset)} samples")
+
+        avg_train_loss = train_loss / len(train_dataloader)
+        loss_values_model_2.append(avg_train_loss)
+
+        ### Testing
+        test_loss, test_acc = 0, 0
+        model_2.eval()
+        with torch.inference_mode():
+            for X, y in test_dataloader:
+                X, y = X.to(device), y.to(device)
+
+                # Forward
+                test_logits = model_2(X)
+
+                # Loss
+                test_loss += loss_fn(test_logits, y).item()
+
+                # Predictions
+                y_pred = torch.softmax(test_logits, dim=1).argmax(dim=1)
+                test_acc += accuracy_fn(y_true=y, y_pred=y_pred)
+
+        test_loss /= len(test_dataloader)
+        test_acc /= len(test_dataloader)
+
+        print(f"\nTrain loss: {avg_train_loss:.4f} | Test loss: {test_loss:.4f} | Test acc: {test_acc:.2f}%\n")
+
+    # Training time
+    train_time_end_model_2 = timer()
+    total_train_time_model_2 = train_time_end_model_2 - train_time_start_model_2
+    print(f"Total training time for model_2: {total_train_time_model_2:.2f} seconds")
+
+    # Plot training loss
+    plt.plot(loss_values_model_2)
+    plt.title("Training Loss (model_2 CNN)")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.grid(True)
+    plt.show()
+
+    {"model_id":"872cf986bbb84b0fb6150e18e876d424","version_major":2,"version_minor":0}
+
+    Epoch: 0
+    -------
+    Looked at 0/60000 samples
+    Looked at 12800/60000 samples
+    Looked at 25600/60000 samples
+    Looked at 38400/60000 samples
+    Looked at 51200/60000 samples
+
+    Train loss: 0.5888 | Test loss: 0.4053 | Test acc: 85.24%
+
+    Epoch: 1
+    -------
+    Looked at 0/60000 samples
+    Looked at 12800/60000 samples
+    Looked at 25600/60000 samples
+    Looked at 38400/60000 samples
+    Looked at 51200/60000 samples
+
+    Train loss: 0.3637 | Test loss: 0.3571 | Test acc: 86.99%
+
+    Epoch: 2
+    -------
+    Looked at 0/60000 samples
+    Looked at 12800/60000 samples
+    Looked at 25600/60000 samples
+    Looked at 38400/60000 samples
+
+    # Also compare the results(accuracy) and the training time
+
+Further reading
+
+https://goodboychan.github.io/python/datacamp/pytorch/deep_learning/2020/07/29/01-Convolutional-Neural-Networks-in-PyTorch.html
+
+https://towardsdatascience.com/visualizing-convolution-neural-networks-using-pytorch-3dfa8443e74e
