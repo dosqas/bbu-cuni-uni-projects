@@ -324,7 +324,7 @@
         }
 
         function goToBrowsePage() {
-            window.location.href = '../pages/browse.php'; // Adjust the path if needed
+            window.location.href = '../pages/browse.php';
         }
 
         let currentPage = 1; // Start on the first page
@@ -377,31 +377,31 @@
         <button onclick="updateProduct()">Update Product</button>
         <button onclick="closeEditModal()">Cancel</button>
     </div>
+
     <!-- Pagination Buttons -->
-    <!-- Pagination Buttons -->
-<div style="margin-top: 20px;">
-    <button id="previousButton" onclick="changePage(-1)" style="
-        padding: 10px 20px;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        cursor: pointer;
-        font-size: 1em;
-        border-radius: 5px;
-        display: none;">
-        Previous
-    </button>
-    <button id="nextButton" onclick="changePage(1)" style="
-        padding: 10px 20px;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        cursor: pointer;
-        font-size: 1em;
-        border-radius: 5px;
-        display: none;">
-        Next
-    </button>
-</div>
+    <div style="margin-top: 20px;">
+        <button id="previousButton" onclick="changePage(-1)" style="
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 5px;
+            display: none;">
+            Previous
+        </button>
+        <button id="nextButton" onclick="changePage(1)" style="
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 5px;
+            display: none;">
+            Next
+        </button>
+    </div>
 </body>
 </html>
