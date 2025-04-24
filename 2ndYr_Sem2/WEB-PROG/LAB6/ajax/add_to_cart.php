@@ -1,19 +1,23 @@
 <?php
 require '../includes/db.php'; // Include the database connection
 
-// Check if the request is a POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get the raw POST data (assuming JSON is sent)
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
 
-    // Validate the product ID
-    if (!isset($data['id']) || !is_numeric($data['id'])) {
-        echo json_encode(['success' => false, 'message' => 'Invalid product ID.']);
+    // Validate the product ID and quantity
+    if (!isset($data['id']) || !is_numeric($data['id']) || !isset($data['quantity']) || !is_numeric($data['quantity'])) {
+        echo json_encode(['success' => false, 'message' => 'Invalid product ID or quantity.']);
         exit;
     }
 
     $productId = (int)$data['id'];
+    $quantity = (int)$data['quantity'];
+
+    if ($quantity < 1 || $quantity > 99) {
+        echo json_encode(['success' => false, 'message' => 'Quantity must be between 1 and 99.']);
+        exit;
+    }
 
     try {
         // Check if the product already exists in the cart
@@ -23,12 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($cartItem) {
             // If the product is already in the cart, increase the quantity
-            $stmt = $pdo->prepare("UPDATE cart SET quantity = quantity + 1 WHERE product_id = :product_id");
-            $stmt->execute(['product_id' => $productId]);
+            $stmt = $pdo->prepare("UPDATE cart SET quantity = quantity + :quantity WHERE product_id = :product_id");
+            $stmt->execute(['quantity' => $quantity, 'product_id' => $productId]);
         } else {
-            // Otherwise, add the product to the cart with a quantity of 1
-            $stmt = $pdo->prepare("INSERT INTO cart (product_id, quantity) VALUES (:product_id, 1)");
-            $stmt->execute(['product_id' => $productId]);
+            // Otherwise, add the product to the cart with the specified quantity
+            $stmt = $pdo->prepare("INSERT INTO cart (product_id, quantity) VALUES (:product_id, :quantity)");
+            $stmt->execute(['product_id' => $productId, 'quantity' => $quantity]);
         }
 
         echo json_encode(['success' => true, 'message' => 'Product added to cart.']);
@@ -38,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// If the request is not POST, return an error
 echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
 exit;
 ?>

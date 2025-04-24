@@ -2,7 +2,7 @@
 require '../includes/db.php'; // Include the database connection
 
 // Check if the request is a POST request
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     // Get the raw POST data (assuming JSON is sent)
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
@@ -22,17 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cartItem = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($cartItem) {
-            if ($cartItem['quantity'] > 1) {
-                // Decrease the quantity if it's greater than 1
-                $stmt = $pdo->prepare("UPDATE cart SET quantity = quantity - 1 WHERE product_id = :product_id");
-                $stmt->execute(['product_id' => $productId]);
-                echo json_encode(['success' => true, 'message' => 'Product quantity decreased.']);
-            } else {
-                // Remove the product from the cart if the quantity is 1
-                $stmt = $pdo->prepare("DELETE FROM cart WHERE product_id = :product_id");
-                $stmt->execute(['product_id' => $productId]);
-                echo json_encode(['success' => true, 'message' => 'Product removed from cart.']);
-            }
+            // Remove the product from the cart
+            $stmt = $pdo->prepare("DELETE FROM cart WHERE product_id = :product_id");
+            $stmt->execute(['product_id' => $productId]);
+            echo json_encode(['success' => true, 'message' => 'Product removed from cart.']);
         } else {
             echo json_encode(['success' => false, 'message' => 'Product not found in cart.']);
         }

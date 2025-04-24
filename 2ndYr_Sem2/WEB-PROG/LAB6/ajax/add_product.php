@@ -1,0 +1,61 @@
+<?php
+require '../includes/db.php'; // Include the database connection
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
+
+    // Validate input
+    if (!isset($data['name'], $data['price'], $data['category'], $data['description'])) {
+        echo json_encode(['success' => false, 'message' => 'Missing required fields.']);
+        exit;
+    }
+
+    $name = htmlspecialchars(trim($data['name']));
+    $price = trim($data['price']);
+    $category = (int)trim($data['category']);
+    $description = htmlspecialchars(trim($data['description']));
+
+    // Validate name (max 40 characters)
+    if (strlen($name) === 0 || strlen($name) > 40) {
+        echo json_encode(['success' => false, 'message' => 'Product name must be between 1 and 40 characters.']);
+        exit;
+    }
+
+    // Validate price (must be a valid number)
+    if (!preg_match('/^\d+(\.\d{1,2})?$/', $price)) {
+        echo json_encode(['success' => false, 'message' => 'Price must be a valid number (e.g., 10, 10.99).']);
+        exit;
+    }
+
+    // Validate category (must be a valid integer)
+    if ($category <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid category selected.']);
+        exit;
+    }
+
+    // Validate description (max 200 characters)
+    if (strlen($description) > 200) {
+        echo json_encode(['success' => false, 'message' => 'Description must not exceed 200 characters.']);
+        exit;
+    }
+
+    try {
+        // Insert the product into the database
+        $stmt = $pdo->prepare("INSERT INTO products (name, price, category_id, description) VALUES (:name, :price, :category, :description)");
+        $stmt->execute([
+            'name' => $name,
+            'price' => $price,
+            'category' => $category,
+            'description' => $description
+        ]);
+
+        echo json_encode(['success' => true, 'message' => 'Product added successfully.']);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
+echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
+exit;
