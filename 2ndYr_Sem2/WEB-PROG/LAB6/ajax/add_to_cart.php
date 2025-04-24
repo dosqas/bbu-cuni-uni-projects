@@ -1,5 +1,5 @@
 <?php
-session_start(); // Start the session to store cart data
+require '../includes/db.php'; // Include the database connection
 
 // Check if the request is a POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -13,27 +13,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $productId = $data['id'];
+    $productId = (int)$data['id'];
 
-    // Check if the cart exists in the session, if not, initialize it
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
+    try {
+        // Check if the product already exists in the cart
+        $stmt = $pdo->prepare("SELECT * FROM cart WHERE product_id = :product_id");
+        $stmt->execute(['product_id' => $productId]);
+        $cartItem = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($cartItem) {
+            // If the product is already in the cart, increase the quantity
+            $stmt = $pdo->prepare("UPDATE cart SET quantity = quantity + 1 WHERE product_id = :product_id");
+            $stmt->execute(['product_id' => $productId]);
+        } else {
+            // Otherwise, add the product to the cart with a quantity of 1
+            $stmt = $pdo->prepare("INSERT INTO cart (product_id, quantity) VALUES (:product_id, 1)");
+            $stmt->execute(['product_id' => $productId]);
+        }
+
+        echo json_encode(['success' => true, 'message' => 'Product added to cart.']);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
     }
-
-    // Check if the product is already in the cart
-    if (isset($_SESSION['cart'][$productId])) {
-        // If the product is already in the cart, increase the quantity
-        $_SESSION['cart'][$productId]['quantity'] += 1;
-    } else {
-        // Otherwise, add the product to the cart with a quantity of 1
-        $_SESSION['cart'][$productId] = [
-            'id' => $productId,
-            'quantity' => 1
-        ];
-    }
-
-    // Return a success response
-    echo json_encode(['success' => true, 'message' => 'Product added to cart.']);
     exit;
 }
 

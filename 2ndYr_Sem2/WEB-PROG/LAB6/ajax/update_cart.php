@@ -1,5 +1,5 @@
 <?php
-session_start(); // Start the session to store cart data
+require '../includes/db.php'; // Include the database connection
 
 // Check if the request is a PATCH request
 if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
@@ -13,20 +13,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
         exit;
     }
 
-    $productId = $data['id'];
+    $productId = (int)$data['id'];
     $quantity = (int)$data['quantity'];
 
-    // Check if the cart exists in the session
-    if (!isset($_SESSION['cart']) || !isset($_SESSION['cart'][$productId])) {
-        echo json_encode(['success' => false, 'message' => 'Product not found in cart.']);
-        exit;
+    try {
+        // Check if the product exists in the cart
+        $stmt = $pdo->prepare("SELECT * FROM cart WHERE product_id = :product_id");
+        $stmt->execute(['product_id' => $productId]);
+        $cartItem = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($cartItem) {
+            // Update the quantity of the product in the cart
+            $stmt = $pdo->prepare("UPDATE cart SET quantity = :quantity WHERE product_id = :product_id");
+            $stmt->execute(['quantity' => $quantity, 'product_id' => $productId]);
+            echo json_encode(['success' => true, 'message' => 'Cart updated successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Product not found in cart.']);
+        }
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
     }
-
-    // Update the quantity of the product in the cart
-    $_SESSION['cart'][$productId]['quantity'] = $quantity;
-
-    // Return a success response
-    echo json_encode(['success' => true, 'message' => 'Cart updated successfully.']);
     exit;
 }
 

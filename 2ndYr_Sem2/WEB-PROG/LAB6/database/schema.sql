@@ -36,3 +36,10 @@ VALUES
 
 SELECT * FROM categories;
 SELECT * FROM products;
+
+CREATE TABLE cart (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL, -- Foreign key to the products table
+    quantity INT NOT NULL DEFAULT 1,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);

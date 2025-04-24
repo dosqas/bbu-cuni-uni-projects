@@ -1,5 +1,5 @@
 <?php
-session_start(); // Start the session to store cart data
+require '../includes/db.php'; // Include the database connection
 
 // Check if the request is a POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -13,21 +13,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $productId = $data['id'];
+    $productId = (int)$data['id'];
 
-    // Check if the cart exists in the session
-    if (!isset($_SESSION['cart']) || !isset($_SESSION['cart'][$productId])) {
-        echo json_encode(['success' => false, 'message' => 'Product not found in cart.']);
-        exit;
-    }
+    try {
+        // Check if the product exists in the cart
+        $stmt = $pdo->prepare("SELECT * FROM cart WHERE product_id = :product_id");
+        $stmt->execute(['product_id' => $productId]);
+        $cartItem = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Decrease the quantity or remove the product
-    if ($_SESSION['cart'][$productId]['quantity'] > 1) {
-        $_SESSION['cart'][$productId]['quantity'] -= 1;
-        echo json_encode(['success' => true, 'message' => 'Product quantity decreased.']);
-    } else {
-        unset($_SESSION['cart'][$productId]);
-        echo json_encode(['success' => true, 'message' => 'Product removed from cart.']);
+        if ($cartItem) {
+            if ($cartItem['quantity'] > 1) {
+                // Decrease the quantity if it's greater than 1
+                $stmt = $pdo->prepare("UPDATE cart SET quantity = quantity - 1 WHERE product_id = :product_id");
+                $stmt->execute(['product_id' => $productId]);
+                echo json_encode(['success' => true, 'message' => 'Product quantity decreased.']);
+            } else {
+                // Remove the product from the cart if the quantity is 1
+                $stmt = $pdo->prepare("DELETE FROM cart WHERE product_id = :product_id");
+                $stmt->execute(['product_id' => $productId]);
+                echo json_encode(['success' => true, 'message' => 'Product removed from cart.']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Product not found in cart.']);
+        }
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
     }
     exit;
 }
