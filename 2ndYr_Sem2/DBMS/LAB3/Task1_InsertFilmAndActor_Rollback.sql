@@ -243,11 +243,11 @@ END CATCH
 -- Clear test data for next test
 DELETE FROM @TestActors;
 
+
+
 -- Log test case start
 INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
 VALUES ('TestScript', 'TEST', 'Test Case 2', 'IN PROGRESS', 'Starting rollback test (duplicate title)');
-
-
 
 -- TEST CASE 2: Failure Case - Should trigger rollback
 -- First, insert a film with unique title constraint that will conflict
@@ -377,6 +377,8 @@ BEGIN CATCH
     INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
     VALUES ('TestScript', 'TEST', 'Test Case 3', 'SUCCESS', 'Validation test failed as expected: ' + ERROR_MESSAGE());
 END CATCH
+
+
 
 -- Final verification
 SELECT 'Final Film Table:' AS Message;
