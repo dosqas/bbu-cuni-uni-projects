@@ -7,7 +7,7 @@ CREATE TYPE ActorTableType AS TABLE
 );
 
 -- Procedure to insert data into Film, Actor, and FilmActor with rollback
-CREATE PROCEDURE InsertFilmAndActorsWithPartialRecovery
+CREATE PROCEDURE InsertFilmAndActorsWithFullRecovery
     @Title VARCHAR(50),
     @Director VARCHAR(50),
     @Origin VARCHAR(30),
@@ -21,53 +21,74 @@ BEGIN
     INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
     VALUES (@ProcName, 'PROCEDURE', 'N/A', 'IN PROGRESS', 'Starting procedure execution');
     
-    -- Parameter validation
+    -- Parameter validation (unchanged)
     IF @Title IS NULL OR LEN(TRIM(@Title)) = 0
     BEGIN
-        -- Log validation failure
         INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
         VALUES (@ProcName, 'VALIDATION', 'Film.Title', 'FAILED', 'Film title cannot be null or empty');
-        
         THROW 50001, 'Film title cannot be null or empty', 1;
         RETURN;
     END
     
-    -- Additional validations with logging...
     IF @Director IS NULL OR LEN(TRIM(@Director)) = 0
     BEGIN
         INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
         VALUES (@ProcName, 'VALIDATION', 'Film.Director', 'FAILED', 'Director name cannot be null or empty');
-        
         THROW 50002, 'Director name cannot be null or empty', 1;
         RETURN;
     END
     
-    -- Check if actors collection is empty
     IF NOT EXISTS (SELECT 1 FROM @Actors)
     BEGIN
         INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
         VALUES (@ProcName, 'VALIDATION', 'Actors', 'FAILED', 'At least one actor must be provided');
-        
         THROW 50007, 'At least one actor must be provided', 1;
         RETURN;
     END
     
-    -- Declare variables for tracking success/failure
+    -- Tracking variables
     DECLARE @ActorsInserted BIT = 0;
     DECLARE @FilmInserted BIT = 0;
     DECLARE @RelationshipsInserted BIT = 0;
     DECLARE @IDFilm INT = NULL;
     DECLARE @ErrorOccurred BIT = 0;
     DECLARE @ErrorMessage NVARCHAR(4000);
-    
-    -- Declare table variable to store actor IDs
     DECLARE @ActorIDs TABLE (ActorName VARCHAR(100), ActorID INT);
     DECLARE @NewActorCount INT = 0;
     DECLARE @ExistingActorCount INT = 0;
     
-    -- STEP 1: Process actors first (these will be kept even if the film fails)
+    -- INDEPENDENT FILM INSERTION (can succeed even if actors fail)
     BEGIN TRY
-        -- Insert new actors that don't already exist and get their IDs
+        IF EXISTS (SELECT 1 FROM Film WHERE Title = @Title)
+        BEGIN
+            SET @ErrorMessage = 'Film title already exists: ' + @Title;
+            INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
+            VALUES (@ProcName, 'VALIDATION', 'Film.Title', 'FAILED', @ErrorMessage);
+            SET @ErrorOccurred = 1;
+        END
+        ELSE
+        BEGIN
+            INSERT INTO Film (Title, Director, Origin, ReleaseYear)
+            VALUES (@Title, @Director, @Origin, @ReleaseYear);
+            
+            SET @IDFilm = SCOPE_IDENTITY();
+            SET @FilmInserted = 1;
+            
+            INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message, AffectedRows)
+            VALUES (@ProcName, 'INSERT', 'Film', 'SUCCESS', 'Film inserted: ' + @Title, 1);
+        END
+    END TRY
+    BEGIN CATCH
+        SET @ErrorOccurred = 1;
+        SET @ErrorMessage = ERROR_MESSAGE();
+        INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
+        VALUES (@ProcName, 'ERROR', 'Film', 'FAILED', 
+                'Error inserting film: ' + @ErrorMessage);
+    END CATCH
+    
+    -- INDEPENDENT ACTOR PROCESSING (can succeed even if film failed)
+    BEGIN TRY
+        -- Insert new actors
         INSERT INTO Actor (Name, BirthYear, Country)
         OUTPUT INSERTED.Name, INSERTED.IDActor INTO @ActorIDs
         SELECT a.Name, a.BirthYear, a.Country 
@@ -77,7 +98,6 @@ BEGIN
         
         SET @NewActorCount = @@ROWCOUNT;
         
-        -- Log actor insertions
         IF @NewActorCount > 0
         BEGIN
             INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message, AffectedRows)
@@ -85,7 +105,7 @@ BEGIN
             SET @ActorsInserted = 1;
         END
         
-        -- Get IDs for existing actors
+        -- Track existing actors
         INSERT INTO @ActorIDs (ActorName, ActorID)
         SELECT a.Name, e.IDActor
         FROM @Actors a
@@ -94,7 +114,6 @@ BEGIN
         
         SET @ExistingActorCount = @@ROWCOUNT;
         
-        -- Log existing actors
         IF @ExistingActorCount > 0
         BEGIN
             INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message, AffectedRows)
@@ -104,117 +123,66 @@ BEGIN
     BEGIN CATCH
         SET @ErrorOccurred = 1;
         SET @ErrorMessage = ERROR_MESSAGE();
-        
-        -- Log error details
         INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
         VALUES (@ProcName, 'ERROR', 'Actor', 'FAILED', 
-                'Error inserting actors: ' + @ErrorMessage + ', Line: ' + CAST(ERROR_LINE() AS VARCHAR) +
-                ', Number: ' + CAST(ERROR_NUMBER() AS VARCHAR));
+                'Error inserting actors: ' + @ErrorMessage);
     END CATCH
     
-    -- STEP 2: Now try to insert the film (separate try/catch to keep actors even if film fails)
-    IF @ErrorOccurred = 0 OR @ActorsInserted = 1
-    BEGIN
-        BEGIN TRY
-            -- Check if the film title already exists
-            IF EXISTS (SELECT 1 FROM Film WHERE Title = @Title)
-            BEGIN
-                INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
-                VALUES (@ProcName, 'VALIDATION', 'Film.Title', 'FAILED', 'Film title already exists: ' + @Title);
-                
-                SET @ErrorOccurred = 1;
-                SET @ErrorMessage = 'A film with this title already exists';
-            END
-            ELSE
-            BEGIN
-                -- Insert into Film table
-                INSERT INTO Film (Title, Director, Origin, ReleaseYear)
-                VALUES (@Title, @Director, @Origin, @ReleaseYear);
-                
-                SET @IDFilm = SCOPE_IDENTITY();
-                SET @FilmInserted = 1;
-                
-                -- Log film insertion
-                INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message, AffectedRows)
-                VALUES (@ProcName, 'INSERT', 'Film', 'SUCCESS', 'Film inserted: ' + @Title, 1);
-            END
-        END TRY
-        BEGIN CATCH
-            SET @ErrorOccurred = 1;
-            SET @ErrorMessage = ERROR_MESSAGE();
-            
-            -- Log error details
-            INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
-            VALUES (@ProcName, 'ERROR', 'Film', 'FAILED', 
-                    'Error inserting film: ' + @ErrorMessage + ', Line: ' + CAST(ERROR_LINE() AS VARCHAR) +
-                    ', Number: ' + CAST(ERROR_NUMBER() AS VARCHAR));
-        END CATCH
-    END
-    
-    -- STEP 3: Only try to create relationships if both film and actors are available
+    -- RELATIONSHIPS (only if both film and actors exist)
     IF @FilmInserted = 1 AND (@NewActorCount > 0 OR @ExistingActorCount > 0)
     BEGIN
         BEGIN TRY
-            -- Insert relationships into FilmActor table
-            DECLARE @RelationshipCount INT = 0;
-            
             INSERT INTO FilmActor (IDFilm, IDActor)
             SELECT @IDFilm, ActorID
             FROM @ActorIDs;
             
-            SET @RelationshipCount = @@ROWCOUNT;
             SET @RelationshipsInserted = 1;
             
-            -- Log relationship insertions
             INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message, AffectedRows)
-            VALUES (@ProcName, 'INSERT', 'FilmActor', 'SUCCESS', 'Film-Actor relationships inserted', @RelationshipCount);
+            VALUES (@ProcName, 'INSERT', 'FilmActor', 'SUCCESS', 
+                    'Film-Actor relationships inserted', @@ROWCOUNT);
         END TRY
         BEGIN CATCH
             SET @ErrorOccurred = 1;
             SET @ErrorMessage = ERROR_MESSAGE();
-            
-            -- Log error details
             INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
             VALUES (@ProcName, 'ERROR', 'FilmActor', 'FAILED', 
-                    'Error inserting relationships: ' + @ErrorMessage + ', Line: ' + CAST(ERROR_LINE() AS VARCHAR) +
-                    ', Number: ' + CAST(ERROR_NUMBER() AS VARCHAR));
+                    'Error inserting relationships: ' + @ErrorMessage);
         END CATCH
     END
     
-    -- STEP 4: Report final status
+    -- COMPREHENSIVE STATUS REPORTING
     IF @ErrorOccurred = 1
     BEGIN
-        -- Report partial success if applicable
-        IF @ActorsInserted = 1 AND @FilmInserted = 0
+        -- Film succeeded but actors failed
+        IF @FilmInserted = 1 AND @ActorsInserted = 0
         BEGIN
             INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
             VALUES (@ProcName, 'PROCEDURE', 'N/A', 'PARTIAL', 
-                    'Procedure completed with partial success: Actors were inserted but Film failed');
-            
-            -- Return information about partial success
-            RAISERROR('Operation partially successful: Actors were inserted but Film insertion failed: %s', 
-                      10, -- Severity 10 for informational message
-                      1,  -- State
-                      @ErrorMessage);
+                    'Film inserted but actor processing failed');
+            RAISERROR('Partial success: Film created but actors failed - %s', 10, 1, @ErrorMessage);
         END
-        ELSE IF @ActorsInserted = 1 AND @FilmInserted = 1 AND @RelationshipsInserted = 0
+        -- Actors succeeded but film failed
+        ELSE IF @ActorsInserted = 1 AND @FilmInserted = 0
         BEGIN
             INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
             VALUES (@ProcName, 'PROCEDURE', 'N/A', 'PARTIAL', 
-                    'Procedure completed with partial success: Actors and Film were inserted but relationships failed');
-            
-            -- Return information about partial success
-            RAISERROR('Operation partially successful: Actors and Film were inserted but relationships failed: %s', 
-                      10, -- Severity 10 for informational message
-                      1,  -- State
-                      @ErrorMessage);
+                    'Actors inserted but film processing failed');
+            RAISERROR('Partial success: Actors created but film failed - %s', 10, 1, @ErrorMessage);
         END
+        -- Both succeeded but relationships failed
+        ELSE IF @FilmInserted = 1 AND @ActorsInserted = 1 AND @RelationshipsInserted = 0
+        BEGIN
+            INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
+            VALUES (@ProcName, 'PROCEDURE', 'N/A', 'PARTIAL', 
+                    'Film and actors inserted but relationships failed');
+            RAISERROR('Partial success: Film and actors created but relationships failed - %s', 10, 1, @ErrorMessage);
+        END
+        -- Complete failure
         ELSE
         BEGIN
             INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
-            VALUES (@ProcName, 'PROCEDURE', 'N/A', 'FAILED', 'Procedure execution failed');
-            
-            -- Re-throw the error with additional information if nothing was inserted
+            VALUES (@ProcName, 'PROCEDURE', 'N/A', 'FAILED', 'No data inserted');
             RAISERROR(@ErrorMessage, 16, 1);
         END
     END
@@ -222,7 +190,7 @@ BEGIN
     BEGIN
         -- Full success
         INSERT INTO ActionLog (ProcedureName, ActionType, ObjectName, Status, Message)
-        VALUES (@ProcName, 'PROCEDURE', 'N/A', 'SUCCESS', 'Procedure executed successfully');
+        VALUES (@ProcName, 'PROCEDURE', 'N/A', 'SUCCESS', 'All data inserted successfully');
     END
 END;
 
