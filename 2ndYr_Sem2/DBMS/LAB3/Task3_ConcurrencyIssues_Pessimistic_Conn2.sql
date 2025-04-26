@@ -1,54 +1,65 @@
 USE MinimalCinemaDB;
+GO
+SET NOCOUNT ON;
+-- ==============================================
+-- 1. DIRTY READ TEST (Connection 2)
+-- ==============================================
+PRINT '=== 1. DIRTY READ TEST - CONNECTION 2 ===';
 
--- ==============================================
--- 1. DIRTY READ DEMONSTRATION (Connection 2)
--- ==============================================
-PRINT '=== DIRTY READ TEST - CONNECTION 2 ===';
--- First show dirty read (uncommitted data)
+-- First show the problem
+PRINT '1.1 Problem: Reading uncommitted data (READ UNCOMMITTED)';
 SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
-PRINT 'Connection 2: Reading with READ UNCOMMITTED (dirty read):';
-SELECT * FROM Film WHERE IDFilm = 1;
+PRINT 'Results with dirty reads enabled:';
+SELECT IDFilm, Title, Director, Origin, ReleaseYear FROM Film WHERE IDFilm = 1;
+GO
 
--- Then show proper read (only committed data)
+-- Then show the solution
+PRINT '1.2 Solution: Preventing dirty reads (READ COMMITTED)';
 SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
-PRINT 'Connection 2: Reading with READ COMMITTED (no dirty read):';
-SELECT * FROM Film WHERE IDFilm = 1;
+PRINT 'Results with dirty reads prevented:';
+SELECT IDFilm, Title, Director, Origin, ReleaseYear FROM Film WHERE IDFilm = 1;
+GO
 
 -- ==============================================
--- 2. NON-REPEATABLE READ DEMONSTRATION (Connection 2)
+-- 2. NON-REPEATABLE READ TEST (Connection 2)
 -- ==============================================
-PRINT '=== NON-REPEATABLE READ TEST - CONNECTION 2 ===';
+PRINT '=== 2. NON-REPEATABLE READ TEST - CONNECTION 2 ===';
+PRINT '2.1 Making changes between Connection 1 reads:';
 BEGIN TRANSACTION;
-    PRINT 'Connection 2: Updating Al Pacino''s birth year';
     UPDATE Actor SET BirthYear = 1941 WHERE Name = 'Al Pacino';
 COMMIT;
-PRINT 'Connection 2: Update committed. Check Connection 1 results.';
+PRINT '2.1 Update committed. Check Connection 1 results.';
+GO
 
 -- ==============================================
--- 3. PHANTOM READ DEMONSTRATION (Connection 2)
+-- 3. PHANTOM READ TEST (Connection 2)
 -- ==============================================
-PRINT '=== PHANTOM READ TEST - CONNECTION 2 ===';
+PRINT '=== 3. PHANTOM READ TEST - CONNECTION 2 ===';
+PRINT '3.1 Inserting new row between Connection 1 reads:';
 BEGIN TRANSACTION;
-    PRINT 'Connection 2: Inserting new film from 2010';
     INSERT INTO Film (Title, Director, Origin, ReleaseYear)
     VALUES ('Inception', 'Christopher Nolan', 'USA', 2010);
 COMMIT;
-PRINT 'Connection 2: Insert committed. Check Connection 1 results.';
+PRINT '3.1 Insert committed. Check Connection 1 results.';
+GO
 
 -- ==============================================
--- 4. DEADLOCK DEMONSTRATION (Connection 2)
+-- 4. DEADLOCK TEST (Connection 2)
 -- ==============================================
-PRINT '=== DEADLOCK TEST - CONNECTION 2 ===';
-BEGIN TRANSACTION;
-    PRINT 'Connection 2: Updating Marlon Brando...';
-    UPDATE Actor SET BirthYear = 1924 WHERE Name = 'Marlon Brando';
-    
-    PRINT 'Connection 2: Waiting 3 seconds for Connection 1...';
-    WAITFOR DELAY '00:00:03';
-    
-    PRINT 'Connection 2: Updating The Godfather...';
-    UPDATE Film SET ReleaseYear = 1972 WHERE Title = 'The Godfather';
-COMMIT;
-PRINT 'Connection 2: Deadlock test completed (if no errors)';
+PRINT '=== 4. DEADLOCK TEST - CONNECTION 2 ===';
+PRINT '4.1 Creating deadlock condition:';
+BEGIN TRY
+    BEGIN TRANSACTION;
+        UPDATE Actor SET BirthYear = 1924 WHERE IDActor = 1;
+        WAITFOR DELAY '00:00:03'; -- This should match the wait in Connection 1
+        UPDATE Film SET ReleaseYear = 1972 WHERE IDFilm = 1;
+    COMMIT;
+END TRY
+BEGIN CATCH
+    IF ERROR_NUMBER() = 1205
+        PRINT '4.1 Deadlock occurred: ' + ERROR_MESSAGE();
+    IF @@TRANCOUNT > 0 ROLLBACK;
+END CATCH;
+GO
 
-PRINT 'Connection 2: All tests executed.';
+PRINT '=== CONNECTION 2 TESTS COMPLETE ===';

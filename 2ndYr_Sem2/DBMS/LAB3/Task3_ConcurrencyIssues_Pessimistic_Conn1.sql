@@ -1,13 +1,15 @@
-USE MinimalCinemaDB;
+﻿USE MinimalCinemaDB;
+GO
 
--- Clear existing data and setup (run this once before any tests)
+-- ==============================================
+-- CLEAN SETUP: Run only once to reset the test data
+-- ==============================================
 DELETE FROM FilmActor;
 DELETE FROM Actor;
 DELETE FROM Film;
 DBCC CHECKIDENT ('Film', RESEED, 0);
 DBCC CHECKIDENT ('Actor', RESEED, 0);
 
--- Insert sample data for testing
 INSERT INTO Film (Title, Director, Origin, ReleaseYear) VALUES
 ('The Godfather', 'Francis Ford Coppola', 'USA', 1972),
 ('Pulp Fiction', 'Quentin Tarantino', 'USA', 1994);
@@ -18,97 +20,120 @@ INSERT INTO Actor (Name, BirthYear, Country) VALUES
 ('John Travolta', 1954, 'USA');
 
 INSERT INTO FilmActor (IDFilm, IDActor) VALUES
-(1, 1), -- Marlon Brando in The Godfather
-(1, 2), -- Al Pacino in The Godfather
-(2, 3); -- John Travolta in Pulp Fiction
+(1, 1), (1, 2), (2, 3);
+GO
 
 -- ==============================================
--- 1. DIRTY READ DEMONSTRATION (Connection 1)
+-- 1. DIRTY READ TEST - CONNECTION 1
 -- ==============================================
-PRINT '=== DIRTY READ TEST - CONNECTION 1 ===';
+PRINT '=== 1. DIRTY READ TEST - CONNECTION 1 ===';
 BEGIN TRANSACTION;
-    PRINT 'Connection 1: Updating film title without committing...';
+    PRINT '1. Making uncommitted change to The Godfather...';
     UPDATE Film SET Title = 'The Godfather Part IV' WHERE IDFilm = 1;
-    -- DON'T COMMIT YET - leave this transaction open
-    PRINT 'Connection 1: Transaction is open. Switch to Connection 2 now.';
-    WAITFOR DELAY '00:00:10'; -- Gives 10 seconds to run Connection 2
-    -- After running Connection 2, come back here and either:
-    -- COMMIT; -- To keep changes
-    ROLLBACK; -- To undo changes
-PRINT 'Connection 1: Transaction completed.';
 
--- ==============================================
--- 2. NON-REPEATABLE READ DEMONSTRATION (Connection 1)
--- ==============================================
-PRINT '=== NON-REPEATABLE READ TEST - CONNECTION 1 ===';
-BEGIN TRANSACTION;
-    PRINT 'Connection 1: First read of Al Pacino:';
-    SELECT * FROM Actor WHERE Name = 'Al Pacino';
-    
-    PRINT 'Connection 1: Waiting 10 seconds for Connection 2 to update...';
+    PRINT '1. Changes made but NOT committed. Run Connection 2 now.';
+    PRINT '1. This transaction will automatically rollback after 10 seconds.';
+
+    -- Wait for Connection 2 to perform read
     WAITFOR DELAY '00:00:10';
-    
-    PRINT 'Connection 1: Second read of Al Pacino (should be different):';
+
+    -- Rollback to keep database clean
+    ROLLBACK TRANSACTION;
+    PRINT '1. Transaction rolled back. Database is clean.';
+GO
+
+-- ==============================================
+-- 2. NON-REPEATABLE READ TEST - CONNECTION 1
+-- ==============================================
+PRINT '=== 2. NON-REPEATABLE READ TEST - CONNECTION 1 ===';
+-- 2.1 Problem demonstration
+PRINT '2.1 Non-repeatable read without isolation level change:';
+BEGIN TRANSACTION;
+    PRINT 'First read:';
+    SELECT * FROM Actor WHERE Name = 'Al Pacino';
+    WAITFOR DELAY '00:00:05'; -- Run update in Connection 2 now
+    PRINT 'Second read:';
     SELECT * FROM Actor WHERE Name = 'Al Pacino';
 COMMIT;
+GO
 
--- ==============================================
--- 3. PHANTOM READ DEMONSTRATION (Connection 1)
--- ==============================================
-PRINT '=== PHANTOM READ TEST - CONNECTION 1 ===';
+-- 2.2 Solution using REPEATABLE READ
+PRINT '2.2 Solved with REPEATABLE READ isolation level:';
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
 BEGIN TRANSACTION;
-    PRINT 'Connection 1: First read of 2000-2010 films:';
-    SELECT * FROM Film WHERE ReleaseYear BETWEEN 2000 AND 2010;
-    
-    PRINT 'Connection 1: Waiting 10 seconds for Connection 2 to insert...';
-    WAITFOR DELAY '00:00:10';
-    
-    PRINT 'Connection 1: Second read (should show new phantom row):';
-    SELECT * FROM Film WHERE ReleaseYear BETWEEN 2000 AND 2010;
+    PRINT 'First read:';
+    SELECT * FROM Actor WHERE Name = 'Al Pacino';
+    WAITFOR DELAY '00:00:05'; -- Try to update in Connection 2
+    PRINT 'Second read:';
+    SELECT * FROM Actor WHERE Name = 'Al Pacino';
 COMMIT;
+-- Reset to default isolation level
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+GO
 
 -- ==============================================
--- 4. DEADLOCK DEMONSTRATION (Connection 1)
+-- 3. PHANTOM READ TEST - CONNECTION 1
 -- ==============================================
-PRINT '=== DEADLOCK TEST - CONNECTION 1 ===';
+PRINT '=== 3. PHANTOM READ TEST - CONNECTION 1 ===';
+-- 3.1 Problem demonstration
+PRINT '3.1 Phantom read without SERIALIZABLE:';
 BEGIN TRANSACTION;
-    PRINT 'Connection 1: Updating The Godfather...';
-    UPDATE Film SET Director = 'Coppola' WHERE Title = 'The Godfather';
-    
-    PRINT 'Connection 1: Waiting 3 seconds for Connection 2...';
-    WAITFOR DELAY '00:00:03';
-    
-    PRINT 'Connection 1: Updating Marlon Brando...';
-    UPDATE Actor SET Name = 'Brando Jr.' WHERE Name = 'Marlon Brando';
+    PRINT 'First read:';
+    SELECT * FROM Film WHERE ReleaseYear > 2000;
+    WAITFOR DELAY '00:00:05'; -- Insert in Connection 2 during this time
+    PRINT 'Second read:';
+    SELECT * FROM Film WHERE ReleaseYear > 2000;
 COMMIT;
-PRINT 'Connection 1: Deadlock test completed (if no errors)';
+GO
+
+-- 3.2 Solution using SERIALIZABLE
+PRINT '3.2 Solved with SERIALIZABLE isolation level:';
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+BEGIN TRANSACTION;
+    PRINT 'First read:';
+    SELECT * FROM Film WHERE ReleaseYear > 2000;
+    WAITFOR DELAY '00:00:05'; -- Insert in Connection 2 should be blocked
+    PRINT 'Second read:';
+    SELECT * FROM Film WHERE ReleaseYear > 2000;
+COMMIT;
+-- Reset to default
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+GO
 
 -- ==============================================
--- CLEANUP (run after all tests)
+-- 4. DEADLOCK TEST - CONNECTION 1
 -- ==============================================
-PRINT '=== CLEANUP ===';
--- Check what data was changed
-SELECT * FROM Film;
-SELECT * FROM Actor;
-SELECT * FROM FilmActor;
+PRINT '=== 4. DEADLOCK TEST - CONNECTION 1 ===';
+-- 4.1 Problem demonstration
+PRINT '4.1 Deadlock situation:';
+BEGIN TRY
+    BEGIN TRANSACTION;
+        UPDATE Film SET Director = 'Coppola' WHERE IDFilm = 1;
+        WAITFOR DELAY '00:00:03'; -- Run Connection 2 now
+        UPDATE Actor SET Name = 'Brando Jr.' WHERE IDActor = 1;
+    COMMIT;
+END TRY
+BEGIN CATCH
+    IF ERROR_NUMBER() = 1205
+        PRINT '4.1 Deadlock occurred: ' + ERROR_MESSAGE();
+    IF @@TRANCOUNT > 0 ROLLBACK;
+END CATCH;
+GO
 
--- Reset to original data
-UPDATE Film SET 
-    Title = 'The Godfather',
-    Director = 'Francis Ford Coppola',
-    ReleaseYear = 1972
-WHERE IDFilm = 1;
+-- 4.2 Solution using consistent access order
+PRINT '4.2 Solved with consistent locking order (Actor → Film):';
+BEGIN TRY
+    BEGIN TRANSACTION;
+		UPDATE Actor SET Name = 'Brando Jr.' WHERE IDActor = 1;
+		WAITFOR DELAY '00:00:03'; -- Run Connection 2 now
+        UPDATE Film SET Director = 'Coppola' WHERE IDFilm = 1;
+    COMMIT;
+    PRINT '4.2 No deadlock occurred with consistent access order.';
+END TRY
+BEGIN CATCH
+    PRINT 'Error: ' + ERROR_MESSAGE();
+    IF @@TRANCOUNT > 0 ROLLBACK;
+END CATCH;
+GO
 
-UPDATE Actor SET
-    Name = 'Marlon Brando',
-    BirthYear = 1924
-WHERE IDActor = 1;
-
-UPDATE Actor SET
-    Name = 'Al Pacino',
-    BirthYear = 1940
-WHERE IDActor = 2;
-
-DELETE FROM Film WHERE Title = 'Inception';
-
-PRINT 'Connection 1: Cleanup complete. All tests finished.';
+PRINT '=== CONNECTION 1 TESTS COMPLETE ===';
