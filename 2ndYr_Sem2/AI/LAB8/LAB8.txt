@@ -1,0 +1,698 @@
+
+
+Modeling and solving search problems
+
+Consider the following river crossing puzzle:
+
+Jealous Husbands Problem with an Island
+
+There are n couples: (𝐻₁,𝑊₁), (𝐻₂,𝑊₂), …, (𝐻_(𝑛),𝑊_(𝑛)) where 𝐻_(𝑖) is
+husband 𝑖 and 𝑊_(𝑖) is wife 𝑖.
+
+They need to cross from the left bank of a river to the right bank.
+
+There is a boat that can carry at most two people at a time.
+
+Important: There is an island midway between the left and right banks.
+The boat can stop at the island.
+
+Rules:
+
+1.  Jealousy constraint: No wife may ever be in the presence of another
+    husband (on any shore or the island or in the boat) unless her own
+    husband is also present. Otherwise, fights (and failures) occur.
+
+2.  The boat needs at least one person to operate (no remote-controlled
+    trips).
+
+3.  The boat can travel between:
+
+             Left bank ↔ Island
+
+             Island ↔ Right bank
+
+4.  All people, including the boat, start at the left bank.
+
+Goal: get everyone (husbands and wives) safely to the right bank,
+obeying all the rules.
+
+Tasks:
+
+1.  Put the problem in a form of a search tree: root, nodes, solution
+    and rules for constructing the childrens.
+2.  Solve it using a classic DFS
+3.  Solve it using a classic Back-tracking.
+4.  Solve it using the A* method.
+
+Task 1 - Modelling the problem
+
+    from typing import Set, Tuple, List
+    from itertools import combinations
+    from copy import deepcopy
+
+    # Define the people labels
+    n = 3 # Number of couples
+    HUSBANDS = {f"H{i}" for i in range(1, n + 1)}
+    WIVES = {f"W{i}" for i in range(1, n + 1)}
+    ALL_PEOPLE = HUSBANDS | WIVES
+
+    # Define valid boat locations
+    BOAT_LOCATIONS = ["left", "island", "right"]
+
+    class State:
+        def __init__(self, left: Set[str], island: Set[str], right: Set[str], boat_location: str):
+            self.left = left
+            self.island = island
+            self.right = right
+            self.boat_location = boat_location  # "left", "island", or "right"
+
+        def __repr__(self):
+            return f"State(L={self.left}, I={self.island}, R={self.right}, boat={self.boat_location})"
+
+        def is_goal(self) -> bool:
+            # Goal: all people on the right bank
+            return self.right == ALL_PEOPLE
+
+        def copy(self):
+            return State(set(self.left), set(self.island), set(self.right), self.boat_location)
+
+        def __eq__(self, other):
+            return (
+                isinstance(other, State) and
+                self.left == other.left and
+                self.island == other.island and
+                self.right == other.right and
+                self.boat_location == other.boat_location
+            )
+
+        def __hash__(self):
+            # Convert sets to frozensets for hashing
+            return hash((
+                frozenset(self.left),
+                frozenset(self.island),
+                frozenset(self.right),
+                self.boat_location
+            ))
+
+    def is_valid_group(group: Set[str]) -> bool:
+        """
+        Check jealousy constraint for a group (left, island, right, or boat).
+        For every wife: if other husbands are present, her husband must be present too.
+        """
+        for i in range(1, n + 1):
+            wife = f"W{i}"
+            husband = f"H{i}"
+            if wife in group:
+                other_husbands = {p for p in group if p.startswith("H") and p != husband}
+                if other_husbands and husband not in group:
+                    return False  # Jealousy occurs
+        return True
+
+    def is_valid_state(state: State, boat_passengers: Set[str]) -> bool:
+        """
+        Check if all groups (left, island, right, boat) are jealousy-safe.
+        """
+        return (
+            is_valid_group(state.left) and
+            is_valid_group(state.island) and
+            is_valid_group(state.right) and
+            is_valid_group(boat_passengers)
+        )
+
+    def get_adjacent_locations(current: str) -> List[str]:
+        """Return valid adjacent boat destinations."""
+        if current == "left":
+            return ["island"]
+        elif current == "island":
+            return ["left", "right"]
+        elif current == "right":
+            return ["island"]
+        return []
+
+    def generate_children(state: State) -> List[Tuple[State, Set[str]]]:
+        """
+        Generate all valid next states (children) from current state.
+        Returns a list of (new_state, passengers_moved).
+        """
+        children = []
+        current_location = state.boat_location
+        possible_passengers = list(combinations(getattr(state, current_location), 1)) + \
+                              list(combinations(getattr(state, current_location), 2))
+
+        for passengers in possible_passengers:
+            passengers = set(passengers)
+            for destination in get_adjacent_locations(current_location):
+                # Create a deep copy of the current state
+                new_state = state.copy()
+                # Move people out of current location
+                getattr(new_state, current_location).difference_update(passengers)
+                # Move people into destination
+                getattr(new_state, destination).update(passengers)
+                # Move the boat
+                new_state.boat_location = destination
+                # Check validity
+                if is_valid_state(new_state, passengers):
+                    children.append((new_state, passengers))
+
+        return children
+
+    initial_state = State(
+        left=set(ALL_PEOPLE),
+        island=set(),
+        right=set(),
+        boat_location="left"
+    )
+
+Task 2 - DFS Approach
+
+    def state_signature(state: State) -> Tuple:
+        """
+        Unique identifier for a state to track visited configurations.
+        Tuple of frozensets and boat location.
+        """
+        return (
+            frozenset(state.left),
+            frozenset(state.island),
+            frozenset(state.right),
+            state.boat_location
+        )
+
+    def dfs(initial_state: State):
+        """
+        Perform classic DFS to solve the problem.
+        """
+        stack = [(initial_state, [])]  # each item: (current_state, path_taken)
+        visited = set()
+
+        while stack:
+            current_state, path = stack.pop()
+            signature = state_signature(current_state)
+
+            if signature in visited:
+                continue
+            visited.add(signature)
+
+            if current_state.is_goal():
+                print("Goal reached!\n")
+                print(f"Initial state:\n{initial_state}\n")
+                for step_num, (state, move) in enumerate(path, 1):
+                    print(f"Step {step_num}: Move {move} → {state}")
+                print(f"\nFinal state:\n{current_state}")
+                return 
+
+            for child_state, passengers in generate_children(current_state):
+                stack.append((child_state, path + [(child_state, passengers)]))
+
+        print("No solution found.")
+
+    dfs(initial_state)
+
+    Goal reached!
+
+    Initial state:
+    State(L={'H1', 'W3', 'H2', 'W2', 'W1', 'H3'}, I=set(), R=set(), boat=left)
+
+    Step 1: Move {'W1', 'W2'} → State(L={'H1', 'W3', 'H2', 'H3'}, I={'W1', 'W2'}, R=set(), boat=island)
+    Step 2: Move {'W1', 'W2'} → State(L={'H1', 'W3', 'H2', 'H3'}, I=set(), R={'W1', 'W2'}, boat=right)
+    Step 3: Move {'W2'} → State(L={'H1', 'W3', 'H2', 'H3'}, I={'W2'}, R={'W1'}, boat=island)
+    Step 4: Move {'W2'} → State(L={'H1', 'W3', 'H2', 'W2', 'H3'}, I=set(), R={'W1'}, boat=left)
+    Step 5: Move {'H2', 'W2'} → State(L={'H1', 'W3', 'H3'}, I={'H2', 'W2'}, R={'W1'}, boat=island)
+    Step 6: Move {'H2'} → State(L={'H1', 'W3', 'H2', 'H3'}, I={'W2'}, R={'W1'}, boat=left)
+    Step 7: Move {'H1', 'H2'} → State(L={'W3', 'H3'}, I={'H1', 'H2', 'W2'}, R={'W1'}, boat=island)
+    Step 8: Move {'H2', 'W2'} → State(L={'H3', 'W3', 'H2', 'W2'}, I={'H1'}, R={'W1'}, boat=left)
+    Step 9: Move {'H3', 'H2'} → State(L={'W3', 'W2'}, I={'H1', 'H3', 'H2'}, R={'W1'}, boat=island)
+    Step 10: Move {'H1', 'H2'} → State(L={'W3', 'W2'}, I={'H3'}, R={'W1', 'H1', 'H2'}, boat=right)
+    Step 11: Move {'W1', 'H1'} → State(L={'W3', 'W2'}, I={'W1', 'H1', 'H3'}, R={'H2'}, boat=island)
+    Step 12: Move {'H1', 'H3'} → State(L={'W3', 'W2'}, I={'W1'}, R={'H1', 'H3', 'H2'}, boat=right)
+    Step 13: Move {'H1', 'H2'} → State(L={'W3', 'W2'}, I={'W1', 'H1', 'H2'}, R={'H3'}, boat=island)
+    Step 14: Move {'W1', 'H1'} → State(L={'W3', 'W2'}, I={'H2'}, R={'W1', 'H1', 'H3'}, boat=right)
+    Step 15: Move {'H3'} → State(L={'W3', 'W2'}, I={'H3', 'H2'}, R={'W1', 'H1'}, boat=island)
+    Step 16: Move {'H3', 'H2'} → State(L={'W3', 'W2'}, I=set(), R={'W1', 'H1', 'H3', 'H2'}, boat=right)
+    Step 17: Move {'W1'} → State(L={'W3', 'W2'}, I={'W1'}, R={'H1', 'H3', 'H2'}, boat=island)
+    Step 18: Move {'W1'} → State(L={'W1', 'W3', 'W2'}, I=set(), R={'H1', 'H3', 'H2'}, boat=left)
+    Step 19: Move {'W3', 'W2'} → State(L={'W1'}, I={'W3', 'W2'}, R={'H1', 'H3', 'H2'}, boat=island)
+    Step 20: Move {'W3', 'W2'} → State(L={'W1'}, I=set(), R={'H1', 'W3', 'H2', 'W2', 'H3'}, boat=right)
+    Step 21: Move {'H2', 'W2'} → State(L={'W1'}, I={'H2', 'W2'}, R={'H1', 'W3', 'H3'}, boat=island)
+    Step 22: Move {'H2'} → State(L={'W1'}, I={'W2'}, R={'H1', 'W3', 'H2', 'H3'}, boat=right)
+    Step 23: Move {'H1', 'H2'} → State(L={'W1'}, I={'H1', 'H2', 'W2'}, R={'W3', 'H3'}, boat=island)
+    Step 24: Move {'H2', 'W2'} → State(L={'W1'}, I={'H1'}, R={'H3', 'W3', 'H2', 'W2'}, boat=right)
+    Step 25: Move {'H3', 'H2'} → State(L={'W1'}, I={'H1', 'H3', 'H2'}, R={'W3', 'W2'}, boat=island)
+    Step 26: Move {'H1', 'H2'} → State(L={'W1', 'H1', 'H2'}, I={'H3'}, R={'W3', 'W2'}, boat=left)
+    Step 27: Move {'W1', 'H1'} → State(L={'H2'}, I={'W1', 'H1', 'H3'}, R={'W3', 'W2'}, boat=island)
+    Step 28: Move {'H1', 'H3'} → State(L={'H1', 'H3', 'H2'}, I={'W1'}, R={'W3', 'W2'}, boat=left)
+    Step 29: Move {'H1', 'H2'} → State(L={'H3'}, I={'W1', 'H1', 'H2'}, R={'W3', 'W2'}, boat=island)
+    Step 30: Move {'W1', 'H1'} → State(L={'W1', 'H1', 'H3'}, I={'H2'}, R={'W3', 'W2'}, boat=left)
+    Step 31: Move {'H3'} → State(L={'W1', 'H1'}, I={'H3', 'H2'}, R={'W3', 'W2'}, boat=island)
+    Step 32: Move {'H3', 'H2'} → State(L={'W1', 'H1'}, I=set(), R={'H3', 'W3', 'H2', 'W2'}, boat=right)
+    Step 33: Move {'H2', 'W2'} → State(L={'W1', 'H1'}, I={'H2', 'W2'}, R={'W3', 'H3'}, boat=island)
+    Step 34: Move {'H2', 'W2'} → State(L={'W1', 'H1', 'H2', 'W2'}, I=set(), R={'H3', 'W3'}, boat=left)
+    Step 35: Move {'H1', 'H2'} → State(L={'W2', 'W1'}, I={'H1', 'H2'}, R={'H3', 'W3'}, boat=island)
+    Step 36: Move {'H1', 'H2'} → State(L={'W1', 'W2'}, I=set(), R={'H3', 'W3', 'H1', 'H2'}, boat=right)
+    Step 37: Move {'W3', 'H3'} → State(L={'W1', 'W2'}, I={'W3', 'H3'}, R={'H1', 'H2'}, boat=island)
+    Step 38: Move {'H3'} → State(L={'W1', 'W2'}, I={'W3'}, R={'H1', 'H3', 'H2'}, boat=right)
+    Step 39: Move {'H3', 'H2'} → State(L={'W1', 'W2'}, I={'H3', 'W3', 'H2'}, R={'H1'}, boat=island)
+    Step 40: Move {'W3', 'H3'} → State(L={'W1', 'W2'}, I={'H2'}, R={'H1', 'W3', 'H3'}, boat=right)
+    Step 41: Move {'H1', 'H3'} → State(L={'W1', 'W2'}, I={'H1', 'H3', 'H2'}, R={'W3'}, boat=island)
+    Step 42: Move {'H3', 'H2'} → State(L={'W1', 'W2'}, I={'H1'}, R={'H3', 'W3', 'H2'}, boat=right)
+    Step 43: Move {'W3', 'H3'} → State(L={'W1', 'W2'}, I={'H1', 'W3', 'H3'}, R={'H2'}, boat=island)
+    Step 44: Move {'W3'} → State(L={'W1', 'W3', 'W2'}, I={'H1', 'H3'}, R={'H2'}, boat=left)
+    Step 45: Move {'W1', 'W3'} → State(L={'W2'}, I={'W1', 'H1', 'W3', 'H3'}, R={'H2'}, boat=island)
+    Step 46: Move {'H3', 'W3'} → State(L={'W2'}, I={'H1', 'W1'}, R={'W3', 'H3', 'H2'}, boat=right)
+    Step 47: Move {'H3', 'H2'} → State(L={'W2'}, I={'W1', 'H1', 'H3', 'H2'}, R={'W3'}, boat=island)
+    Step 48: Move {'H3', 'H2'} → State(L={'H3', 'H2', 'W2'}, I={'H1', 'W1'}, R={'W3'}, boat=left)
+    Step 49: Move {'H2', 'W2'} → State(L={'H3'}, I={'W1', 'H1', 'H2', 'W2'}, R={'W3'}, boat=island)
+    Step 50: Move {'W1', 'W2'} → State(L={'H3'}, I={'H1', 'H2'}, R={'W1', 'W3', 'W2'}, boat=right)
+    Step 51: Move {'W2'} → State(L={'H3'}, I={'H1', 'H2', 'W2'}, R={'W1', 'W3'}, boat=island)
+    Step 52: Move {'H2', 'W2'} → State(L={'H3', 'H2', 'W2'}, I={'H1'}, R={'W1', 'W3'}, boat=left)
+    Step 53: Move {'H3', 'H2'} → State(L={'W2'}, I={'H1', 'H3', 'H2'}, R={'W1', 'W3'}, boat=island)
+    Step 54: Move {'H1', 'H2'} → State(L={'H1', 'H2', 'W2'}, I={'H3'}, R={'W1', 'W3'}, boat=left)
+    Step 55: Move {'H2', 'W2'} → State(L={'H1'}, I={'H3', 'H2', 'W2'}, R={'W1', 'W3'}, boat=island)
+    Step 56: Move {'H3', 'H2'} → State(L={'H1', 'H3', 'H2'}, I={'W2'}, R={'W1', 'W3'}, boat=left)
+    Step 57: Move {'H2'} → State(L={'H1', 'H3'}, I={'H2', 'W2'}, R={'W1', 'W3'}, boat=island)
+    Step 58: Move {'H2', 'W2'} → State(L={'H1', 'H3', 'H2', 'W2'}, I=set(), R={'W1', 'W3'}, boat=left)
+    Step 59: Move {'H1', 'H3'} → State(L={'H2', 'W2'}, I={'H1', 'H3'}, R={'W1', 'W3'}, boat=island)
+    Step 60: Move {'H1', 'H3'} → State(L={'H2', 'W2'}, I=set(), R={'W1', 'H1', 'W3', 'H3'}, boat=right)
+    Step 61: Move {'H3', 'W3'} → State(L={'H2', 'W2'}, I={'H3', 'W3'}, R={'H1', 'W1'}, boat=island)
+    Step 62: Move {'W3', 'H3'} → State(L={'H3', 'W3', 'H2', 'W2'}, I=set(), R={'W1', 'H1'}, boat=left)
+    Step 63: Move {'H2', 'W2'} → State(L={'W3', 'H3'}, I={'H2', 'W2'}, R={'W1', 'H1'}, boat=island)
+    Step 64: Move {'H2', 'W2'} → State(L={'H3', 'W3'}, I=set(), R={'W1', 'H1', 'H2', 'W2'}, boat=right)
+    Step 65: Move {'H1', 'H2'} → State(L={'H3', 'W3'}, I={'H1', 'H2'}, R={'W2', 'W1'}, boat=island)
+    Step 66: Move {'H1', 'H2'} → State(L={'H3', 'W3', 'H1', 'H2'}, I=set(), R={'W1', 'W2'}, boat=left)
+    Step 67: Move {'W3', 'H3'} → State(L={'H1', 'H2'}, I={'W3', 'H3'}, R={'W1', 'W2'}, boat=island)
+    Step 68: Move {'H3'} → State(L={'H1', 'H3', 'H2'}, I={'W3'}, R={'W1', 'W2'}, boat=left)
+    Step 69: Move {'H3', 'H2'} → State(L={'H1'}, I={'H3', 'W3', 'H2'}, R={'W1', 'W2'}, boat=island)
+    Step 70: Move {'W3', 'H3'} → State(L={'H1', 'W3', 'H3'}, I={'H2'}, R={'W1', 'W2'}, boat=left)
+    Step 71: Move {'H1', 'H3'} → State(L={'W3'}, I={'H1', 'H3', 'H2'}, R={'W1', 'W2'}, boat=island)
+    Step 72: Move {'H3', 'H2'} → State(L={'H3', 'W3', 'H2'}, I={'H1'}, R={'W1', 'W2'}, boat=left)
+    Step 73: Move {'W3', 'H3'} → State(L={'H2'}, I={'H1', 'W3', 'H3'}, R={'W1', 'W2'}, boat=island)
+    Step 74: Move {'W3'} → State(L={'H2'}, I={'H1', 'H3'}, R={'W1', 'W3', 'W2'}, boat=right)
+    Step 75: Move {'W1', 'W3'} → State(L={'H2'}, I={'W1', 'H1', 'W3', 'H3'}, R={'W2'}, boat=island)
+    Step 76: Move {'H3', 'W3'} → State(L={'W3', 'H3', 'H2'}, I={'H1', 'W1'}, R={'W2'}, boat=left)
+    Step 77: Move {'H3', 'H2'} → State(L={'W3'}, I={'W1', 'H1', 'H3', 'H2'}, R={'W2'}, boat=island)
+    Step 78: Move {'H3', 'H2'} → State(L={'W3'}, I={'H1', 'W1'}, R={'H3', 'H2', 'W2'}, boat=right)
+    Step 79: Move {'H2', 'W2'} → State(L={'W3'}, I={'W1', 'H1', 'H2', 'W2'}, R={'H3'}, boat=island)
+    Step 80: Move {'W1', 'W2'} → State(L={'W1', 'W3', 'W2'}, I={'H1', 'H2'}, R={'H3'}, boat=left)
+    Step 81: Move {'W2'} → State(L={'W1', 'W3'}, I={'H1', 'H2', 'W2'}, R={'H3'}, boat=island)
+    Step 82: Move {'H2', 'W2'} → State(L={'W1', 'W3'}, I={'H1'}, R={'H3', 'H2', 'W2'}, boat=right)
+    Step 83: Move {'H3', 'H2'} → State(L={'W1', 'W3'}, I={'H1', 'H3', 'H2'}, R={'W2'}, boat=island)
+    Step 84: Move {'H1', 'H2'} → State(L={'W1', 'W3'}, I={'H3'}, R={'H1', 'H2', 'W2'}, boat=right)
+    Step 85: Move {'H2', 'W2'} → State(L={'W1', 'W3'}, I={'H3', 'H2', 'W2'}, R={'H1'}, boat=island)
+    Step 86: Move {'H3', 'H2'} → State(L={'W1', 'W3'}, I={'W2'}, R={'H1', 'H3', 'H2'}, boat=right)
+    Step 87: Move {'H2'} → State(L={'W1', 'W3'}, I={'H2', 'W2'}, R={'H1', 'H3'}, boat=island)
+    Step 88: Move {'H2', 'W2'} → State(L={'W1', 'W3'}, I=set(), R={'H1', 'H3', 'H2', 'W2'}, boat=right)
+    Step 89: Move {'H1', 'H3'} → State(L={'W1', 'W3'}, I={'H1', 'H3'}, R={'H2', 'W2'}, boat=island)
+    Step 90: Move {'H1', 'H3'} → State(L={'W1', 'H1', 'W3', 'H3'}, I=set(), R={'H2', 'W2'}, boat=left)
+    Step 91: Move {'H3', 'W3'} → State(L={'H1', 'W1'}, I={'H3', 'W3'}, R={'H2', 'W2'}, boat=island)
+    Step 92: Move {'H3'} → State(L={'W1', 'H1'}, I={'W3'}, R={'H3', 'H2', 'W2'}, boat=right)
+    Step 93: Move {'H3', 'H2'} → State(L={'W1', 'H1'}, I={'H3', 'W3', 'H2'}, R={'W2'}, boat=island)
+    Step 94: Move {'H3', 'H2'} → State(L={'W1', 'H1', 'H3', 'H2'}, I={'W3'}, R={'W2'}, boat=left)
+    Step 95: Move {'H3'} → State(L={'W1', 'H1', 'H2'}, I={'H3', 'W3'}, R={'W2'}, boat=island)
+    Step 96: Move {'W3', 'H3'} → State(L={'H1', 'W3', 'H2', 'W1', 'H3'}, I=set(), R={'W2'}, boat=left)
+    Step 97: Move {'W1', 'W3'} → State(L={'H1', 'H2', 'H3'}, I={'W1', 'W3'}, R={'W2'}, boat=island)
+    Step 98: Move {'W1', 'W3'} → State(L={'H1', 'H3', 'H2'}, I=set(), R={'W1', 'W3', 'W2'}, boat=right)
+    Step 99: Move {'W3', 'W2'} → State(L={'H1', 'H3', 'H2'}, I={'W3', 'W2'}, R={'W1'}, boat=island)
+    Step 100: Move {'W2'} → State(L={'H1', 'H3', 'H2'}, I={'W3'}, R={'W1', 'W2'}, boat=right)
+    Step 101: Move {'W1', 'W2'} → State(L={'H1', 'H3', 'H2'}, I={'W1', 'W3', 'W2'}, R=set(), boat=island)
+    Step 102: Move {'W3', 'W2'} → State(L={'H1', 'H3', 'H2'}, I={'W1'}, R={'W3', 'W2'}, boat=right)
+    Step 103: Move {'W2'} → State(L={'H1', 'H3', 'H2'}, I={'W1', 'W2'}, R={'W3'}, boat=island)
+    Step 104: Move {'W1', 'W2'} → State(L={'H1', 'H2', 'W2', 'W1', 'H3'}, I=set(), R={'W3'}, boat=left)
+    Step 105: Move {'H2', 'W2'} → State(L={'H1', 'W1', 'H3'}, I={'H2', 'W2'}, R={'W3'}, boat=island)
+    Step 106: Move {'H2'} → State(L={'W1', 'H1', 'H3', 'H2'}, I={'W2'}, R={'W3'}, boat=left)
+    Step 107: Move {'H3', 'H2'} → State(L={'H1', 'W1'}, I={'H3', 'H2', 'W2'}, R={'W3'}, boat=island)
+    Step 108: Move {'H2', 'W2'} → State(L={'W1', 'H1', 'H2', 'W2'}, I={'H3'}, R={'W3'}, boat=left)
+    Step 109: Move {'W1', 'H1'} → State(L={'H2', 'W2'}, I={'W1', 'H1', 'H3'}, R={'W3'}, boat=island)
+    Step 110: Move {'H1', 'H3'} → State(L={'H2', 'W2'}, I={'W1'}, R={'H1', 'W3', 'H3'}, boat=right)
+    Step 111: Move {'W3'} → State(L={'H2', 'W2'}, I={'W1', 'W3'}, R={'H1', 'H3'}, boat=island)
+    Step 112: Move {'W1'} → State(L={'H2', 'W2'}, I={'W3'}, R={'W1', 'H1', 'H3'}, boat=right)
+    Step 113: Move {'H1', 'H3'} → State(L={'H2', 'W2'}, I={'H1', 'W3', 'H3'}, R={'W1'}, boat=island)
+    Step 114: Move {'W3'} → State(L={'H2', 'W2'}, I={'H1', 'H3'}, R={'W1', 'W3'}, boat=right)
+    Step 115: Move {'W1', 'W3'} → State(L={'H2', 'W2'}, I={'W1', 'H1', 'W3', 'H3'}, R=set(), boat=island)
+    Step 116: Move {'H3', 'W3'} → State(L={'W3', 'H3', 'H2', 'W2'}, I={'H1', 'W1'}, R=set(), boat=left)
+    Step 117: Move {'H2', 'W2'} → State(L={'W3', 'H3'}, I={'W1', 'H1', 'H2', 'W2'}, R=set(), boat=island)
+    Step 118: Move {'H2', 'W2'} → State(L={'H3', 'W3'}, I={'H1', 'W1'}, R={'H2', 'W2'}, boat=right)
+    Step 119: Move {'H2'} → State(L={'H3', 'W3'}, I={'W1', 'H1', 'H2'}, R={'W2'}, boat=island)
+    Step 120: Move {'H1', 'H2'} → State(L={'H3', 'W3'}, I={'W1'}, R={'H1', 'H2', 'W2'}, boat=right)
+    Step 121: Move {'H1'} → State(L={'H3', 'W3'}, I={'W1', 'H1'}, R={'H2', 'W2'}, boat=island)
+    Step 122: Move {'H1'} → State(L={'H3', 'W3', 'H1'}, I={'W1'}, R={'H2', 'W2'}, boat=left)
+    Step 123: Move {'H1', 'H3'} → State(L={'W3'}, I={'W1', 'H1', 'H3'}, R={'H2', 'W2'}, boat=island)
+    Step 124: Move {'H1', 'H3'} → State(L={'W3'}, I={'W1'}, R={'H1', 'H3', 'H2', 'W2'}, boat=right)
+    Step 125: Move {'W2'} → State(L={'W3'}, I={'W1', 'W2'}, R={'H1', 'H3', 'H2'}, boat=island)
+    Step 126: Move {'W1', 'W2'} → State(L={'W3'}, I=set(), R={'H1', 'H2', 'W2', 'W1', 'H3'}, boat=right)
+    Step 127: Move {'H2', 'W2'} → State(L={'W3'}, I={'H2', 'W2'}, R={'H1', 'W1', 'H3'}, boat=island)
+    Step 128: Move {'H2'} → State(L={'W3'}, I={'W2'}, R={'W1', 'H1', 'H3', 'H2'}, boat=right)
+    Step 129: Move {'H3', 'H2'} → State(L={'W3'}, I={'H3', 'H2', 'W2'}, R={'H1', 'W1'}, boat=island)
+    Step 130: Move {'H3', 'H2'} → State(L={'H3', 'W3', 'H2'}, I={'W2'}, R={'W1', 'H1'}, boat=left)
+    Step 131: Move {'W3'} → State(L={'H3', 'H2'}, I={'W3', 'W2'}, R={'W1', 'H1'}, boat=island)
+    Step 132: Move {'W2'} → State(L={'H3', 'H2', 'W2'}, I={'W3'}, R={'W1', 'H1'}, boat=left)
+    Step 133: Move {'H3', 'H2'} → State(L={'W2'}, I={'H3', 'W3', 'H2'}, R={'W1', 'H1'}, boat=island)
+    Step 134: Move {'H3', 'H2'} → State(L={'W2'}, I={'W3'}, R={'W1', 'H1', 'H3', 'H2'}, boat=right)
+    Step 135: Move {'H3'} → State(L={'W2'}, I={'H3', 'W3'}, R={'W1', 'H1', 'H2'}, boat=island)
+    Step 136: Move {'W3', 'H3'} → State(L={'W2'}, I=set(), R={'H1', 'W3', 'H2', 'W1', 'H3'}, boat=right)
+    Step 137: Move {'W1', 'W3'} → State(L={'W2'}, I={'W1', 'W3'}, R={'H1', 'H2', 'H3'}, boat=island)
+    Step 138: Move {'W3'} → State(L={'W2'}, I={'W1'}, R={'H1', 'W3', 'H3', 'H2'}, boat=right)
+    Step 139: Move {'H1', 'H2'} → State(L={'W2'}, I={'W1', 'H1', 'H2'}, R={'W3', 'H3'}, boat=island)
+    Step 140: Move {'H2'} → State(L={'H2', 'W2'}, I={'W1', 'H1'}, R={'H3', 'W3'}, boat=left)
+    Step 141: Move {'H2', 'W2'} → State(L=set(), I={'W1', 'H1', 'H2', 'W2'}, R={'H3', 'W3'}, boat=island)
+    Step 142: Move {'H2', 'W2'} → State(L=set(), I={'H1', 'W1'}, R={'H3', 'W3', 'H2', 'W2'}, boat=right)
+    Step 143: Move {'H3', 'H2'} → State(L=set(), I={'W1', 'H1', 'H3', 'H2'}, R={'W3', 'W2'}, boat=island)
+    Step 144: Move {'W1'} → State(L=set(), I={'H1', 'H3', 'H2'}, R={'W1', 'W3', 'W2'}, boat=right)
+    Step 145: Move {'W3', 'W2'} → State(L=set(), I={'H1', 'W3', 'H2', 'W2', 'H3'}, R={'W1'}, boat=island)
+    Step 146: Move {'H2', 'W2'} → State(L={'H2', 'W2'}, I={'H1', 'W3', 'H3'}, R={'W1'}, boat=left)
+    Step 147: Move {'H2'} → State(L={'W2'}, I={'H1', 'W3', 'H2', 'H3'}, R={'W1'}, boat=island)
+    Step 148: Move {'H1', 'H2'} → State(L={'H1', 'H2', 'W2'}, I={'W3', 'H3'}, R={'W1'}, boat=left)
+    Step 149: Move {'H2', 'W2'} → State(L={'H1'}, I={'H3', 'W3', 'H2', 'W2'}, R={'W1'}, boat=island)
+    Step 150: Move {'W3', 'H3'} → State(L={'H1', 'W3', 'H3'}, I={'H2', 'W2'}, R={'W1'}, boat=left)
+    Step 151: Move {'H1', 'H3'} → State(L={'W3'}, I={'H1', 'H3', 'H2', 'W2'}, R={'W1'}, boat=island)
+    Step 152: Move {'W2'} → State(L={'W3'}, I={'H1', 'H3', 'H2'}, R={'W1', 'W2'}, boat=right)
+    Step 153: Move {'W1', 'W2'} → State(L={'W3'}, I={'H1', 'H2', 'W2', 'W1', 'H3'}, R=set(), boat=island)
+    Step 154: Move {'W1', 'W2'} → State(L={'W1', 'W3', 'W2'}, I={'H1', 'H2', 'H3'}, R=set(), boat=left)
+    Step 155: Move {'W3', 'W2'} → State(L={'W1'}, I={'H1', 'W3', 'H2', 'W2', 'H3'}, R=set(), boat=island)
+    Step 156: Move {'H2', 'W2'} → State(L={'W1'}, I={'H1', 'W3', 'H3'}, R={'H2', 'W2'}, boat=right)
+    Step 157: Move {'H2'} → State(L={'W1'}, I={'H1', 'W3', 'H2', 'H3'}, R={'W2'}, boat=island)
+    Step 158: Move {'H1', 'H2'} → State(L={'W1'}, I={'W3', 'H3'}, R={'H1', 'H2', 'W2'}, boat=right)
+    Step 159: Move {'H1'} → State(L={'W1'}, I={'H3', 'W3', 'H1'}, R={'H2', 'W2'}, boat=island)
+    Step 160: Move {'H1'} → State(L={'W1', 'H1'}, I={'H3', 'W3'}, R={'H2', 'W2'}, boat=left)
+    Step 161: Move {'W1', 'H1'} → State(L=set(), I={'W1', 'H1', 'W3', 'H3'}, R={'H2', 'W2'}, boat=island)
+    Step 162: Move {'H1', 'H3'} → State(L=set(), I={'W3', 'W1'}, R={'H1', 'H3', 'H2', 'W2'}, boat=right)
+    Step 163: Move {'W2'} → State(L=set(), I={'W1', 'W3', 'W2'}, R={'H1', 'H3', 'H2'}, boat=island)
+    Step 164: Move {'W3', 'W2'} → State(L=set(), I={'W1'}, R={'H1', 'W3', 'H2', 'W2', 'H3'}, boat=right)
+    Step 165: Move {'W2'} → State(L=set(), I={'W1', 'W2'}, R={'H1', 'W3', 'H2', 'H3'}, boat=island)
+    Step 166: Move {'W1', 'W2'} → State(L=set(), I=set(), R={'H1', 'W3', 'H2', 'W2', 'W1', 'H3'}, boat=right)
+
+    Final state:
+    State(L=set(), I=set(), R={'H1', 'W3', 'H2', 'W2', 'W1', 'H3'}, boat=right)
+
+Task 3 - Backtrack Approach
+
+    from itertools import combinations
+
+    def generate_possible_moves(people):
+        """Generate all combinations of 1 or 2 people for moving the boat."""
+        return [set(c) for i in [1, 2] for c in combinations(people, i)]
+
+    def backtrack(state, path, visited):
+        """Try using classic backtracking to get the final result + path there."""
+        if state.is_goal():
+            return path
+
+        visited.add(state)
+
+        for child_state, passengers in generate_children(state):
+            if child_state not in visited:
+                result = backtrack(child_state, path + [(child_state, passengers)], visited)
+                if result:
+                    return result
+
+        return None
+
+
+    solution = backtrack(initial_state, [(initial_state, None)], set())  # None for initial move (no move yet)
+
+    if solution:
+        print("Goal reached!\n")
+        print(f"Initial state:\n{initial_state}\n")
+        for step_num, (state, move) in enumerate(solution, 1):
+            if move is not None:
+                print(f"Step {step_num - 1}: Move {move} → {state}")
+        print(f"\nFinal state:\n{state}")
+    else:
+        print("No solution found.")
+
+    Goal reached!
+
+    Initial state:
+    State(L={'H1', 'W3', 'H2', 'W2', 'W1', 'H3'}, I=set(), R=set(), boat=left)
+
+    Step 1: Move {'W1', 'H1'} → State(L={'W3', 'H2', 'W2', 'H3'}, I={'W1', 'H1'}, R=set(), boat=island)
+    Step 2: Move {'H1'} → State(L={'H1', 'W3', 'H2', 'W2', 'H3'}, I={'W1'}, R=set(), boat=left)
+    Step 3: Move {'W3'} → State(L={'H1', 'H2', 'W2', 'H3'}, I={'W1', 'W3'}, R=set(), boat=island)
+    Step 4: Move {'W1'} → State(L={'H1', 'H2', 'W2', 'W1', 'H3'}, I={'W3'}, R=set(), boat=left)
+    Step 5: Move {'W2'} → State(L={'H1', 'H2', 'W1', 'H3'}, I={'W3', 'W2'}, R=set(), boat=island)
+    Step 6: Move {'W3'} → State(L={'H1', 'W3', 'H2', 'W1', 'H3'}, I={'W2'}, R=set(), boat=left)
+    Step 7: Move {'H2'} → State(L={'H1', 'W3', 'W1', 'H3'}, I={'H2', 'W2'}, R=set(), boat=island)
+    Step 8: Move {'H2', 'W2'} → State(L={'W1', 'H1', 'W3', 'H3'}, I=set(), R={'H2', 'W2'}, boat=right)
+    Step 9: Move {'H2'} → State(L={'W1', 'H1', 'W3', 'H3'}, I={'H2'}, R={'W2'}, boat=island)
+    Step 10: Move {'H2'} → State(L={'H1', 'W3', 'H2', 'W1', 'H3'}, I=set(), R={'W2'}, boat=left)
+    Step 11: Move {'W3'} → State(L={'H1', 'H2', 'W1', 'H3'}, I={'W3'}, R={'W2'}, boat=island)
+    Step 12: Move {'W3'} → State(L={'W1', 'H1', 'H3', 'H2'}, I=set(), R={'W3', 'W2'}, boat=right)
+    Step 13: Move {'W2'} → State(L={'W1', 'H1', 'H3', 'H2'}, I={'W2'}, R={'W3'}, boat=island)
+    Step 14: Move {'W2'} → State(L={'H1', 'H2', 'W2', 'W1', 'H3'}, I=set(), R={'W3'}, boat=left)
+    Step 15: Move {'W1'} → State(L={'H1', 'H2', 'W2', 'H3'}, I={'W1'}, R={'W3'}, boat=island)
+    Step 16: Move {'W1'} → State(L={'H1', 'H3', 'H2', 'W2'}, I=set(), R={'W1', 'W3'}, boat=right)
+    Step 17: Move {'W3'} → State(L={'H1', 'H3', 'H2', 'W2'}, I={'W3'}, R={'W1'}, boat=island)
+    Step 18: Move {'W3'} → State(L={'H1', 'W3', 'H2', 'W2', 'H3'}, I=set(), R={'W1'}, boat=left)
+    Step 19: Move {'W3', 'W2'} → State(L={'H1', 'H2', 'H3'}, I={'W3', 'W2'}, R={'W1'}, boat=island)
+    Step 20: Move {'W3'} → State(L={'H1', 'W3', 'H3', 'H2'}, I={'W2'}, R={'W1'}, boat=left)
+    Step 21: Move {'H1', 'H2'} → State(L={'W3', 'H3'}, I={'H1', 'H2', 'W2'}, R={'W1'}, boat=island)
+    Step 22: Move {'H1'} → State(L={'H3', 'W3', 'H1'}, I={'H2', 'W2'}, R={'W1'}, boat=left)
+    Step 23: Move {'W3', 'H3'} → State(L={'H1'}, I={'H3', 'W3', 'H2', 'W2'}, R={'W1'}, boat=island)
+    Step 24: Move {'W3', 'W2'} → State(L={'H1'}, I={'H2', 'H3'}, R={'W1', 'W3', 'W2'}, boat=right)
+    Step 25: Move {'W3'} → State(L={'H1'}, I={'W3', 'H3', 'H2'}, R={'W1', 'W2'}, boat=island)
+    Step 26: Move {'H2'} → State(L={'H1', 'H2'}, I={'W3', 'H3'}, R={'W1', 'W2'}, boat=left)
+    Step 27: Move {'H1'} → State(L={'H2'}, I={'H3', 'W3', 'H1'}, R={'W1', 'W2'}, boat=island)
+    Step 28: Move {'W3'} → State(L={'H2'}, I={'H3', 'H1'}, R={'W1', 'W3', 'W2'}, boat=right)
+    Step 29: Move {'W1'} → State(L={'H2'}, I={'W1', 'H1', 'H3'}, R={'W3', 'W2'}, boat=island)
+    Step 30: Move {'H3'} → State(L={'H3', 'H2'}, I={'W1', 'H1'}, R={'W3', 'W2'}, boat=left)
+    Step 31: Move {'H2'} → State(L={'H3'}, I={'W1', 'H1', 'H2'}, R={'W3', 'W2'}, boat=island)
+    Step 32: Move {'W1'} → State(L={'H3'}, I={'H1', 'H2'}, R={'W1', 'W3', 'W2'}, boat=right)
+    Step 33: Move {'W2'} → State(L={'H3'}, I={'H1', 'H2', 'W2'}, R={'W1', 'W3'}, boat=island)
+    Step 34: Move {'H1'} → State(L={'H1', 'H3'}, I={'H2', 'W2'}, R={'W1', 'W3'}, boat=left)
+    Step 35: Move {'H3'} → State(L={'H1'}, I={'H3', 'H2', 'W2'}, R={'W1', 'W3'}, boat=island)
+    Step 36: Move {'H3', 'H2'} → State(L={'H1', 'H3', 'H2'}, I={'W2'}, R={'W1', 'W3'}, boat=left)
+    Step 37: Move {'H2'} → State(L={'H1', 'H3'}, I={'H2', 'W2'}, R={'W1', 'W3'}, boat=island)
+    Step 38: Move {'H2', 'W2'} → State(L={'H1', 'H3', 'H2', 'W2'}, I=set(), R={'W1', 'W3'}, boat=left)
+    Step 39: Move {'W2'} → State(L={'H1', 'H3', 'H2'}, I={'W2'}, R={'W1', 'W3'}, boat=island)
+    Step 40: Move {'W2'} → State(L={'H1', 'H3', 'H2'}, I=set(), R={'W1', 'W3', 'W2'}, boat=right)
+    Step 41: Move {'W1'} → State(L={'H1', 'H3', 'H2'}, I={'W1'}, R={'W3', 'W2'}, boat=island)
+    Step 42: Move {'W1'} → State(L={'W1', 'H1', 'H3', 'H2'}, I=set(), R={'W3', 'W2'}, boat=left)
+    Step 43: Move {'H3', 'H2'} → State(L={'H1', 'W1'}, I={'H3', 'H2'}, R={'W3', 'W2'}, boat=island)
+    Step 44: Move {'H3'} → State(L={'W1', 'H1', 'H3'}, I={'H2'}, R={'W3', 'W2'}, boat=left)
+    Step 45: Move {'H1', 'H3'} → State(L={'W1'}, I={'H1', 'H3', 'H2'}, R={'W3', 'W2'}, boat=island)
+    Step 46: Move {'H1'} → State(L={'W1', 'H1'}, I={'H3', 'H2'}, R={'W3', 'W2'}, boat=left)
+    Step 47: Move {'W1', 'H1'} → State(L=set(), I={'W1', 'H1', 'H3', 'H2'}, R={'W3', 'W2'}, boat=island)
+    Step 48: Move {'W1'} → State(L=set(), I={'H1', 'H3', 'H2'}, R={'W1', 'W3', 'W2'}, boat=right)
+    Step 49: Move {'W3'} → State(L=set(), I={'H1', 'W3', 'H3', 'H2'}, R={'W1', 'W2'}, boat=island)
+    Step 50: Move {'H1', 'H2'} → State(L=set(), I={'W3', 'H3'}, R={'W1', 'H1', 'H2', 'W2'}, boat=right)
+    Step 51: Move {'W1', 'H1'} → State(L=set(), I={'W1', 'H3', 'W3', 'H1'}, R={'H2', 'W2'}, boat=island)
+    Step 52: Move {'W1', 'W3'} → State(L={'W1', 'W3'}, I={'H1', 'H3'}, R={'H2', 'W2'}, boat=left)
+    Step 53: Move {'W1'} → State(L={'W3'}, I={'W1', 'H1', 'H3'}, R={'H2', 'W2'}, boat=island)
+    Step 54: Move {'H3'} → State(L={'W3'}, I={'W1', 'H1'}, R={'H3', 'H2', 'W2'}, boat=right)
+    Step 55: Move {'H3', 'H2'} → State(L={'W3'}, I={'W1', 'H1', 'H3', 'H2'}, R={'W2'}, boat=island)
+    Step 56: Move {'W1'} → State(L={'W1', 'W3'}, I={'H1', 'H3', 'H2'}, R={'W2'}, boat=left)
+    Step 57: Move {'W3'} → State(L={'W1'}, I={'H1', 'W3', 'H3', 'H2'}, R={'W2'}, boat=island)
+    Step 58: Move {'H1'} → State(L={'W1', 'H1'}, I={'W3', 'H3', 'H2'}, R={'W2'}, boat=left)
+    Step 59: Move {'W1', 'H1'} → State(L=set(), I={'H1', 'W3', 'H2', 'W1', 'H3'}, R={'W2'}, boat=island)
+    Step 60: Move {'W3'} → State(L=set(), I={'H1', 'H2', 'W1', 'H3'}, R={'W3', 'W2'}, boat=right)
+    Step 61: Move {'W2'} → State(L=set(), I={'H1', 'H2', 'W2', 'W1', 'H3'}, R={'W3'}, boat=island)
+    Step 62: Move {'W1'} → State(L=set(), I={'H1', 'H2', 'W2', 'H3'}, R={'W1', 'W3'}, boat=right)
+    Step 63: Move {'W3'} → State(L=set(), I={'H1', 'W3', 'H2', 'W2', 'H3'}, R={'W1'}, boat=island)
+    Step 64: Move {'H1'} → State(L=set(), I={'W3', 'H2', 'W2', 'H3'}, R={'W1', 'H1'}, boat=right)
+    Step 65: Move {'W1', 'H1'} → State(L=set(), I={'H1', 'W3', 'H2', 'W2', 'W1', 'H3'}, R=set(), boat=island)
+    Step 66: Move {'W1', 'H1'} → State(L={'W1', 'H1'}, I={'W3', 'H2', 'W2', 'H3'}, R=set(), boat=left)
+    Step 67: Move {'H1'} → State(L={'W1'}, I={'H1', 'W3', 'H2', 'W2', 'H3'}, R=set(), boat=island)
+    Step 68: Move {'W3'} → State(L={'W1', 'W3'}, I={'H1', 'H2', 'W2', 'H3'}, R=set(), boat=left)
+    Step 69: Move {'W1'} → State(L={'W3'}, I={'H1', 'H2', 'W2', 'W1', 'H3'}, R=set(), boat=island)
+    Step 70: Move {'W2'} → State(L={'W3', 'W2'}, I={'H1', 'H2', 'W1', 'H3'}, R=set(), boat=left)
+    Step 71: Move {'W3'} → State(L={'W2'}, I={'H1', 'W3', 'H2', 'W1', 'H3'}, R=set(), boat=island)
+    Step 72: Move {'W1', 'H1'} → State(L={'W2'}, I={'W3', 'H2', 'H3'}, R={'W1', 'H1'}, boat=right)
+    Step 73: Move {'H1'} → State(L={'W2'}, I={'H3', 'H1', 'W3', 'H2'}, R={'W1'}, boat=island)
+    Step 74: Move {'W3'} → State(L={'W3', 'W2'}, I={'H3', 'H1', 'H2'}, R={'W1'}, boat=left)
+    Step 75: Move {'W2'} → State(L={'W3'}, I={'H1', 'H3', 'H2', 'W2'}, R={'W1'}, boat=island)
+    Step 76: Move {'H1', 'H3'} → State(L={'W3'}, I={'H2', 'W2'}, R={'W1', 'H1', 'H3'}, boat=right)
+    Step 77: Move {'H3'} → State(L={'W3'}, I={'H3', 'H2', 'W2'}, R={'W1', 'H1'}, boat=island)
+    Step 78: Move {'H3'} → State(L={'H3', 'W3'}, I={'H2', 'W2'}, R={'W1', 'H1'}, boat=left)
+    Step 79: Move {'W3', 'H3'} → State(L=set(), I={'H3', 'W3', 'H2', 'W2'}, R={'W1', 'H1'}, boat=island)
+    Step 80: Move {'W3', 'H3'} → State(L=set(), I={'H2', 'W2'}, R={'W1', 'H1', 'W3', 'H3'}, boat=right)
+    Step 81: Move {'W1', 'H1'} → State(L=set(), I={'W1', 'H1', 'H2', 'W2'}, R={'W3', 'H3'}, boat=island)
+    Step 82: Move {'W1', 'H1'} → State(L={'W1', 'H1'}, I={'H2', 'W2'}, R={'H3', 'W3'}, boat=left)
+    Step 83: Move {'H1'} → State(L={'W1'}, I={'H1', 'H2', 'W2'}, R={'H3', 'W3'}, boat=island)
+    Step 84: Move {'H1'} → State(L={'W1'}, I={'H2', 'W2'}, R={'H3', 'W3', 'H1'}, boat=right)
+    Step 85: Move {'W3', 'H3'} → State(L={'W1'}, I={'H3', 'W3', 'H2', 'W2'}, R={'H1'}, boat=island)
+    Step 86: Move {'W3', 'W2'} → State(L={'W1', 'W3', 'W2'}, I={'H2', 'H3'}, R={'H1'}, boat=left)
+    Step 87: Move {'W3'} → State(L={'W1', 'W2'}, I={'W3', 'H3', 'H2'}, R={'H1'}, boat=island)
+    Step 88: Move {'H2'} → State(L={'W1', 'W2'}, I={'W3', 'H3'}, R={'H1', 'H2'}, boat=right)
+    Step 89: Move {'H1'} → State(L={'W1', 'W2'}, I={'H3', 'W3', 'H1'}, R={'H2'}, boat=island)
+    Step 90: Move {'W3'} → State(L={'W1', 'W3', 'W2'}, I={'H3', 'H1'}, R={'H2'}, boat=left)
+    Step 91: Move {'W1'} → State(L={'W3', 'W2'}, I={'W1', 'H1', 'H3'}, R={'H2'}, boat=island)
+    Step 92: Move {'H3'} → State(L={'W3', 'W2'}, I={'W1', 'H1'}, R={'H3', 'H2'}, boat=right)
+    Step 93: Move {'H2'} → State(L={'W3', 'W2'}, I={'W1', 'H1', 'H2'}, R={'H3'}, boat=island)
+    Step 94: Move {'W1'} → State(L={'W1', 'W3', 'W2'}, I={'H1', 'H2'}, R={'H3'}, boat=left)
+    Step 95: Move {'W2'} → State(L={'W1', 'W3'}, I={'H1', 'H2', 'W2'}, R={'H3'}, boat=island)
+    Step 96: Move {'H1'} → State(L={'W1', 'W3'}, I={'H2', 'W2'}, R={'H1', 'H3'}, boat=right)
+    Step 97: Move {'H3'} → State(L={'W1', 'W3'}, I={'H3', 'H2', 'W2'}, R={'H1'}, boat=island)
+    Step 98: Move {'H3', 'H2'} → State(L={'W1', 'W3'}, I={'W2'}, R={'H1', 'H3', 'H2'}, boat=right)
+    Step 99: Move {'H2'} → State(L={'W1', 'W3'}, I={'H2', 'W2'}, R={'H1', 'H3'}, boat=island)
+    Step 100: Move {'H2', 'W2'} → State(L={'W1', 'W3'}, I=set(), R={'H1', 'H3', 'H2', 'W2'}, boat=right)
+    Step 101: Move {'W2'} → State(L={'W1', 'W3'}, I={'W2'}, R={'H1', 'H3', 'H2'}, boat=island)
+    Step 102: Move {'W2'} → State(L={'W1', 'W3', 'W2'}, I=set(), R={'H1', 'H3', 'H2'}, boat=left)
+    Step 103: Move {'W1'} → State(L={'W3', 'W2'}, I={'W1'}, R={'H1', 'H3', 'H2'}, boat=island)
+    Step 104: Move {'W1'} → State(L={'W3', 'W2'}, I=set(), R={'W1', 'H1', 'H3', 'H2'}, boat=right)
+    Step 105: Move {'H3', 'H2'} → State(L={'W3', 'W2'}, I={'H3', 'H2'}, R={'H1', 'W1'}, boat=island)
+    Step 106: Move {'H3'} → State(L={'W3', 'W2'}, I={'H2'}, R={'W1', 'H1', 'H3'}, boat=right)
+    Step 107: Move {'H1', 'H3'} → State(L={'W3', 'W2'}, I={'H1', 'H3', 'H2'}, R={'W1'}, boat=island)
+    Step 108: Move {'H1'} → State(L={'W3', 'W2'}, I={'H3', 'H2'}, R={'W1', 'H1'}, boat=right)
+    Step 109: Move {'W1', 'H1'} → State(L={'W3', 'W2'}, I={'W1', 'H1', 'H3', 'H2'}, R=set(), boat=island)
+    Step 110: Move {'W1'} → State(L={'W1', 'W3', 'W2'}, I={'H1', 'H3', 'H2'}, R=set(), boat=left)
+    Step 111: Move {'W3'} → State(L={'W1', 'W2'}, I={'H1', 'W3', 'H3', 'H2'}, R=set(), boat=island)
+    Step 112: Move {'H1', 'H2'} → State(L={'W1', 'H1', 'H2', 'W2'}, I={'W3', 'H3'}, R=set(), boat=left)
+    Step 113: Move {'W1', 'H1'} → State(L={'H2', 'W2'}, I={'W1', 'H3', 'W3', 'H1'}, R=set(), boat=island)
+    Step 114: Move {'W1', 'W3'} → State(L={'H2', 'W2'}, I={'H1', 'H3'}, R={'W1', 'W3'}, boat=right)
+    Step 115: Move {'W1'} → State(L={'H2', 'W2'}, I={'W1', 'H1', 'H3'}, R={'W3'}, boat=island)
+    Step 116: Move {'H3'} → State(L={'H3', 'H2', 'W2'}, I={'W1', 'H1'}, R={'W3'}, boat=left)
+    Step 117: Move {'H3', 'H2'} → State(L={'W2'}, I={'W1', 'H1', 'H3', 'H2'}, R={'W3'}, boat=island)
+    Step 118: Move {'W1'} → State(L={'W1', 'W2'}, I={'H1', 'H3', 'H2'}, R={'W3'}, boat=left)
+    Step 119: Move {'W2'} → State(L={'W1'}, I={'H1', 'H3', 'H2', 'W2'}, R={'W3'}, boat=island)
+    Step 120: Move {'H1', 'H3'} → State(L={'W1', 'H1', 'H3'}, I={'H2', 'W2'}, R={'W3'}, boat=left)
+    Step 121: Move {'H3'} → State(L={'W1', 'H1'}, I={'H3', 'H2', 'W2'}, R={'W3'}, boat=island)
+    Step 122: Move {'H3'} → State(L={'W1', 'H1'}, I={'H2', 'W2'}, R={'H3', 'W3'}, boat=right)
+    Step 123: Move {'W3', 'H3'} → State(L={'W1', 'H1'}, I={'H3', 'W3', 'H2', 'W2'}, R=set(), boat=island)
+    Step 124: Move {'W3', 'H3'} → State(L={'W1', 'H1', 'W3', 'H3'}, I={'H2', 'W2'}, R=set(), boat=left)
+    Step 125: Move {'W1', 'H1'} → State(L={'W3', 'H3'}, I={'W1', 'H1', 'H2', 'W2'}, R=set(), boat=island)
+    Step 126: Move {'W1', 'W2'} → State(L={'H3', 'W3'}, I={'H1', 'H2'}, R={'W1', 'W2'}, boat=right)
+    Step 127: Move {'W1'} → State(L={'H3', 'W3'}, I={'W1', 'H1', 'H2'}, R={'W2'}, boat=island)
+    Step 128: Move {'H2'} → State(L={'H3', 'W3', 'H2'}, I={'W1', 'H1'}, R={'W2'}, boat=left)
+    Step 129: Move {'W3', 'H3'} → State(L={'H2'}, I={'W1', 'H1', 'W3', 'H3'}, R={'W2'}, boat=island)
+    Step 130: Move {'W1', 'H1'} → State(L={'W1', 'H1', 'H2'}, I={'W3', 'H3'}, R={'W2'}, boat=left)
+    Step 131: Move {'H2'} → State(L={'W1', 'H1'}, I={'H3', 'W3', 'H2'}, R={'W2'}, boat=island)
+    Step 132: Move {'W3', 'H3'} → State(L={'W1', 'H1', 'W3', 'H3'}, I={'H2'}, R={'W2'}, boat=left)
+    Step 133: Move {'H1', 'H3'} → State(L={'W3', 'W1'}, I={'H1', 'H3', 'H2'}, R={'W2'}, boat=island)
+    Step 134: Move {'H1', 'H2'} → State(L={'W1', 'W3'}, I={'H3'}, R={'H1', 'H2', 'W2'}, boat=right)
+    Step 135: Move {'H1'} → State(L={'W1', 'W3'}, I={'H1', 'H3'}, R={'H2', 'W2'}, boat=island)
+    Step 136: Move {'H1', 'H3'} → State(L={'W1', 'H1', 'W3', 'H3'}, I=set(), R={'H2', 'W2'}, boat=left)
+    Step 137: Move {'W1', 'H1'} → State(L={'W3', 'H3'}, I={'W1', 'H1'}, R={'H2', 'W2'}, boat=island)
+    Step 138: Move {'H1'} → State(L={'H3', 'W3', 'H1'}, I={'W1'}, R={'H2', 'W2'}, boat=left)
+    Step 139: Move {'W3'} → State(L={'H3', 'H1'}, I={'W1', 'W3'}, R={'H2', 'W2'}, boat=island)
+    Step 140: Move {'W1'} → State(L={'W1', 'H1', 'H3'}, I={'W3'}, R={'H2', 'W2'}, boat=left)
+    Step 141: Move {'H3'} → State(L={'W1', 'H1'}, I={'H3', 'W3'}, R={'H2', 'W2'}, boat=island)
+    Step 142: Move {'H3'} → State(L={'W1', 'H1'}, I={'W3'}, R={'H3', 'H2', 'W2'}, boat=right)
+    Step 143: Move {'W2'} → State(L={'W1', 'H1'}, I={'W3', 'W2'}, R={'H3', 'H2'}, boat=island)
+    Step 144: Move {'W3'} → State(L={'W1', 'H1'}, I={'W2'}, R={'W3', 'H3', 'H2'}, boat=right)
+    Step 145: Move {'H2'} → State(L={'W1', 'H1'}, I={'H2', 'W2'}, R={'W3', 'H3'}, boat=island)
+    Step 146: Move {'H2'} → State(L={'W1', 'H1', 'H2'}, I={'W2'}, R={'H3', 'W3'}, boat=left)
+    Step 147: Move {'W1'} → State(L={'H1', 'H2'}, I={'W1', 'W2'}, R={'H3', 'W3'}, boat=island)
+    Step 148: Move {'W2'} → State(L={'H1', 'H2', 'W2'}, I={'W1'}, R={'H3', 'W3'}, boat=left)
+    Step 149: Move {'H1'} → State(L={'H2', 'W2'}, I={'W1', 'H1'}, R={'H3', 'W3'}, boat=island)
+    Step 150: Move {'H1'} → State(L={'H2', 'W2'}, I={'W1'}, R={'H3', 'W3', 'H1'}, boat=right)
+    Step 151: Move {'W3'} → State(L={'H2', 'W2'}, I={'W1', 'W3'}, R={'H3', 'H1'}, boat=island)
+    Step 152: Move {'W1'} → State(L={'H2', 'W2'}, I={'W3'}, R={'W1', 'H1', 'H3'}, boat=right)
+    Step 153: Move {'H3'} → State(L={'H2', 'W2'}, I={'H3', 'W3'}, R={'W1', 'H1'}, boat=island)
+    Step 154: Move {'H3'} → State(L={'H3', 'H2', 'W2'}, I={'W3'}, R={'W1', 'H1'}, boat=left)
+    Step 155: Move {'H3', 'H2'} → State(L={'W2'}, I={'H3', 'W3', 'H2'}, R={'W1', 'H1'}, boat=island)
+    Step 156: Move {'H2'} → State(L={'W2'}, I={'H3', 'W3'}, R={'W1', 'H1', 'H2'}, boat=right)
+    Step 157: Move {'W1', 'H1'} → State(L={'W2'}, I={'W1', 'H1', 'W3', 'H3'}, R={'H2'}, boat=island)
+    Step 158: Move {'H3', 'W3'} → State(L={'W2'}, I={'H1', 'W1'}, R={'W3', 'H3', 'H2'}, boat=right)
+    Step 159: Move {'H2'} → State(L={'W2'}, I={'W1', 'H1', 'H2'}, R={'W3', 'H3'}, boat=island)
+    Step 160: Move {'H1', 'H2'} → State(L={'W2'}, I={'W1'}, R={'H3', 'W3', 'H1', 'H2'}, boat=right)
+    Step 161: Move {'W3'} → State(L={'W2'}, I={'W1', 'W3'}, R={'H3', 'H1', 'H2'}, boat=island)
+    Step 162: Move {'W1'} → State(L={'W1', 'W2'}, I={'W3'}, R={'H1', 'H3', 'H2'}, boat=left)
+    Step 163: Move {'W2'} → State(L={'W1'}, I={'W3', 'W2'}, R={'H1', 'H3', 'H2'}, boat=island)
+    Step 164: Move {'W3'} → State(L={'W1', 'W3'}, I={'W2'}, R={'H1', 'H3', 'H2'}, boat=left)
+    Step 165: Move {'W1'} → State(L={'W3'}, I={'W1', 'W2'}, R={'H1', 'H3', 'H2'}, boat=island)
+    Step 166: Move {'W1'} → State(L={'W3'}, I={'W2'}, R={'W1', 'H1', 'H3', 'H2'}, boat=right)
+    Step 167: Move {'H2'} → State(L={'W3'}, I={'H2', 'W2'}, R={'W1', 'H1', 'H3'}, boat=island)
+    Step 168: Move {'H2', 'W2'} → State(L={'W3'}, I=set(), R={'H1', 'H2', 'W2', 'W1', 'H3'}, boat=right)
+    Step 169: Move {'W2'} → State(L={'W3'}, I={'W2'}, R={'H1', 'H2', 'W1', 'H3'}, boat=island)
+    Step 170: Move {'W2'} → State(L={'W3', 'W2'}, I=set(), R={'W1', 'H1', 'H3', 'H2'}, boat=left)
+    Step 171: Move {'W3'} → State(L={'W2'}, I={'W3'}, R={'W1', 'H1', 'H3', 'H2'}, boat=island)
+    Step 172: Move {'W3'} → State(L={'W2'}, I=set(), R={'H1', 'W3', 'H2', 'W1', 'H3'}, boat=right)
+    Step 173: Move {'H2'} → State(L={'W2'}, I={'H2'}, R={'H1', 'W3', 'W1', 'H3'}, boat=island)
+    Step 174: Move {'H2'} → State(L={'H2', 'W2'}, I=set(), R={'W1', 'H1', 'W3', 'H3'}, boat=left)
+    Step 175: Move {'H2', 'W2'} → State(L=set(), I={'H2', 'W2'}, R={'W1', 'H1', 'W3', 'H3'}, boat=island)
+    Step 176: Move {'H2'} → State(L=set(), I={'W2'}, R={'H1', 'W3', 'H2', 'W1', 'H3'}, boat=right)
+    Step 177: Move {'W3'} → State(L=set(), I={'W3', 'W2'}, R={'H1', 'H2', 'W1', 'H3'}, boat=island)
+    Step 178: Move {'W2'} → State(L=set(), I={'W3'}, R={'H1', 'H2', 'W2', 'W1', 'H3'}, boat=right)
+    Step 179: Move {'W1'} → State(L=set(), I={'W1', 'W3'}, R={'H1', 'H2', 'W2', 'H3'}, boat=island)
+    Step 180: Move {'W3'} → State(L=set(), I={'W1'}, R={'H1', 'W3', 'H2', 'W2', 'H3'}, boat=right)
+    Step 181: Move {'H1'} → State(L=set(), I={'W1', 'H1'}, R={'W3', 'H2', 'W2', 'H3'}, boat=island)
+    Step 182: Move {'W1', 'H1'} → State(L={'W1', 'H1'}, I=set(), R={'H3', 'W3', 'H2', 'W2'}, boat=left)
+    Step 183: Move {'H1'} → State(L={'W1'}, I={'H1'}, R={'H3', 'W3', 'H2', 'W2'}, boat=island)
+    Step 184: Move {'H1'} → State(L={'W1'}, I=set(), R={'H1', 'W3', 'H2', 'W2', 'H3'}, boat=right)
+    Step 185: Move {'W2'} → State(L={'W1'}, I={'W2'}, R={'H1', 'W3', 'H2', 'H3'}, boat=island)
+    Step 186: Move {'W2'} → State(L={'W1', 'W2'}, I=set(), R={'H1', 'W3', 'H2', 'H3'}, boat=left)
+    Step 187: Move {'W1', 'W2'} → State(L=set(), I={'W1', 'W2'}, R={'H1', 'W3', 'H2', 'H3'}, boat=island)
+    Step 188: Move {'W1', 'W2'} → State(L=set(), I=set(), R={'H1', 'W3', 'H2', 'W2', 'W1', 'H3'}, boat=right)
+
+    Final state:
+    State(L=set(), I=set(), R={'H1', 'W3', 'H2', 'W2', 'W1', 'H3'}, boat=right)
+
+Task 4 - A* Approach
+
+    class Node:
+        def __init__(self, state: State, parent: Optional['Node'], cost: int, heuristic: int, move: Optional[Set[str]] = None):
+            self.state = state
+            self.parent = parent
+            self.cost = cost
+            self.heuristic = heuristic
+            self.move = move  # The move (passengers) taken to reach this state
+
+        def __lt__(self, other: 'Node'):
+            return (self.cost + self.heuristic) < (other.cost + other.heuristic)
+
+    def heuristic(state: State) -> int:
+        return len(ALL_PEOPLE - state.right)
+
+    def reconstruct_path(node: Node) -> List[Tuple[State, Optional[Set[str]]]]:
+        path = []
+        while node:
+            path.append((node.state, node.move))
+            node = node.parent
+        return list(reversed(path))  # From initial state to goal
+
+    def a_star_search(start_state: State) -> Optional[List[Tuple[State, Optional[Set[str]]]]]:
+        open_set = []
+        heapq.heappush(open_set, Node(start_state, None, 0, heuristic(start_state), None))
+        visited: Dict[State, int] = {start_state: 0}
+
+        while open_set:
+            current_node = heapq.heappop(open_set)
+            current_state = current_node.state
+
+            if current_state.is_goal():
+                return reconstruct_path(current_node)
+
+            for child_state, move in generate_children(current_state):
+                new_cost = current_node.cost + 1
+                if child_state not in visited or new_cost < visited[child_state]:
+                    visited[child_state] = new_cost
+                    heapq.heappush(open_set, Node(child_state, current_node, new_cost, heuristic(child_state), move))
+
+        return None
+
+    solution = a_star_search(initial_state)
+
+    if solution:
+        print("Goal reached!\n")
+        print(f"Initial state:\n{solution[0][0]}\n")
+        for step_num, (state, move) in enumerate(solution[1:], 1):  # Skip initial state
+            move_str = ', '.join(sorted(move)) if move else "None"
+            print(f"Step {step_num}: Move {{{move_str}}} → {state}")
+        print(f"\nFinal state:\n{solution[-1][0]}")
+    else:
+        print("No solution found.")
+
+    Goal reached!
+
+    Initial state:
+    State(L={'H1', 'W3', 'H2', 'W2', 'W1', 'H3'}, I=set(), R=set(), boat=left)
+
+    Step 1: Move {W1, W2} → State(L={'H1', 'W3', 'H2', 'H3'}, I={'W1', 'W2'}, R=set(), boat=island)
+    Step 2: Move {W2} → State(L={'H1', 'W3', 'H2', 'W2', 'H3'}, I={'W1'}, R=set(), boat=left)
+    Step 3: Move {W2, W3} → State(L={'H1', 'H2', 'H3'}, I={'W1', 'W3', 'W2'}, R=set(), boat=island)
+    Step 4: Move {W3} → State(L={'H1', 'W3', 'H3', 'H2'}, I={'W1', 'W2'}, R=set(), boat=left)
+    Step 5: Move {H1, H2} → State(L={'W3', 'H3'}, I={'W1', 'H1', 'H2', 'W2'}, R=set(), boat=island)
+    Step 6: Move {H1, W1} → State(L={'H3', 'W3'}, I={'H2', 'W2'}, R={'W1', 'H1'}, boat=right)
+    Step 7: Move {H1} → State(L={'H3', 'W3'}, I={'H1', 'H2', 'W2'}, R={'W1'}, boat=island)
+    Step 8: Move {H1, H2} → State(L={'H3', 'W3'}, I={'W2'}, R={'W1', 'H1', 'H2'}, boat=right)
+    Step 9: Move {H2} → State(L={'H3', 'W3'}, I={'H2', 'W2'}, R={'W1', 'H1'}, boat=island)
+    Step 10: Move {H2} → State(L={'H3', 'W3', 'H2'}, I={'W2'}, R={'W1', 'H1'}, boat=left)
+    Step 11: Move {H2, H3} → State(L={'W3'}, I={'H3', 'H2', 'W2'}, R={'W1', 'H1'}, boat=island)
+    Step 12: Move {W2} → State(L={'W3', 'W2'}, I={'H3', 'H2'}, R={'W1', 'H1'}, boat=left)
+    Step 13: Move {W2, W3} → State(L=set(), I={'W3', 'H3', 'H2', 'W2'}, R={'W1', 'H1'}, boat=island)
+    Step 14: Move {H2, H3} → State(L=set(), I={'W3', 'W2'}, R={'W1', 'H1', 'H3', 'H2'}, boat=right)
+    Step 15: Move {W1} → State(L=set(), I={'W1', 'W3', 'W2'}, R={'H1', 'H3', 'H2'}, boat=island)
+    Step 16: Move {W1, W2} → State(L=set(), I={'W3'}, R={'H1', 'H2', 'W2', 'W1', 'H3'}, boat=right)
+    Step 17: Move {H3} → State(L=set(), I={'H3', 'W3'}, R={'H1', 'H2', 'W2', 'W1'}, boat=island)
+    Step 18: Move {H3, W3} → State(L=set(), I=set(), R={'H1', 'W3', 'H2', 'W2', 'W1', 'H3'}, boat=right)
+
+    Final state:
+    State(L=set(), I=set(), R={'H1', 'W3', 'H2', 'W2', 'W1', 'H3'}, boat=right)
