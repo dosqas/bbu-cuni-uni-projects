@@ -1,3 +1,5 @@
+USE MinimalCinemaDB
+
 -- Create the user-defined table type
 CREATE TYPE ActorTableType AS TABLE
 (
