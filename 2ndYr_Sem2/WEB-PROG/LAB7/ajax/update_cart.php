@@ -1,4 +1,7 @@
 <?php
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, PATCH, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 require '../includes/db.php'; // Include the database connection
 
 // Check if the request is a PATCH request
