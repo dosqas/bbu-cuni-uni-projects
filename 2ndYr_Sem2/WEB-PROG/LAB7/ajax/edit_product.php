@@ -1,8 +1,12 @@
 <?php
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, PUT, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 require '../includes/db.php'; // Include the database connection
 
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $input = file_get_contents('php://input');
+    
     $data = json_decode($input, true);
 
     // Validate input
