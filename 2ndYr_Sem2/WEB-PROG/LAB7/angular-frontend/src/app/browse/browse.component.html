@@ -1,0 +1,49 @@
+<h1>Browse Products</h1>
+
+<!-- Navigation Buttons -->
+<div style="margin-bottom: 20px; display: flex; gap: 10px;">
+  <button (click)="goToCartPage()"
+     style="padding: 10px 20px; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px; font-size: 1em; cursor: pointer">
+     View Cart
+  </button>
+
+  <button (click)="goToAdminPage()"
+     style="padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; font-size: 1em; cursor: pointer">
+     Go to Admin Page
+  </button>
+</div>
+
+<div>
+  <label for="category">Filter by Category:</label>
+  <select id="category" [(ngModel)]="currentCategory" (change)="onCategoryChange()">
+    <option value="">All Categories</option> <!-- Default option -->
+    <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+  </select>
+</div>
+
+<div id="products">
+  <div *ngFor="let product of products" class="product">
+    <div class="product-details">
+      <h2>{{ product.product_name }}</h2>
+      <p>Price: ${{ product.price }}</p>
+      <p>Category: {{ product.category_name }}</p>
+      <p>{{ product.description }}</p>
+      <div class="add-to-cart">
+        <label for="quantity-{{ product.product_id }}">Quantity:</label>
+        <input type="number" id="quantity-{{ product.product_id }}" [(ngModel)]="product.quantity" value="1" min="1" max="99">
+        <button (click)="addToCart(product.product_id)">Add to Cart</button>
+      </div>
+    </div>
+    <img [src]="product.image_url" alt="{{ product.product_name }}">
+  </div>
+</div>
+
+<div style="margin-top: 20px;">
+  <button *ngIf="currentPage > 1" (click)="changePage(-1)" style="padding: 10px 20px; background-color: #007BFF; color: white; border: none; cursor: pointer; font-size: 1em; border-radius: 5px;">
+    Previous
+  </button>
+
+  <button *ngIf="hasMoreProducts" (click)="changePage(1)" style="padding: 10px 20px; background-color: #007BFF; color: white; border: none; cursor: pointer; font-size: 1em; border-radius: 5px;">
+    Next
+  </button>
+</div>
