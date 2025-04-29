@@ -1,0 +1,27 @@
+<div class="cart-container">
+    <h1>Your Cart</h1>
+    <button (click)="goToBrowsePage()" class="back-button">Back to Browse</button>
+  
+    <!-- Error message display -->
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+  
+    <!-- Cart items -->
+    <div id="cart" *ngIf="cart.length > 0">
+      <div *ngFor="let item of cart" class="cart-item">
+        <h2>{{ item.name }}</h2>
+        <p>Price: ${{ item.price }}</p>
+        <p>Quantity:
+          <input type="number" [(ngModel)]="item.quantity" min="1" (change)="updateCart(item.product_id, item.quantity)" />
+        </p>
+        <button (click)="removeFromCart(item.product_id)">Remove</button>
+      </div>
+    </div>
+  
+    <!-- Empty cart message -->
+    <div *ngIf="cart.length === 0">
+      <p>Your cart is empty.</p>
+    </div>
+  </div>
+  

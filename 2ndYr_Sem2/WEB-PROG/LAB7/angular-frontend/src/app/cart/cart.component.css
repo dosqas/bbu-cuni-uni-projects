@@ -1,0 +1,26 @@
+.cart-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    max-width: 400px;
+}
+.cart-item h2 {
+    margin: 0;
+}
+.cart-item p {
+    margin: 5px 0;
+}
+.cart-item input {
+    width: 50px;
+    text-align: center;
+}
+.cart-item button {
+    padding: 5px 10px;
+    background-color: #FF0000;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.cart-item button:hover {
+    background-color: #CC0000;
+}
