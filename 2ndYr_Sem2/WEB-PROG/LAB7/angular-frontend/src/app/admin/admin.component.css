@@ -1,0 +1,52 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+.form-container {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    max-width: 600px;
+}
+.form-container h2 {
+    margin-top: 0;
+}
+.form-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.form-container input, .form-container select, .form-container textarea, .form-container button {
+    width: 95%;
+    padding: 8px;
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+.form-container button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.form-container button:hover {
+    background-color: #0056b3;
+}
+.product-list, .category-list {
+    margin-top: 20px;
+}
+.product-item, .category-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+.product-item button, .category-item button {
+    margin-right: 10px;
+}
+#edit-product-modal {
+    width: 400px;
+    background-color: #fff;
+    border-radius: 8px;
+}
+#edit-product-modal button {
+    margin-top: 10px;
+}
