@@ -47,14 +47,16 @@ export class CartComponent implements OnInit {
 
   // Remove item from cart
   removeFromCart(productId: number): void {
-    this.apiService.removeFromCart(productId).subscribe(data => {
-      if (data.success) {
-        alert(data.message); // "Item removed from cart."
-        this.fetchCart(); // Refresh the cart
-      } else {
-        alert('Error: ' + data.message);
-      }
-    });
+    if (confirm('Are you sure you want to remove this item from the cart?')) {
+      this.apiService.removeFromCart(productId).subscribe(data => {
+        if (data.success) {
+          alert(data.message); // "Item removed from cart."
+          this.fetchCart(); // Refresh the cart
+        } else {
+          alert('Error: ' + data.message);
+        }
+      });
+    }
   }
 
   // Navigate to the browse page
