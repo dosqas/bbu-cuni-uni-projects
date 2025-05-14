@@ -1,0 +1,178 @@
+@{
+    ViewBag.Title = "Admin Panel";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .form-container {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            max-width: 600px;
+            border-radius: 5px;
+        }
+
+        .form-container h2 {
+            margin-top: 0;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-container input,
+        .form-container select,
+        .form-container textarea {
+            width: 95%;
+            padding: 8px;
+            margin-bottom: 10px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-container textarea {
+            min-height: 100px;
+        }
+
+        .btn-admin {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: #007BFF;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .nav-buttons {
+            margin-bottom: 20px;
+        }
+
+        .product-list {
+            margin-top: 20px;
+        }
+
+        .product-item {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .product-item h3 {
+            margin-top: 0;
+        }
+
+        .product-item button {
+            margin-right: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .pagination button {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Panel</h1>
+    <div class="nav-buttons">
+        <a href="/Browse" class="btn-admin btn-success">Go to Browse Page</a>
+    </div>
+
+    <!-- Add Product Form -->
+    <div class="form-container">
+        <h2>Add Product</h2>
+        <label for="product-name">Name:</label>
+        <input type="text" id="product-name" required maxlength="40">
+        <label for="product-price">Price:</label>
+        <input type="number" id="product-price" step="0.01" required>
+        <label for="product-category">Category:</label>
+        <select id="product-category"></select>
+        <label for="product-description">Description:</label>
+        <textarea id="product-description" rows="4" maxlength="200"></textarea>
+        <button onclick="adminView.addProduct()" class="btn-admin btn-primary">Add Product</button>
+    </div>
+
+    <!-- Product List -->
+    <div id="product-list" class="product-list">
+        <!-- Products will be dynamically loaded here -->
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div id="edit-product-modal" class="form-container modal">
+        <h2>Edit Product</h2>
+        <label for="edit-product-name">Name:</label>
+        <input type="text" id="edit-product-name" maxlength="40" required>
+        <label for="edit-product-price">Price:</label>
+        <input type="number" id="edit-product-price" step="0.01" required>
+        <label for="edit-product-category">Category:</label>
+        <select id="edit-product-category"></select>
+        <label for="edit-product-description">Description:</label>
+        <textarea id="edit-product-description" rows="4" maxlength="200"></textarea>
+        <button onclick="adminView.updateProduct()" class="btn-admin btn-primary">Update Product</button>
+        <button onclick="adminView.closeEditModal()" class="btn-admin btn-secondary">Cancel</button>
+    </div>
+
+    <!-- Pagination Buttons -->
+    <div class="pagination">
+        <button id="previousButton" onclick="adminView.changePage(-1)" class="btn-admin btn-primary">Previous</button>
+        <button id="nextButton" onclick="adminView.changePage(1)" class="btn-admin btn-primary">Next</button>
+    </div>
+
+    <script src="/js/adminViewModel.js"></script>
+</body>
+</html>
