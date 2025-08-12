@@ -1,4 +1,4 @@
-Welcome! Here, you'll find all the work I've completed during my university years. I hope it’s helpful!
+Welcome! Here, you'll find all the work I've completed during my university years at Babeș Bolyai University in Cluj-Napoca. It also includes work from my Erasmus semester at Charles University in Prague. I hope it’s of use!
 
 💡 Need help or have questions? Feel free to reach out:
 - 📧 Email: [sebastian.soptelea@proton.me](mailto:sebastian.soptelea@proton.me)
