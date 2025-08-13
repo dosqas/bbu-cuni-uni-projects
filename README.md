@@ -147,6 +147,58 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
   </ul>
 </details>
 
+<details>
+  <summary>📒 2nd Year, 2nd Semester – Avg: 10</summary>
+  <ul>
+    <li>
+      <details>
+        <summary>🧠 Artificial Intelligence – Grade: 10</summary>
+        <strong>- Short Description:</strong> Provided a comprehensive overview of artificial intelligence, covering fundamental concepts, machine learning, neural networks, intelligent systems, search algorithms, evolutionary computation, and advanced AI models.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/dosqas/bbu-cuni-uni-projects/tree/master/yr2-sem2/artificial-intelligence">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Contains laboratory work in Jupyter Notebooks (converted to text to use up less space) using Python, covering perceptrons, CNNs, computer vision, evolutionary algorithms, and other machine learning tasks.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🛢 Database Management Systems – Grade: 10</summary>
+        <strong>- Short Description:</strong> Covers database fundamentals, including concurrency control, recovery, security, query optimization, distributed and parallel databases, and data stream processing<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/dosqas/bbu-cuni-uni-projects/tree/master/yr2-sem2/database-management-systems">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Lab work in SQL Server and Visual Studio for building ADO.NET applications and handling transactions.</li>
+          <li>Submission for the SQL Injection Contest.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🌎 Web Programming – Grade: 10</summary>
+        <strong>- Short Description:</strong> Introductory course to modern web development, covering WWW fundamentals, HTML, CSS, JavaScript (including libraries and frameworks), XML/JSON, and server-side technologies (PHP, JSP, ASP.NET).<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/dosqas/bbu-cuni-uni-projects/tree/master/yr2-sem2/web-programming">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Solved assignments related to CSS, HTML, JavaScript, JSP, ASP, PHP, and Angular.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>⚙️ Software Engineering – Grade: 10</summary>
+        <strong>- Short Description:</strong> Completed a semester-long team project, developing a complex app over multiple iterations following software engineering principles. The project is available in the <a href="https://github.com/dosqas/se-hospital-duo" target="_blank">se-hospital-duo repository</a>.<br>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>ⓘ Systems for Design and Implementation – Grade: 10</summary>
+        <strong>- Short Description:</strong> Completed a semester-long individual project, developing a complex web app over multiple iterations following software engineering principles. The project is available in the <a href="https://github.com/dosqas/dosq.fm-lite" target="_blank">dosq.fm-lite repository</a>.<br>
+      </details>
+    </li>
+  </ul>
+</details>
+
 
 ### Charles University (CUNI) – Erasmus Semester
 <details>
@@ -187,7 +239,7 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
     </li>
     <li>
       <details>
-        <summary>🌎 Introduction to Networking – Grade: 10</summary>
+        <summary>🖧 Introduction to Networking – Grade: 10</summary>
         <strong>- Short Description:</strong> Touched networking fundamentals in-depth, OSI/TCP-IP models, addressing and routing, transport and application protocols, network security, media layers (Ethernet/Wi-Fi), and basic web development (HTML/CSS).<br>
         <strong>- Coursework:</strong> <a href="https://github.com/dosqas/bbu-cuni-uni-projects/tree/master/yr2-sem1/networking">GitHub</a><br>
         <strong>- Contents:</strong>
