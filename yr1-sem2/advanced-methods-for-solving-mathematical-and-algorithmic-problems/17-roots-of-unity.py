@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# definesc cele 17 rădăcini ale unității
+# defining the 17th root of unity
 roots_of_unity = [np.exp(2j * np.pi * n / 17) for n in range(17)]
 
 x = [z.real for z in roots_of_unity]
