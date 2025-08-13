@@ -1,6 +1,6 @@
 # 🎓 University Work
 
-Welcome! Here you’ll find all the projects and coursework I completed during my university years at Babeș Bolyai University (BBU) in Cluj-Napoca, along with work from my Erasmus semester at Charles University (CUNI) in Prague. I hope you find it helpful and interesting!
+Welcome! Here you’ll find all the projects and coursework I completed during my university years at Babeș-Bolyai University (BBU) in Cluj-Napoca, along with work from my Erasmus semester at Charles University (CUNI) in Prague. Each relevant computer science course also includes a brief description and the grade I achieved. I hope you find it helpful and interesting!  
 
 **Note:** Grades are on a 10-point scale (10 = highest, 1 = lowest).  
 
@@ -11,7 +11,7 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
 ### Babeș Bolyai University (BBU)
 
 <details>
-  <summary>📚 1st Year, 1st Semester</summary>
+  <summary>📝 1st Year, 1st Semester – Avg: 9.4</summary>
   <ul>
     <li>
       <details>
@@ -70,7 +70,7 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
 </details>
 
 <details>
-  <summary>🌟 1st Year, 2nd Semester</summary>
+  <summary>📜 1st Year, 2nd Semester – Avg: 9.7</summary>
   <ul>
     <li>
       <details>
@@ -148,7 +148,80 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
 </details>
 
 
-### Charles University (CUNI) - Erasmus Semester
+### Charles University (CUNI) – Erasmus Semester
+<details>
+  <summary>📖 2nd Year, 1st Semester – Avg: 10</summary>
+  <ul>
+    <li>
+      <details>
+        <summary>📗 Programming in C# Language – Grade: 10</summary>
+        <strong>- Short Description:</strong> In-depth C# course covering managed code, OOP, memory management, generics, delegates/events, and key .NET features.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/dosqas/bbu-cuni-uni-projects/tree/master/yr2-sem1/csharp-programming">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Contains completed C# assignments, including console apps with complex algorithms and challenges that exercise different parts of the language.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🧬 Evolutionary Algorithms – Grade: 10</summary>
+        <strong>- Short Description:</strong> Covered evolutionary computation and genetic algorithms, including population models, selection, mutation, crossover, schema theorem, probabilistic analysis, and classifier systems with learning algorithms.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/dosqas/bbu-cuni-uni-projects/tree/master/yr2-sem1/evolutionary-algorithms">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Contains only the first assignment: a Python implementation of a simple genetic algorithm, solving OneMax and alternating 1s/0s problems, with experiments on different mutation and crossover settings.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>☕ Programming in Java Language – Grade: 10</summary>
+        <strong>- Short Description:</strong> Covers Java fundamentals: syntax, classes and inheritance, interfaces, exception handling, memory management, JVM, threads, and standard libraries for files, collections, and networking.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/dosqas/bbu-cuni-uni-projects/tree/master/yr2-sem1/java-programming">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Contains Java applications built mainly with Maven, including a Brainfuck interpreter, exercises on threads, multithreading, ForkJoinPools, and various tasks exploring Java features.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🌎 Introduction to Networking – Grade: 10</summary>
+        <strong>- Short Description:</strong> Touched networking fundamentals in-depth, OSI/TCP-IP models, addressing and routing, transport and application protocols, network security, media layers (Ethernet/Wi-Fi), and basic web development (HTML/CSS).<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/dosqas/bbu-cuni-uni-projects/tree/master/yr2-sem1/networking">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Contains my simple static web project, which I completed on the topic of Prague.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🔗 Functional Programming – Grade: 10</summary>
+        <strong>- Short Description:</strong> Covers Haskell and functional programming: lambda calculus, types, higher-order and recursive functions, data structures, type inference, polymorphism, and monads.<br>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🗄️ Database Systems – Grade: 10</summary>
+        <strong>- Short Description:</strong> Covers data modeling and databases: conceptual and logical models, relational model with SQL, transactions, non-relational databases, unstructured data, file formats, and database architectures.<br>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🤖 Elements of AI – Grade: 10</summary>
+        <strong>- Short Description:</strong> Online course on AI basics, problem solving, machine learning, neural networks, and real-world applications.<br>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>⚖️ Ethics of AI – Grade: 10</summary>
+        <strong>- Short Description:</strong> Online course covering AI ethics, including non-maleficence, accountability, transparency, human rights, fairness, and practical applications.<br>
+      </details>
+    </li>
+  </ul>
+</details>
 
 ---
 
