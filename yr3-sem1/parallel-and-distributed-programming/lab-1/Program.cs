@@ -12,7 +12,6 @@ public class Program
     readonly static int totalTransactions = 10_000_000;
     static Account[]? accounts;
     static bool running = true;
-    static readonly object globalLock = new();
 
     public static void Main()
     {
@@ -43,19 +42,7 @@ public class Program
 
             var t = Task.Run(() =>
             {
-                var first = Math.Min(from, to);
-                var second = Math.Max(from, to);
-
-                lock (accounts[first].Lock)
-                {
-                    lock (accounts[second].Lock)
-                    {
-                        if (accounts[from].Balance >= amount)
-                        {
-                            Transfer(from, to, amount);
-                        }
-                    }
-                }
+                Transfer(from, to, amount);
             });
             transferTasks.Add(t);
         }
@@ -69,24 +56,39 @@ public class Program
 
     static void Transfer(int from, int to, int amount)
     {
-        lock (globalLock)
+        var first = Math.Min(from, to);
+        var second = Math.Max(from, to);
+
+        lock (accounts![first].Lock)
         {
-            if (accounts![from].Balance >= amount)
+            lock (accounts[second].Lock)
             {
-                accounts[from].Balance -= amount;
-                accounts[to].Balance += amount;
+                if (accounts[from].Balance >= amount)
+                {
+                    accounts[from].Balance -= amount;
+                    accounts[to].Balance += amount;
+                }
             }
         }
     }
 
     static void ConsistencyCheck(int initialBalance)
     {
-        lock (globalLock)
+        foreach (var acc in accounts!)
+            Monitor.Enter(acc.Lock);
+
+        try
         {
             int total = 0;
-            foreach (var acc in accounts!)
+            foreach (var acc in accounts)
                 total += acc.Balance;
+
             Console.WriteLine($"[Check] Total balance: {total} (should be {totalAccounts * initialBalance})");
+        }
+        finally
+        {
+            foreach (var acc in accounts)
+                Monitor.Exit(acc.Lock);
         }
     }
 }
