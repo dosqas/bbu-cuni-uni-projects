@@ -34,31 +34,30 @@ public class Program
 
         for (int i = 0; i < totalTransactions; i++)
         {
-            int from = i % 20;
-            int to = (i * 7) % 20;
+            int from = i % totalAccounts;
+            int to = (i * 7) % totalAccounts;
             Random random = new();
             int amount = random.Next(1, 100);
 
-            if (from != to)
-            {
-                var t = Task.Run(() =>
-                {
-                    var first = Math.Min(from, to);
-                    var second = Math.Max(from, to);
+            if (from == to) to = (to + 1) % totalAccounts;
 
-                    lock (accounts[first].Lock)
+            var t = Task.Run(() =>
+            {
+                var first = Math.Min(from, to);
+                var second = Math.Max(from, to);
+
+                lock (accounts[first].Lock)
+                {
+                    lock (accounts[second].Lock)
                     {
-                        lock (accounts[second].Lock)
+                        if (accounts[from].Balance >= amount)
                         {
-                            if (accounts[from].Balance >= amount)
-                            {
-                                Transfer(from, to, amount);
-                            }
+                            Transfer(from, to, amount);
                         }
                     }
-                });
-                transferTasks.Add(t);
-            }
+                }
+            });
+            transferTasks.Add(t);
         }
 
         Task.WaitAll([.. transferTasks]);
