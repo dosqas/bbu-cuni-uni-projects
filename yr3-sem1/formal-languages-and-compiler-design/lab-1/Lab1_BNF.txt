@@ -1,0 +1,61 @@
+<program> ::= <statement> | <statement> <program>
+
+<statement> ::= <dataset_init> 
+              | <input> 
+              | <filter> 
+              | <select> 
+              | <count> 
+              | <group> 
+              | <sort> 
+              | <output> 
+              | <if> 
+              | <for>
+
+<dataset_init> ::= "dataset" <id> "=" <dataset_literal>
+<input> ::= "input" <id> "from" <string>
+<filter> ::= "filter" <id> "where" <condition>
+<select> ::= "select" <id> <field_list>
+<count> ::= "count" <id>
+<group> ::= "group" <id> "by" <field>
+<sort> ::= "sort" <id> <order>
+<output> ::= "output" <id> ["to" <string>]
+<if> ::= "if" <condition> <statements> "end"
+<for> ::= "for" <var> "in" <id> <statements> "end"
+<statements> ::= <statement> | <statement> <statements>
+
+<condition> ::= <expr> <comp_op> <expr> 
+              | <condition> <logical_op> <condition>
+
+<expr> ::= <value> | <field> | <function> "(" <field> ")"
+
+<function> ::= "len" | "avg" | "max" | "min"
+
+<dataset_literal> ::= "[" <record_list> "]"
+<record_list> ::= <record> | <record> "," <record_list>
+<record> ::= "{" <field_assignments> "}"
+<field_assignments> ::= <field> ":" <value> | <field> ":" <value> "," <field_assignments>
+
+<field_list> ::= <field> | <field> "," <field_list>
+<field> ::= <identifier>
+
+<value> ::= <string> | <number>
+
+<id> ::= <identifier>
+<identifier> ::= <letter> | <letter> <ident_rest>
+<ident_rest> ::= <letter_or_digit> | <letter_or_digit> <ident_rest>
+<letter_or_digit> ::= <letter> | <digit>
+
+<string> ::= "\"" <string_content> "\""
+<string_content> ::= <character> | <character> <string_content>
+<character> ::= <letter> | <digit>
+
+<comp_op> ::= "==" | "!=" | "<" | "<=" | ">" | ">="
+<logical_op> ::= "and" | "or"
+<order> ::= "asc" | "desc"
+
+<number> ::= "0" | <nonzero_digit> <digits_opt>
+<digits_opt> ::= "" | <digit> <digits_opt>
+<nonzero_digit> ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+
+<letter> ::= "a" | "b" | ... | "z" | "A" | "B" | ... | "Z"
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"

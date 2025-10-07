@@ -1,0 +1,40 @@
+Data Filtering DSL
+
+This DSL is a domain-specific language for filtering and processing collections of data in a clear, declarative, and procedural way. It allows you to define a dataset, either by reading input from a user (input data) or by assigning a static value (dataset items = [ ... ]), and then apply a sequence of filtering and selection operations on it. These operations include filtering based on conditions (filter data x => x.age > 30), selecting certain fields (select data name, salary), sorting results (sort data asc or sort data desc), counting elements (count data), grouping (group data by department), and producing output (output data). The language is designed to work with collections of structured records, keeping the syntax simple and predictable.
+
+The DSL also supports control flow constructs like if and for, allowing you to conditionally execute filters or iterate over records. For example, you can write if count(data) > 10 … end to check the number of filtered results, or you can loop through each record using for x in data … end, optionally combining it with nested if statements inside the loop. These constructs give you expressive power to not only filter data but also react to its properties, enabling more dynamic and flexible scripts.
+
+Finally, the DSL is designed to be easy to read and write, with one operation per line and minimal syntax overhead. It avoids complexity, uses clear verbs (filter, select, sort, group, output), and allows concise logical expressions (x => x.age > 25 and x.department == "IT"). It provides a simple, scriptable way to explore, clean, and analyze datasets interactively or programmatically.
+
+
+
+[Sample 1] 
+dataset employees = [
+  {"name": "Alice", "age": 28, "department": "IT"},
+  {"name": "Bob", "age": 35, "department": "HR"},
+  {"name": "Carol", "age": 42, "department": "IT"},
+  {"name": "Dan", "age": 23, "department": "Sales"}
+]
+
+filter employees x => x.age > 30
+filter employees x => x.department == "IT"
+sort employees desc
+select employees name, age
+output employees
+
+
+
+[Sample 2]
+input records
+filter records x => x.score >= 80
+group records by course
+count records
+if count(records) > 5
+  output records
+end
+
+for r in records
+  if r.course == "Mathematics"
+    output r
+  end
+end
