@@ -16,8 +16,8 @@ dataset employees = [
   {"name": "Dan", "age": 23, "department": "Sales"}
 ]
 
-filter employees x => x.age > 30
-filter employees x => x.department == "IT"
+filter employees where age > 30
+filter employees where department == "IT"
 sort employees desc
 select employees name, age
 output employees
