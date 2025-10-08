@@ -1,0 +1,13 @@
+This program takes a dataset of cities, filters them to get rid of cities with less than 20000 people living in it, sorting them in a descending order, followed by selecting their name and outputting them. (to the console, since we do not specify a path to output to)
+
+dataset cities = [
+  {"name": "Falticeni", "population": 30000}
+  {"name": "Ludus", "population": 17000}
+  {"name": "Boholt", "population": 5000}
+  {"name": "Tandarei", "population": 32000}
+]
+
+filter cities where population > 20000
+sort cities desc
+select cities name
+output cities

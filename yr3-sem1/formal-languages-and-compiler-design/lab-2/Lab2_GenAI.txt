@@ -1,0 +1,437 @@
+The GenAI I used is ChatGPT using GPT-5.
+For problem 1, he showed me that my dataset definition was wrong, since I put the numbers as a quoted string. According to my BNF, numbers do not have quotes, so he was right.
+
+Problem: 
+dataset cities = [
+  {"name": "Falticeni", "population": "30000"}
+  {"name": "Ludus", "population": "17000"}
+  {"name": "Boholt", "population": "5000"}
+  {"name": "Tandarei", "population": "32000"}
+]
+
+Fix: 
+dataset cities = [
+  {"name": "Falticeni", "population": 30000}
+  {"name": "Ludus", "population": 17000}
+  {"name": "Boholt", "population": 5000}
+  {"name": "Tandarei", "population": 32000}
+]
+
+
+
+For the second problem, once again I had a small issue, particularly when I tried to output a field. According to my BNF I can only output id's, so he was once again right. I fixed it by extending the language to allow the output of specific fields.
+
+Problem: 
+<output> ::= "output" <id> ["to" <string>]
+
+
+Fix: 
+<output> ::= "output" (<id> | <field>) ["to" <string>]
+
+
+Another issue he pointed to was not a syntactic issue, but rather a logic one. Since f is a single record it makes no sense to use max(f.calories) and min(f.calories)
+
+Problem: 
+  if max(f.calories) > 1500 or min(f.calories) < 1000
+    ...
+  end
+
+Fix:
+  if f.calories > 1500 or f.calories < 1000
+    ...
+  end
+
+
+Full conversation:
+This program takes a dataset of cities, filters them to get rid of cities with less than 20000 people living in it, sorting them in a descending order, followed by selecting their name and outputting them. (to the console, since we do not specify a path to output to)
+
+dataset cities = [
+  {"name": "Falticeni", "population": "30000"}
+  {"name": "Ludus", "population": "17000"}
+  {"name": "Boholt", "population": "5000"}
+  {"name": "Tandarei", "population": "32000"}
+]
+
+filter cities where population > 20000
+sort cities desc
+select cities name
+output cities        is this written okay based on this BNF language <program> ::= <statement> | <statement> <program>
+
+<statement> ::= <dataset_init> 
+              | <input> 
+              | <filter> 
+              | <select> 
+              | <count> 
+              | <group> 
+              | <sort> 
+              | <output> 
+              | <if> 
+              | <for>
+
+<dataset_init> ::= "dataset" <id> "=" <dataset_literal>
+<input> ::= "input" <id> ["from" <string>]
+<filter> ::= "filter" <id> "where" <condition>
+<select> ::= "select" <id> <field_list>
+<count> ::= "count" <id>
+<group> ::= "group" <id> "by" <field>
+<sort> ::= "sort" <id> <order>
+<output> ::= "output" <id> ["to" <string>]
+<if> ::= "if" <condition> <statements> "end"
+<for> ::= "for" <id> "in" <id> <statements> "end"
+<statements> ::= <statement> | <statement> <statements>
+
+<condition> ::= <expr> <comp_op> <expr> 
+              | <condition> <logical_op> <condition>
+
+<expr> ::= <value> | <field> | <function> "(" <field> ")" | <function> "(" <id> ")"
+
+<function> ::= "len" | "avg" | "max" | "min" | "count"
+
+<dataset_literal> ::= "[" <record_list> "]"
+<record_list> ::= <record> | <record> "," <record_list>
+<record> ::= "{" <field_assignments> "}"
+<field_assignments> ::= <field> ":" <value> | <field> ":" <value> "," <field_assignments>
+
+<field_list> ::= <field> | <field> "," <field_list>
+<field> ::= <identifier> | <identifier> "." <field>
+
+<value> ::= <string> | <number>
+
+<id> ::= <identifier>
+<identifier> ::= <letter> | <letter> <ident_rest>
+<ident_rest> ::= <letter_or_digit> | <letter_or_digit> <ident_rest>
+<letter_or_digit> ::= <letter> | <digit>
+
+<string> ::= "\"" <string_content> "\""
+<string_content> ::= <character> | <character> <string_content>
+<character> ::= <letter> | <digit>
+
+<comp_op> ::= "==" | "!=" | "<" | "<=" | ">" | ">="
+<logical_op> ::= "and" | "or"
+<order> ::= "asc" | "desc"
+
+<number> ::= "0" | <nonzero_digit> <digits_opt>
+<digits_opt> ::= "" | <digit> <digits_opt>
+<nonzero_digit> ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+
+<letter> ::= "a" | "b" | ... | "z" | "A" | "B" | ... | "Z"
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+ChatGPT said:
+
+You’re very close, but your example has a few syntax issues when compared strictly to the BNF grammar you provided. Let’s go through them step by step and then show a corrected version.
+
+🧩 1. Dataset initialization
+
+You wrote:
+
+dataset cities = [
+  {"name": "Falticeni", "population": "30000"}
+  {"name": "Ludus", "population": "17000"}
+  {"name": "Boholt", "population": "5000"}
+  {"name": "Tandarei", "population": "32000"}
+]
+
+
+Issues:
+
+According to <record_list> ::= <record> | <record> "," <record_list>,
+each record must be separated by a comma ,.
+
+According to <value> ::= <string> | <number>, population should be a number, not a quoted string.
+
+✅ Correct version:
+
+dataset cities = [
+  {"name": "Falticeni", "population": 30000},
+  {"name": "Ludus", "population": 17000},
+  {"name": "Boholt", "population": 5000},
+  {"name": "Tandarei", "population": 32000}
+]
+
+🧩 2. Filter statement
+
+You wrote:
+
+filter cities where population > 20000
+
+
+This matches perfectly:
+
+<filter> ::= "filter" <id> "where" <condition>
+<condition> ::= <expr> <comp_op> <expr>
+<expr> ::= <field> | <value>
+
+
+✅ Valid.
+
+🧩 3. Sort statement
+
+You wrote:
+
+sort cities desc
+
+
+This also matches correctly:
+
+<sort> ::= "sort" <id> <order>
+<order> ::= "asc" | "desc"
+
+
+✅ Valid.
+
+🧩 4. Select statement
+
+You wrote:
+
+select cities name
+
+
+Let’s check the rule:
+
+<select> ::= "select" <id> <field_list>
+
+
+and
+
+<field_list> ::= <field> | <field> "," <field_list>
+
+
+So select cities name is valid only if name is a <field> — and since <field> ::= <identifier>, it’s fine.
+
+✅ Valid.
+
+🧩 5. Output statement
+
+You wrote:
+
+output cities
+
+
+This matches:
+
+<output> ::= "output" <id> ["to" <string>]
+
+
+✅ Valid.
+
+✅ Final corrected program
+
+Putting it all together:
+
+dataset cities = [
+  {"name": "Falticeni", "population": 30000},
+  {"name": "Ludus", "population": 17000},
+  {"name": "Boholt", "population": 5000},
+  {"name": "Tandarei", "population": 32000}
+]
+
+filter cities where population > 20000
+sort cities desc
+select cities name
+output cities
+
+💡 Summary
+Statement	Valid	Notes
+dataset cities = [...]	✅	Added commas + made population numeric
+filter cities where population > 20000	✅	Correct
+sort cities desc	✅	Correct
+select cities name	✅	Correct
+output cities	✅	Correct
+
+So yes — your logic and structure were correct, only minor syntax fixes (commas and numeric types) were needed for it to fully conform to the given BNF.
+
+You said:
+what about for this problem is it fine This program inputs a csv of foods which have fields for their calories, country of origin and name. First we filter them to only keep foods having calories greater than 750, followed by grouping them by country, sorting them, and outputting the foods if we have more than 10 countries where we have foods from. We then iterate over the food, and we output the name and the calories of the foods that have more than 1500 or less than 1000 calories.
+
+input food from "food.csv"
+filter food where calories > 750
+group food by country
+sort food asc
+if count(food) > 10
+  output food
+end
+
+for f in food
+  if max(f.calories) > 1500 or min(f.calories) < 1000
+    if len(f.name) > 10
+      output f.name
+      output f.calories
+    end	
+  end
+end
+ChatGPT said:
+
+Excellent — this is a great example to test your BNF.
+Let’s go through it carefully and check each line for syntactic correctness and whether it follows the semantics implied by your grammar.
+
+🧩 1. Input statement
+input food from "food.csv"
+
+
+Matches:
+
+<input> ::= "input" <id> ["from" <string>]
+
+
+✅ Valid.
+
+🧩 2. Filter
+filter food where calories > 750
+
+
+Matches:
+
+<filter> ::= "filter" <id> "where" <condition>
+<condition> ::= <expr> <comp_op> <expr>
+
+
+✅ Valid.
+
+🧩 3. Group
+group food by country
+
+
+Matches:
+
+<group> ::= "group" <id> "by" <field>
+
+
+✅ Valid.
+
+🧩 4. Sort
+sort food asc
+
+
+Matches:
+
+<sort> ::= "sort" <id> <order>
+<order> ::= "asc" | "desc"
+
+
+✅ Valid.
+
+🧩 5. If condition
+if count(food) > 10
+  output food
+end
+
+
+Let’s check the pieces:
+
+count(food) fits <expr> ::= <function> "(" <id> ")".
+
+> fits <comp_op>.
+
+10 is <number>.
+
+Block structure: if <condition> <statements> end — your statements inside (output food) is valid.
+
+✅ Valid.
+
+🧩 6. For loop
+for f in food
+  if max(f.calories) > 1500 or min(f.calories) < 1000
+    if len(f.name) > 10
+      output f.name
+      output f.calories
+    end	
+  end
+end
+
+
+Let’s analyze part by part.
+
+a) for f in food ... end
+
+Matches:
+
+<for> ::= "for" <id> "in" <id> <statements> "end"
+
+
+✅ Valid.
+
+b) Inner if 1
+if max(f.calories) > 1500 or min(f.calories) < 1000
+
+
+max(f.calories) → matches <expr> ::= <function> "(" <field> ")".
+
+Same for min(f.calories).
+
+or → valid <logical_op>.
+✅ Valid.
+
+c) Nested if 2
+if len(f.name) > 10
+
+
+len(f.name) fits <function> "(" <field> ")".
+✅ Valid.
+
+d) Output lines
+output f.name
+output f.calories
+
+
+According to the grammar:
+
+<output> ::= "output" <id> ["to" <string>]
+
+
+❌ Problem: f.name is a <field>, not an <id>.
+Your grammar only allows <id> after output, not <field>.
+
+So syntactically, output f ✅ works,
+but output f.name ❌ does not match the grammar as currently written.
+
+🧩 7. Another small logic issue
+
+Inside the for f in food loop, you’re using max(f.calories) and min(f.calories).
+If f is a single record (not a group), calling max/min doesn’t make sense.
+However, syntactically, it’s allowed — because max is defined for <field>.
+It’s only semantically questionable, not a syntax error.
+
+✅ Corrected (grammar-valid) version
+
+Here’s how it should look if you want it to be 100% valid according to the BNF:
+
+input food from "food.csv"
+filter food where calories > 750
+group food by country
+sort food asc
+if count(food) > 10
+  output food
+end
+
+for f in food
+  if max(f.calories) > 1500 or min(f.calories) < 1000
+    if len(f.name) > 10
+      output f
+    end	
+  end
+end
+
+💡 Optional: Extending the grammar
+
+If your language should support output f.name (field-level output),
+you could extend your grammar like this:
+
+<output> ::= "output" (<id> | <field>) ["to" <string>]
+
+
+That single change would make your original version fully valid.
+
+✅ Summary
+
+Statement	Valid?	Notes
+input food from "food.csv"	✅	Correct
+filter food where calories > 750	✅	Correct
+group food by country	✅	Correct
+sort food asc	✅	Correct
+if count(food) > 10 … end	✅	Correct
+for f in food … end	✅	Correct
+output f.name / f.calories	⚠️	Not valid per current grammar (only <id> allowed)
+
+So — your program is almost perfect and semantically consistent,
+just slightly outside the grammar’s definition for output.
+

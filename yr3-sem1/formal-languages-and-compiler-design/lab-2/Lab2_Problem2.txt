@@ -1,0 +1,18 @@
+This program inputs a csv of foods which have fields for their calories, country of origin and name. First we filter them to only keep foods having calories greater than 750, followed by grouping them by country, sorting them, and outputting the foods if we have more than 10 countries where we have foods from. We then iterate over the food, and we output the name and the calories of the foods that have more than 1500 or less than 1000 calories.
+
+input food from "food.csv"
+filter food where calories > 750
+group food by country
+sort food asc
+if count(food) > 10
+  output food
+end
+
+for f in food
+  if f.calories > 1500 or f.calories < 1000
+    if len(f.name) > 10
+      output f.name
+      output f.calories
+    end	
+  end
+end
