@@ -26,9 +26,8 @@ output employees
 
 [Sample 2]
 input records
-filter records x => x.score >= 80
+filter records where score >= 80
 group records by course
-count records
 if count(records) > 5
   output records
 end

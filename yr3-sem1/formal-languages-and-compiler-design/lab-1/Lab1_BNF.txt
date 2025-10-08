@@ -12,23 +12,23 @@
               | <for>
 
 <dataset_init> ::= "dataset" <id> "=" <dataset_literal>
-<input> ::= "input" <id> "from" <string>
+<input> ::= "input" <id> ["from" <string>]
 <filter> ::= "filter" <id> "where" <condition>
 <select> ::= "select" <id> <field_list>
 <count> ::= "count" <id>
 <group> ::= "group" <id> "by" <field>
 <sort> ::= "sort" <id> <order>
-<output> ::= "output" <id> ["to" <string>]
+<output> ::= "output" (<id> | <field>) ["to" <string>]
 <if> ::= "if" <condition> <statements> "end"
-<for> ::= "for" <var> "in" <id> <statements> "end"
+<for> ::= "for" <id> "in" <id> <statements> "end"
 <statements> ::= <statement> | <statement> <statements>
 
 <condition> ::= <expr> <comp_op> <expr> 
               | <condition> <logical_op> <condition>
 
-<expr> ::= <value> | <field> | <function> "(" <field> ")"
+<expr> ::= <value> | <field> | <function> "(" <field> ")" | <function> "(" <id> ")"
 
-<function> ::= "len" | "avg" | "max" | "min"
+<function> ::= "len" | "avg" | "max" | "min" | "count"
 
 <dataset_literal> ::= "[" <record_list> "]"
 <record_list> ::= <record> | <record> "," <record_list>
@@ -36,7 +36,7 @@
 <field_assignments> ::= <field> ":" <value> | <field> ":" <value> "," <field_assignments>
 
 <field_list> ::= <field> | <field> "," <field_list>
-<field> ::= <identifier>
+<field> ::= <identifier> | <identifier> "." <field>
 
 <value> ::= <string> | <number>
 
