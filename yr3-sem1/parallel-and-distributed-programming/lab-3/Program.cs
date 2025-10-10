@@ -4,12 +4,12 @@ namespace lab_3;
 
 class Program
 {
-    static readonly int matrixSize = 9;
+    static int matrixSize;
     static readonly int functionVersion = 1; 
 
-    static int[,] matrixA = new int[matrixSize, matrixSize];
-    static int[,] matrixB = new int[matrixSize, matrixSize];
-    static int[,] resultMatrix = new int[matrixSize, matrixSize];
+    static int[,] matrixA;
+    static int[,] matrixB;
+    static int[,] resultMatrix;
 
     static int Compute_element(int row, int col, int thread_number)
     {
@@ -52,6 +52,7 @@ class Program
     {
         matrixA = new int[matrixSize, matrixSize];
         matrixB = new int[matrixSize, matrixSize];
+        resultMatrix = new int[matrixSize, matrixSize];
 
         var rand = new Random();
         for (int i = 0; i < matrixSize; i++)
@@ -66,13 +67,14 @@ class Program
 
     static void Main(string[] args)
     {
-        for (int thread_count = 4; thread_count <= 10; thread_count++)
+        for (int thread_count = 4; thread_count <= 10; thread_count+=2)
         {
             Console.WriteLine("===============================================");
             Console.WriteLine($"Starting experiment with {thread_count} threads");
             for (int matrix_size = 10; matrix_size <= 11; matrix_size++)
             {
-                Console.WriteLine($"\n[{matrix_size - 6}] Matrix size: {matrix_size}x{matrix_size}");
+                matrixSize = matrix_size;
+                Console.WriteLine($"\n[{matrix_size - 9}] Matrix size: {matrixSize}x{matrixSize}");
                 Generate_matrices();
 
                 var tasks = new List<Task>();
