@@ -5,11 +5,11 @@ namespace lab_3;
 class Program
 {
     static int matrixSize;
-    static readonly int functionVersion = 1; 
+    static readonly int functionVersion = 3; 
 
-    static int[,] matrixA;
-    static int[,] matrixB;
-    static int[,] resultMatrix;
+    static int[,]? matrixA;
+    static int[,]? matrixB;
+    static int[,]? resultMatrix;
 
     static int Compute_element(int row, int col, int thread_number)
     {
@@ -18,7 +18,7 @@ class Program
         int sum = 0;
         for (int k = 0; k < matrixSize; k++)
         {
-            sum += matrixA[row, k] * matrixB[k, col];
+            sum += matrixA![row, k] * matrixB![k, col];
         }
         return sum;
     }
@@ -27,7 +27,7 @@ class Program
     {
         for (int k = startIdx; k < endIdx; k++)
         {
-            resultMatrix[k / matrixSize, k % matrixSize] = Compute_element(k / matrixSize, k % matrixSize, thread_number);
+            resultMatrix![k / matrixSize, k % matrixSize] = Compute_element(k / matrixSize, k % matrixSize, thread_number);
         }
     }
 
@@ -35,7 +35,7 @@ class Program
     {
         for (int k = startIdx; k < endIdx; k++)
         {
-            resultMatrix[k % matrixSize, k / matrixSize] = Compute_element(k % matrixSize, k / matrixSize, thread_number);
+            resultMatrix![k % matrixSize, k / matrixSize] = Compute_element(k % matrixSize, k / matrixSize, thread_number);
         }
     }
 
@@ -44,7 +44,7 @@ class Program
         for (int i = 0; i < amount; i++)
         {
             int index = startIdx + i * k;
-            resultMatrix[index / matrixSize, index % matrixSize] = Compute_element(index / matrixSize, index % matrixSize, thread_number);
+            resultMatrix![index / matrixSize, index % matrixSize] = Compute_element(index / matrixSize, index % matrixSize, thread_number);
         }
     }
 
@@ -65,7 +65,7 @@ class Program
         }
     }
 
-    static void Main(string[] args)
+    static void Main()
     {
         for (int thread_count = 4; thread_count <= 10; thread_count+=2)
         {
@@ -97,7 +97,7 @@ class Program
                                 Compute_product_col_by_col(startIdx, endIdx, threadNum);
                                 break;
                             case 3:
-                                Compute_product_every_k(startIdx, thread_count, (matrixSize * matrixSize) / thread_count, threadNum);
+                                Compute_product_every_k(threadNum, thread_count, (matrixSize * matrixSize) / thread_count, threadNum);
                                 break;
                         }
                     });
@@ -117,7 +117,7 @@ class Program
                 {
                     for (int j = 0; j < matrixSize; j++)
                     {
-                        Console.Write(matrixA[i, j] + " ");
+                        Console.Write(matrixA![i, j] + " ");
                     }
                     Console.WriteLine();
                 }
@@ -127,7 +127,7 @@ class Program
                 {
                     for (int j = 0; j < matrixSize; j++)
                     {
-                        Console.Write(matrixB[i, j] + " ");
+                        Console.Write(matrixB![i, j] + " ");
                     }
                     Console.WriteLine();
                 }
@@ -137,7 +137,7 @@ class Program
                 {
                     for (int j = 0; j < matrixSize; j++)
                     {
-                        Console.Write(resultMatrix[i, j] + " ");
+                        Console.Write(resultMatrix![i, j] + " ");
                     }
                     Console.WriteLine();
                 }
