@@ -1,4 +1,6 @@
-﻿class Program
+﻿using System.Diagnostics;
+
+class Program
 {
     static readonly int graph_node_count = 10;
     static readonly int starting_node = 0;
@@ -120,7 +122,10 @@
         Console.WriteLine($"Starting parallel Hamiltonian cycle search with {thread_count} threads...");
 
         var result = new Result();
+        var sw = new Stopwatch();
+        sw.Start();
         ParallelHamiltonianDFS(starting_node, visited, path, starting_node, thread_count, result);
+        sw.Stop();
 
         if (result.Found && result.Path != null)
         {
@@ -131,5 +136,6 @@
         {
             Console.WriteLine("\nNo Hamiltonian cycle exists.");
         }
+        Console.WriteLine($"Time taken: {sw.ElapsedMilliseconds} ms");
     }
 }

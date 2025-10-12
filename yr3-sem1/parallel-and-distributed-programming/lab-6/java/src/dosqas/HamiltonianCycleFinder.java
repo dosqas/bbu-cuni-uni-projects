@@ -18,6 +18,7 @@ public class HamiltonianCycleFinder {
         }
     }
 
+    // RecursiveTask is a specialized subclass of ForkJoinTask, designed for divide and conquer paralellism
     static class HamiltonianCycleTask extends RecursiveTask<List<Integer>> {
         private final List<List<Integer>> graph;
         private final int current;
@@ -33,6 +34,7 @@ public class HamiltonianCycleFinder {
             this.threadsLeft = threadsLeft;
         }
 
+        // The compute function represents the core logic of our task
         @Override
         protected List<Integer> compute() {
             // If we visited all the nodes, check if the last node has an edge from it to the starting node (0)

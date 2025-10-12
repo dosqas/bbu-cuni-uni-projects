@@ -25,9 +25,13 @@ public class Main {
         int size = 10;
         var graph = createGraph(size);
 
-        int numThreads = 10;
+        int numThreads = 8;
         HamiltonianCycleFinder cycleFinder = new HamiltonianCycleFinder(graph, numThreads);
+
+        System.out.println("Starting parallel Hamiltonian cycle search with " + numThreads + " threads...");
+        long start = System.nanoTime();
         var path = cycleFinder.findCycle(0);
+        long end = System.nanoTime();
 
         if (path != null) {
             System.out.println("Cycle found: " + path);
@@ -35,5 +39,7 @@ public class Main {
         else {
             System.out.println("No cycle found");
         }
+
+        System.out.println("Time taken: " + (end - start) / 1000000 + " ms");
     }
 }
