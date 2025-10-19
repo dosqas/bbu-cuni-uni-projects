@@ -1,0 +1,160 @@
+Lexical Analyzer Documentation for Custom DSL
+=============================================
+
+Run with:
+    flex Lab3_Flex.l
+    gcc lex.yy.c -o scanner
+    ./scanner Lab3_Problem2.txt
+
+1. Purpose
+----------
+This program implements a lexical analyzer for a domain-specific language (DSL) designed to manipulate datasets. 
+It identifies tokens in the source program, builds a Symbol Table (ST) for identifiers and constants, 
+and generates a Program Internal Form (PIF) representing the program structure. It also detects lexical errors.
+
+2. Tools Used
+-------------
+- Flex: Lexical analyzer generator for scanning the source code.
+- C: Language used for implementing supporting data structures (ST, PIF) and the main program logic.
+- GCC/MinGW: Compiler to build the lexer executable.
+
+3. Lexical Tokens
+-----------------
+The lexer detects three main types of symbols:
+
+3.1 Keywords
+------------
+Reserved words of the language. They are recognized directly and do not appear in the ST. Examples:
+dataset, input, filter, where, select, count, group, by,
+sort, asc, desc, output, if, end, for, in, from, to, and, or,
+len, avg, max, min
+
+3.2 Operators and Separators
+----------------------------
+Recognized directly, not stored in the ST. Examples:
+=, ==, !=, <, <=, >, >=
+[, ], {, }, :, ,, ., (, )
+
+3.3 Identifiers
+---------------
+- Names for datasets, variables, or fields.
+- Must start with a letter and can contain letters or digits.
+- Stored in Symbol Table.
+- Token code used in PIF: 103
+Example: cities, population, name
+
+3.4 Constants
+
+3.4.1 Numeric Constants
+-----------------------
+- Positive integers.
+- Stored in Symbol Table.
+- Token code used in PIF: 100
+Example: 30000, 5000
+
+3.4.2 String Constants
+----------------------
+- Text enclosed in double quotes " ".
+- Stored in Symbol Table.
+- Token code used in PIF: 101
+Example: "Falticeni", "Ludus"
+
+3.5 Whitespace
+--------------
+- Spaces, tabs, newlines are ignored.
+
+3.6 Lexical Errors
+-----------------
+- Any unrecognized character triggers yyerror.
+- Example errors: @, $, malformed numbers, strings without closing quotes.
+
+4. Data Structures
+------------------
+
+4.1 Symbol Table (ST)
+---------------------
+- Hash table with separate chaining to store identifiers and constants.
+- Each entry:
+  typedef struct SymbolEntry {
+      char* lexeme;        
+      int index;           
+      struct SymbolEntry *next;
+  } SymbolEntry;
+- ST operations:
+
+Function      | Description
+--------------|-------------
+ST_init()     | Initialize the table and index counter.
+ST_insert()   | Insert a lexeme into ST; returns its index if already exists.
+ST_print()    | Print all entries sorted by index.
+ST_free()     | Free all allocated memory for the table.
+
+- Hash function: hash(lexeme) = (h * 31 + char) % TABLE_SIZE
+
+4.2 Program Internal Form (PIF)
+-------------------------------
+- Array storing token code and ST index (if applicable).
+- Structure:
+  typedef struct {
+      int code;
+      int st_index;
+  } PIFEntry;
+- PIF operations:
+
+Function     | Description
+-------------|------------
+PIF_add()    | Add a token and ST index to the PIF.
+PIF_print()  | Print all entries in the PIF.
+
+5. Program Flow
+---------------
+1. Initialize ST (ST_init()).
+2. Read source file and feed to Flex (yylex()).
+3. Scan tokens:
+   - Keywords/operators → directly added to PIF with code, ST index = 0.
+   - Identifiers/constants → insert into ST, add (code, st_index) to PIF.
+   - Lexical errors → trigger yyerror().
+4. Print results:
+   - PIF: shows program structure with references to ST.
+   - ST: shows lexemes with unique indices.
+5. Free memory (ST_free()).
+
+6. Example
+----------
+Source program:
+
+dataset cities = [
+  {name: "Falticeni", population: 30000},
+  {name: "Ludus", population: 17000}
+]
+
+filter cities where population > 20000
+sort cities desc
+select cities name
+output cities
+
+ST:
+
+(1, cities)
+(2, name)
+(3, "Falticeni")
+(4, population)
+(5, 30000)
+(6, "Ludus")
+(7, 17000)
+
+PIF:
+
+(10, 0)  // dataset
+(103, 1) // cities
+(40, 0)  // =
+(49, 0)  // [
+(49, 0)  // {
+(103, 2) // name
+(51, 0)  // :
+(101, 3)// "Falticeni"
+(52, 0)  // ,
+(103, 4) // population
+(51, 0)  // :
+(100, 5)// 30000
+...
