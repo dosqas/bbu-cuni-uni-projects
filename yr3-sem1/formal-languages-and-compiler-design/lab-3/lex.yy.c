@@ -476,20 +476,21 @@ char *yytext;
 #include <stdlib.h>
 #include <string.h>
 
-/* SYMBOL TABLE + PIF FUNCTIONS */
-
 #define TABLE_SIZE 211
+#define MAX_PIF_ENTRIES 10000
 
 unsigned int hash(const char* lexeme);
 void ST_init();
+void PIF_insert(const char* code, int st_index);
 int ST_insert(const char *lexeme);
-void ST_print();
 void ST_free();
-void PIF_add(int code, int st_index);
+
+void ST_print();
+void PIF_print();
+
 void yyerror(const char *s);
 
-/* REGEX DEFINITIONS */
-#line 493 "lex.yy.c"
+#line 494 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -643,7 +644,7 @@ YY_DECL
 #line 32 "Lab3_Flex.l"
 
 
-#line 647 "lex.yy.c"
+#line 648 "lex.yy.c"
 
 	if ( yy_init )
 		{
@@ -737,210 +738,209 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 34 "Lab3_Flex.l"
-{ PIF_add(10, 0); } 
+{ PIF_insert("dataset", 0); } 
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 35 "Lab3_Flex.l"
-{ PIF_add(11, 0); }
+{ PIF_insert("input", 0); }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 36 "Lab3_Flex.l"
-{ PIF_add(12, 0); }
+{ PIF_insert("filter", 0); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 37 "Lab3_Flex.l"
-{ PIF_add(13, 0); }
+{ PIF_insert("where", 0); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 38 "Lab3_Flex.l"
-{ PIF_add(14, 0); }
+{ PIF_insert("select", 0); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 39 "Lab3_Flex.l"
-{ PIF_add(15, 0); }
+{ PIF_insert("count", 0); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 40 "Lab3_Flex.l"
-{ PIF_add(16, 0); }
+{ PIF_insert("group", 0); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 41 "Lab3_Flex.l"
-{ PIF_add(17, 0); }
+{ PIF_insert("by", 0); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 42 "Lab3_Flex.l"
-{ PIF_add(18, 0); }
+{ PIF_insert("sort", 0); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 43 "Lab3_Flex.l"
-{ PIF_add(19, 0); }
+{ PIF_insert("asc", 0); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 44 "Lab3_Flex.l"
-{ PIF_add(20, 0); }
+{ PIF_insert("desc", 0); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 45 "Lab3_Flex.l"
-{ PIF_add(21, 0); }
+{ PIF_insert("output", 0); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 46 "Lab3_Flex.l"
-{ PIF_add(22, 0); }
+{ PIF_insert("if", 0); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 47 "Lab3_Flex.l"
-{ PIF_add(23, 0); }
+{ PIF_insert("end", 0); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 48 "Lab3_Flex.l"
-{ PIF_add(24, 0); }
+{ PIF_insert("for", 0); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 49 "Lab3_Flex.l"
-{ PIF_add(25, 0); }
+{ PIF_insert("in", 0); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 50 "Lab3_Flex.l"
-{ PIF_add(26, 0); }
+{ PIF_insert("from", 0); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 51 "Lab3_Flex.l"
-{ PIF_add(27, 0); }
+{ PIF_insert("to", 0); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 52 "Lab3_Flex.l"
-{ PIF_add(28, 0); }
+{ PIF_insert("and", 0); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 53 "Lab3_Flex.l"
-{ PIF_add(29, 0); }
+{ PIF_insert("or", 0); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 54 "Lab3_Flex.l"
-{ PIF_add(30, 0); }
+{ PIF_insert("len", 0); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 55 "Lab3_Flex.l"
-{ PIF_add(31, 0); }
+{ PIF_insert("avg", 0); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 56 "Lab3_Flex.l"
-{ PIF_add(32, 0); }
+{ PIF_insert("max", 0); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 57 "Lab3_Flex.l"
-{ PIF_add(33, 0); }
+{ PIF_insert("min", 0); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 59 "Lab3_Flex.l"
-{ PIF_add(40, 0); }
+{ PIF_insert("=", 0); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 61 "Lab3_Flex.l"
-{ PIF_add(41, 0); }
+{ PIF_insert("==", 0); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 62 "Lab3_Flex.l"
-{ PIF_add(42, 0); }
+{ PIF_insert("!=", 0); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 63 "Lab3_Flex.l"
-{ PIF_add(44, 0); }
+{ PIF_insert("<=", 0); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 64 "Lab3_Flex.l"
-{ PIF_add(46, 0); }
+{ PIF_insert(">=", 0); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 65 "Lab3_Flex.l"
-{ PIF_add(43, 0); }
+{ PIF_insert("<", 0); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 66 "Lab3_Flex.l"
-{ PIF_add(45, 0); }
+{ PIF_insert(">", 0); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 68 "Lab3_Flex.l"
-{ PIF_add(47, 0); }
+{ PIF_insert("[", 0); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 69 "Lab3_Flex.l"
-{ PIF_add(48, 0); }
+{ PIF_insert("]", 0); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 70 "Lab3_Flex.l"
-{ PIF_add(49, 0); }
+{ PIF_insert("{", 0); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 71 "Lab3_Flex.l"
-{ PIF_add(50, 0); }
+{ PIF_insert("}", 0); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 72 "Lab3_Flex.l"
-{ PIF_add(51, 0); }
+{ PIF_insert(":", 0); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 73 "Lab3_Flex.l"
-{ PIF_add(52, 0); }
+{ PIF_insert(",", 0); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 74 "Lab3_Flex.l"
-{ PIF_add(53, 0); }
+{ PIF_insert(".", 0); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 75 "Lab3_Flex.l"
-{ PIF_add(54, 0); }
+{ PIF_insert("(", 0); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 76 "Lab3_Flex.l"
-{ PIF_add(55, 0); }
+{ PIF_insert(")", 0); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 78 "Lab3_Flex.l"
+#line 79 "Lab3_Flex.l"
 {
-    // yytext matches the current token (in our case, the number)
     int st_index = ST_insert(yytext);
-    PIF_add(100, st_index);
+    PIF_insert("number", st_index);
 }
 	YY_BREAK
 case 42:
@@ -948,7 +948,7 @@ YY_RULE_SETUP
 #line 84 "Lab3_Flex.l"
 {
     int st_index = ST_insert(yytext);
-    PIF_add(101, st_index);
+    PIF_insert("string", st_index);
 }
 	YY_BREAK
 case 43:
@@ -956,7 +956,7 @@ YY_RULE_SETUP
 #line 89 "Lab3_Flex.l"
 {
     int st_index = ST_insert(yytext);
-    PIF_add(103, st_index);
+    PIF_insert("identifier", st_index);
 }
 	YY_BREAK
 case 44:
@@ -1861,23 +1861,22 @@ int main()
 #line 98 "Lab3_Flex.l"
 
 
-// PIF STRUCTURE 
+// ---- PIF STRUCTURE ----
 typedef struct {
-    int code;      // token code
-    int st_index;  // symbol table index (or 0 if not applicable)
+    char* symbol;
+    int st_index;
 } PIFEntry;
 
-#define MAX_PIF_ENTRIES 10000
 PIFEntry PIF[MAX_PIF_ENTRIES];
 int PIF_size = 0;
 
 // ---- PIF FUNCTIONS ----
-void PIF_add(int code, int st_index) {
+void PIF_insert(const char *symbol, int st_index) {
     if (PIF_size >= MAX_PIF_ENTRIES) {
         fprintf(stderr, "PIF overflow!\n");
         exit(1);
     }
-    PIF[PIF_size].code = code;
+    PIF[PIF_size].symbol = strdup(symbol);  // duplicate the string safely
     PIF[PIF_size].st_index = st_index;
     PIF_size++;
 }
@@ -1885,11 +1884,11 @@ void PIF_add(int code, int st_index) {
 void PIF_print() {
     printf("\n---- PROGRAM INTERNAL FORM ----\n");
     for (int i = 0; i < PIF_size; i++) {
-        printf("(%d, %d)\n", PIF[i].code, PIF[i].st_index);
+        printf("(%s, %d)\n", PIF[i].symbol, PIF[i].st_index);
     }
 }
 
-
+// ---- ST STRUCTURE ----
 typedef struct SymbolEntry {
     char* lexeme;
     int index;
@@ -1903,6 +1902,7 @@ typedef struct {
 
 SymbolTable ST;
 
+// ---- ST FUNCTIONS ----
 unsigned int hash(const char* lexeme) {
     unsigned int h = 0;
     while (*lexeme) {
@@ -1934,10 +1934,9 @@ int ST_insert(const char* lexeme) {
 }
 
 void ST_print() {
-    printf("\n---- SYMBOL TABLE (by index) ----\n");
+    printf("\n---- SYMBOL TABLE ----\n");
 
-    // Step 1: collect all entries
-    SymbolEntry* all_entries[TABLE_SIZE * 10]; // rough upper bound
+    SymbolEntry* all_entries[TABLE_SIZE * 10];
     int count = 0;
 
     for (int i = 0; i < TABLE_SIZE; i++) {
@@ -1948,7 +1947,6 @@ void ST_print() {
         }
     }
 
-    // Step 2: sort by index
     for (int i = 0; i < count - 1; i++) {
         for (int j = i + 1; j < count; j++) {
             if (all_entries[i]->index > all_entries[j]->index) {
@@ -1959,7 +1957,6 @@ void ST_print() {
         }
     }
 
-    // Step 3: print
     for (int i = 0; i < count; i++) {
         printf("(%d, %s)\n", all_entries[i]->index, all_entries[i]->lexeme);
     }

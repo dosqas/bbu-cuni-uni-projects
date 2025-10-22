@@ -8,7 +8,7 @@
 
 unsigned int hash(const char* lexeme);
 void ST_init();
-void PIF_insert(int code, int st_index);
+void PIF_insert(const char* code, int st_index);
 int ST_insert(const char *lexeme);
 void ST_free();
 
@@ -31,64 +31,64 @@ WHITESPACE  [ \t\n\r]+
 
 %%
 
-"dataset"               { PIF_add(10, 0); } 
-"input"                 { PIF_add(11, 0); }
-"filter"                { PIF_add(12, 0); }
-"where"                 { PIF_add(13, 0); }
-"select"                { PIF_add(14, 0); }
-"count"                 { PIF_add(15, 0); }
-"group"                 { PIF_add(16, 0); }
-"by"                    { PIF_add(17, 0); }
-"sort"                  { PIF_add(18, 0); }
-"asc"                   { PIF_add(19, 0); }
-"desc"                  { PIF_add(20, 0); }
-"output"                { PIF_add(21, 0); }
-"if"                    { PIF_add(22, 0); }
-"end"                   { PIF_add(23, 0); }
-"for"                   { PIF_add(24, 0); }
-"in"                    { PIF_add(25, 0); }
-"from"                  { PIF_add(26, 0); }
-"to"                    { PIF_add(27, 0); }
-"and"                   { PIF_add(28, 0); }
-"or"                    { PIF_add(29, 0); }
-"len"                   { PIF_add(30, 0); }
-"avg"                   { PIF_add(31, 0); }
-"max"                   { PIF_add(32, 0); }
-"min"                   { PIF_add(33, 0); }
+"dataset"               { PIF_insert("dataset", 0); } 
+"input"                 { PIF_insert("input", 0); }
+"filter"                { PIF_insert("filter", 0); }
+"where"                 { PIF_insert("where", 0); }
+"select"                { PIF_insert("select", 0); }
+"count"                 { PIF_insert("count", 0); }
+"group"                 { PIF_insert("group", 0); }
+"by"                    { PIF_insert("by", 0); }
+"sort"                  { PIF_insert("sort", 0); }
+"asc"                   { PIF_insert("asc", 0); }
+"desc"                  { PIF_insert("desc", 0); }
+"output"                { PIF_insert("output", 0); }
+"if"                    { PIF_insert("if", 0); }
+"end"                   { PIF_insert("end", 0); }
+"for"                   { PIF_insert("for", 0); }
+"in"                    { PIF_insert("in", 0); }
+"from"                  { PIF_insert("from", 0); }
+"to"                    { PIF_insert("to", 0); }
+"and"                   { PIF_insert("and", 0); }
+"or"                    { PIF_insert("or", 0); }
+"len"                   { PIF_insert("len", 0); }
+"avg"                   { PIF_insert("avg", 0); }
+"max"                   { PIF_insert("max", 0); }
+"min"                   { PIF_insert("min", 0); }
 
-"="                     { PIF_add(40, 0); }
+"="                     { PIF_insert("=", 0); }
 
-"=="                    { PIF_add(41, 0); }
-"!="                    { PIF_add(42, 0); }
-"<="                    { PIF_add(44, 0); }
-">="                    { PIF_add(46, 0); }
-"<"                     { PIF_add(43, 0); }
-">"                     { PIF_add(45, 0); }
+"=="                    { PIF_insert("==", 0); }
+"!="                    { PIF_insert("!=", 0); }
+"<="                    { PIF_insert("<=", 0); }
+">="                    { PIF_insert(">=", 0); }
+"<"                     { PIF_insert("<", 0); }
+">"                     { PIF_insert(">", 0); }
 
-"["                     { PIF_add(47, 0); }
-"]"                     { PIF_add(48, 0); }
-"{"                     { PIF_add(49, 0); }
-"}"                     { PIF_add(50, 0); }
-":"                     { PIF_add(51, 0); }
-","                     { PIF_add(52, 0); }
-"."                     { PIF_add(53, 0); }
-"("                     { PIF_add(54, 0); }
-")"                     { PIF_add(55, 0); }
+"["                     { PIF_insert("[", 0); }
+"]"                     { PIF_insert("]", 0); }
+"{"                     { PIF_insert("{", 0); }
+"}"                     { PIF_insert("}", 0); }
+":"                     { PIF_insert(":", 0); }
+","                     { PIF_insert(",", 0); }
+"."                     { PIF_insert(".", 0); }
+"("                     { PIF_insert("(", 0); }
+")"                     { PIF_insert(")", 0); }
+
 
 {NUMBER} {
-    // yytext matches the current token (in our case, the number)
     int st_index = ST_insert(yytext);
-    PIF_add(100, st_index);
+    PIF_insert("number", st_index);
 }
 
 {STRING} {
     int st_index = ST_insert(yytext);
-    PIF_add(101, st_index);
+    PIF_insert("string", st_index);
 }
 
 {IDENTIFIER} {
     int st_index = ST_insert(yytext);
-    PIF_add(103, st_index);
+    PIF_insert("identifier", st_index);
 }
 
 {WHITESPACE}            { /* ignore */ }
@@ -99,7 +99,7 @@ WHITESPACE  [ \t\n\r]+
 
 // ---- PIF STRUCTURE ----
 typedef struct {
-    int code;
+    char* symbol;
     int st_index;
 } PIFEntry;
 
@@ -107,12 +107,12 @@ PIFEntry PIF[MAX_PIF_ENTRIES];
 int PIF_size = 0;
 
 // ---- PIF FUNCTIONS ----
-void PIF_insert(int code, int st_index) {
+void PIF_insert(const char *symbol, int st_index) {
     if (PIF_size >= MAX_PIF_ENTRIES) {
         fprintf(stderr, "PIF overflow!\n");
         exit(1);
     }
-    PIF[PIF_size].code = code;
+    PIF[PIF_size].symbol = strdup(symbol);  // duplicate the string safely
     PIF[PIF_size].st_index = st_index;
     PIF_size++;
 }
@@ -120,7 +120,7 @@ void PIF_insert(int code, int st_index) {
 void PIF_print() {
     printf("\n---- PROGRAM INTERNAL FORM ----\n");
     for (int i = 0; i < PIF_size; i++) {
-        printf("(%d, %d)\n", PIF[i].code, PIF[i].st_index);
+        printf("(%s, %d)\n", PIF[i].symbol, PIF[i].st_index);
     }
 }
 
