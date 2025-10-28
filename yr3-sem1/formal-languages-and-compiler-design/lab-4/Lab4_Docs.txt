@@ -1,0 +1,133 @@
+Lab 4 – Finite Automata and Regular Grammars
+
+1. Identifiers and Constants in the DSL
+
+In the domain-specific language defined in Lab 1, identifiers and constants follow specific syntactic forms.
+
+Identifiers
+------------
+<id> ::= <identifier>
+<identifier> ::= <letter> | <letter> <ident_rest>
+<ident_rest> ::= <letter_or_digit> | <letter_or_digit> <ident_rest>
+<letter_or_digit> ::= <letter> | <digit>
+<letter> ::= "a" | "b" | ... | "z" | "A" | "B" | ... | "Z"
+<digit> ::= "0" | "1" | ... | "9"
+
+Description:
+- An identifier must start with a letter.
+- It can be followed by any combination of letters or digits.
+- Examples of valid identifiers: a, x1, DataSet, city2, avgPopulation
+- Examples of invalid identifiers: 1x (starts with a digit), _abc (invalid character)
+
+Numeric Constants
+-----------------
+<number> ::= "0" | <nonzero_digit> <digits_opt>
+<digits_opt> ::= "" | <digit> <digits_opt>
+<nonzero_digit> ::= "1" | "2" | ... | "9"
+<digit> ::= "0" | "1" | ... | "9"
+
+Description:
+- A number is either the single digit 0, or a nonzero digit followed by any number of digits.
+- Examples of valid numbers: 0, 3, 42, 1000
+- Examples of invalid numbers: 01 (leading zero not allowed), a12 (contains a letter)
+
+
+2. Finite Automata (FA)
+
+Identifier FA
+--------------
+Components:
+Q = {q0, q1}
+Σ = {a–z, A–Z, 0–9}
+q0 = start state
+F = {q1}
+δ:
+    q0 --letter--> q1
+    q1 --letter/digit--> q1
+
+Explanation:
+- The automaton starts in q0.
+- If it reads a letter, it moves to q1.
+- In q1, it accepts any combination of letters or digits.
+- It accepts the string if it ends in q1.
+
+Examples:
+- Input a1b2 → accepted
+- Input 1abc → rejected
+
+Number FA
+----------
+Components:
+Q = {q0, q1, q2}
+Σ = {0–9}
+q0 = start state
+F = {q1, q2}
+δ:
+    q0 --'0'--> q1
+    q0 --[1–9]--> q2
+    q2 --[0–9]--> q2
+
+Explanation:
+- From q0, reading 0 leads to q1 (accepting single zero).
+- Reading a nonzero digit moves to q2, which can loop through more digits.
+- The automaton accepts 0 or any sequence of digits not starting with zero.
+
+Examples:
+- Input 0 → accepted
+- Input 123 → accepted
+- Input 01 → rejected
+
+
+3. Regular Grammars (RG)
+
+Identifier RG
+--------------
+S → L A
+A → L A | D A | ε
+L → a | b | ... | z | A | B | ... | Z
+D → 0 | 1 | ... | 9
+
+Explanation:
+- S starts the production (equivalent to q0).
+- The first symbol must be a letter (L).
+- A can produce more letters or digits, or stop (ε).
+
+Number RG
+----------
+S → 0 | N B
+N → 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+B → D B | ε
+D → 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+
+Explanation:
+- The grammar allows a single 0, or a nonzero digit followed by any number of digits.
+
+
+4. Transformation Between FA and RG
+
+From FA to RG
+--------------
+Each FA can be converted to a Regular Grammar using the following rules:
+
+If δ(qi, a) = qj then:
+    Ai → aAj
+
+If qi is an accepting state:
+    Ai → ε
+
+For the identifier FA:
+    q0 --letter--> q1
+    q1 --letter/digit--> q1
+
+Transformation:
+    S → L A
+    A → L A | D A | ε
+
+For the number FA:
+    q0 --'0'--> q1
+    q0 --[1–9]--> q2
+    q2 --[0–9]--> q2
+
+Transformation:
+    S → 0 | N B
+    B → D B | ε
