@@ -1,0 +1,216 @@
+Mini-DSL Grammar Definition
+===========================
+
+1. Overview
+------------
+This mini-DSL allows users to perform operations on datasets including:
+- Initialization
+- Filtering
+- Selecting fields
+- Counting
+- Grouping
+- Sorting
+- Outputting data
+- Conditional statements (if)
+- Loops (for)
+
+The parser is implemented using Flex (scanner) and Bison/Yacc (parser). 
+The lexical analyzer produces tokens, and the parser applies grammar rules to analyze input.
+
+2. Tokens
+----------
+Terminal symbols used in the DSL:
+
+DATASET, INPUT, FILTER, WHERE, SELECT, COUNT, GROUP, BY, SORT, ASC, DESC, OUTPUT,
+IF, END, FOR, IN, FROM, TO, AND, OR, LEN, AVG, MAX, MIN,
+ASSIGN, EQ, NEQ, LE, GE, LT, GT,
+LBRACKET, RBRACKET, LBRACE, RBRACE, COLON, COMMA, DOT, LPAREN, RPAREN,
+IDENTIFIER (user-defined names), STRING (quoted text), NUMBER (numeric literals)
+
+3. Grammar Rules (Productions)
+-------------------------------
+
+program:
+    statement
+    | statement program
+    ;
+
+statement:
+    dataset_init
+    | input_stmt
+    | filter_stmt
+    | select_stmt
+    | count_stmt
+    | group_stmt
+    | sort_stmt
+    | output_stmt
+    | if_stmt
+    | for_stmt
+    ;
+
+dataset_init:
+    DATASET IDENTIFIER ASSIGN dataset_literal
+    ;
+
+input_stmt:
+    INPUT IDENTIFIER
+    | INPUT IDENTIFIER FROM STRING
+    ;
+
+filter_stmt:
+    FILTER IDENTIFIER WHERE condition
+    ;
+
+select_stmt:
+    SELECT IDENTIFIER field_list
+    ;
+
+count_stmt:
+    COUNT IDENTIFIER
+    ;
+
+group_stmt:
+    GROUP IDENTIFIER BY field
+    ;
+
+sort_stmt:
+    SORT IDENTIFIER order
+    ;
+
+output_stmt:
+    OUTPUT field_or_id optional_to
+    ;
+
+field_or_id:
+    IDENTIFIER
+    | field
+    ;
+
+optional_to:
+    /* empty */
+    | TO STRING
+    ;
+
+if_stmt:
+    IF condition statements END
+    ;
+
+for_stmt:
+    FOR IDENTIFIER IN IDENTIFIER statements END
+    ;
+
+statements:
+    statement
+    | statement statements
+    ;
+
+condition:
+    expr comp_op expr
+    | condition logical_op condition
+    ;
+
+expr:
+    value
+    | field
+    | function LPAREN field RPAREN
+    | function LPAREN IDENTIFIER RPAREN
+    ;
+
+function:
+    LEN
+    | AVG
+    | MAX
+    | MIN
+    | COUNT
+    ;
+
+dataset_literal:
+    LBRACKET record_list RBRACKET
+    ;
+
+record_list:
+    record
+    | record COMMA record_list
+    ;
+
+record:
+    LBRACE field_assignments RBRACE
+    ;
+
+field_assignments:
+    field COLON value
+    | field COLON value COMMA field_assignments
+    ;
+
+field_list:
+    field
+    | field COMMA field_list
+    ;
+
+field:
+    IDENTIFIER
+    | IDENTIFIER DOT field
+    ;
+
+value:
+    STRING
+    | NUMBER
+    ;
+
+comp_op:
+    EQ
+    | NEQ
+    | LT
+    | LE
+    | GT
+    | GE
+    ;
+
+logical_op:
+    AND
+    | OR
+    ;
+
+order:
+    ASC
+    | DESC
+    ;
+
+4. Parsing Example
+------------------
+Input:
+dataset students = [
+  {name: "Alice", age: 20},
+  {name: "Bob", age: 22}
+]
+
+Starting lexical and syntactic analysis...
+Applied: field -> IDENTIFIER
+Applied: value -> STRING
+Applied: field -> IDENTIFIER
+Applied: value -> NUMBER
+Applied: field_assignments -> field COLON value
+Applied: field_assignments -> field COLON value COMMA field_assignments
+Applied: record -> LBRACE field_assignments RBRACE
+Applied: field -> IDENTIFIER
+Applied: value -> STRING
+Applied: field -> IDENTIFIER
+Applied: value -> NUMBER
+Applied: field_assignments -> field COLON value
+Applied: field_assignments -> field COLON value COMMA field_assignments
+Applied: record -> LBRACE field_assignments RBRACE
+Applied: record_list -> record
+Applied: record_list -> record COMMA record_list
+Applied: dataset_literal -> LBRACKET record_list RBRACKET
+Applied: dataset_init -> DATASET IDENTIFIER ASSIGN dataset_literal
+Applied: statement -> dataset_init
+Applied: program -> statement
+Parsing complete.
+
+5. Integration
+---------------
+The parser integrates **Flex** and **Bison**:
+- Flex scans the input text and produces tokens.
+- Bison parses the tokens according to the grammar.
+- `yyparse()` is called from `main()`, which reads the input file and executes parsing.
+

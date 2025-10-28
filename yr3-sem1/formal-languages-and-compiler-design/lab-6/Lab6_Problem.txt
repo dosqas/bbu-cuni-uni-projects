@@ -1,0 +1,11 @@
+dataset cities = [
+  {name: "Falticeni", population: 30000},
+  {name: "Ludus", population: 17000},
+  {name: "Boholt", population: 5000},
+  {name: "Tandarei", population: 32000}
+]
+
+filter cities where population > 20000
+sort cities desc
+select cities name
+output cities
