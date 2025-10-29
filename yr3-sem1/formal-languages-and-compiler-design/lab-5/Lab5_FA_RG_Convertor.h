@@ -1,7 +1,7 @@
 // -------------------------------------------------------------
 // CONFIGURATION CONSTANTS
 // -------------------------------------------------------------
-#define MAX_STATES 3      // Maximum number of states allowed in an automaton
+#define MAX_STATES 4      // Maximum number of states allowed in an automaton
 #define MAX_SYMBOLS 65   // Maximum number of input symbols (alphabet size)
 
 // -------------------------------------------------------------
@@ -24,3 +24,4 @@ void printFA(FiniteAutomaton *fa, const char *name);
 void FA_to_RG(FiniteAutomaton *fa, const char *name);
 FiniteAutomaton buildIdentifierFA();
 FiniteAutomaton buildNumberFA();
+FiniteAutomaton buildStringFA();

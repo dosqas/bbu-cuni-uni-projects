@@ -90,10 +90,13 @@ WHITESPACE  [ \t\n\r]+
 }
 
 
-{STRING} {
-    int st_index = ST_insert(yytext);
-    PIF_insert("string", st_index);
+\"[a-zA-Z0-9]*\" {
+    if (is_string) {
+        int st_index = ST_insert(yytext);
+        PIF_insert("string", st_index);
+    }
 }
+
 
 {WHITESPACE}            { /* ignore */ }
 

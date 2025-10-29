@@ -36,3 +36,23 @@ int is_number(const char *lexeme) {
             return 1;
     return 0;
 }
+
+int is_string(const char *lexeme) {
+    FiniteAutomaton fa = buildStringFA();
+    int state = fa.start_state;
+
+    for (int i = 0; i < strlen(lexeme); i++) {
+        char c = lexeme[i];
+        int idx = symbol_index(&fa, c);
+        if (idx == -1) return 0;           // invalid symbol (not in alphabet)
+        state = fa.transitions[state][idx];
+        if (state == -1) return 0;         // no valid transition
+    }
+
+    // accept if current state is one of the final states
+    for (int i = 0; i < fa.num_finals; i++)
+        if (fa.final_states[i] == state)
+            return 1;
+
+    return 0;
+}
