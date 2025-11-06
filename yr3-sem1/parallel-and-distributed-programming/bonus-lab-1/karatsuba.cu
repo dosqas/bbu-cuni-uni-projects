@@ -108,7 +108,7 @@ void Karatsuba::KaratsubaCUDA(const int* h_poly1, const int* h_poly2, int* h_res
     int threads = 256;
     int blocks = (k + threads - 1) / threads;
 
-    karatsubaSingleSplitKernel<<<blocks, threads>>>(d_A, d_B, d_C, n, k);
+    karatsubaSingleSplitKernel<<<blocks, threads>>>(d_poly1, d_poly2, d_result, n, k);
     cudaDeviceSynchronize();
 
     cudaMemcpy(h_result, d_result, resultSize * sizeof(int), cudaMemcpyDeviceToHost);
