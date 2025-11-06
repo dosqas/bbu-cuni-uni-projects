@@ -11,8 +11,8 @@ k_a = 4;
 P_a_formula = geopdf(k_a, p);
 
 % b) find the probability that the phrase is found after at most 3 sites;
-% ==>  <= 2 failures
-k_b = 2;
+% ==>  <= 3 failures
+k_b = 3;
 P_b_formula = geocdf(k_b, p);
 
 % c) estimate by simulations the two probabilities in parts a) and b).
@@ -30,7 +30,7 @@ for i = 1:Nsim
 end
 
 P_a_sim = mean(found_at == 4);     % stops at 5th site
-P_b_sim = mean(found_at <= 2);     % found within 3 sites
+P_b_sim = mean(found_at <= 3);     % found within 3 sites
 
 fprintf("Search engine problem (p = %.2f)\n", p);
 fprintf("(a) P(stop at 5th site): formula = %.4f, simulation = %.4f\n", ...
