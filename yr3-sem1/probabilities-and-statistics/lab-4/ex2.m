@@ -16,7 +16,7 @@ p_ready_before_60 = gamcdf(t, 3, mu);
 %c) estimate by simulations the probabilities above.
 N = 2e6;
 
-% Generate exponential random variables: X = -log(U)/lambda
+% Generate exponential random variables
 X = -log(rand(N, 1)) / lambda;
 p_gt_30_sim = mean(X > 30);
 

@@ -5,6 +5,7 @@ sigma = 0.088;
 
 
 % a) what percent of professional basketball players are taller than 2.1 m?
+% P(X > 2.1) = P(X <= 2.1)
 p_gt_2_1 = 1 - normcdf(2.1, mu, sigma);
 
 
@@ -23,7 +24,25 @@ p_between = normcdf(2.2, mu, sigma) - normcdf(1.9, mu, sigma);
 
 % e) estimate by simulations the probabilities above.
 N = 2e6;
-X = mu + sigma * randn(N,1);
+
+function z = boxmuller(N)
+    npairs = ceil(N/2);
+    U = rand(npairs,1);
+    V = rand(npairs,1);
+
+    R = sqrt(-2 .* log(U));
+    Theta = 2 .* pi .* V;
+
+    Z1 = R .* cos(Theta);
+    Z2 = R .* sin(Theta);
+
+    zpair = [Z1; Z2];
+    z = zpair(1:N);
+end
+
+Z = boxmuller(N);
+X = mu + sigma .* Z;
+
 p_gt_2_1_sim = mean(X > 2.1);
 p_eq_2_1_sim = mean(abs(X - 2.1) < 1e-6);
 p_atleast_2_1_sim = mean(X >= 2.1);
@@ -31,6 +50,7 @@ p_between_sim = mean((X >= 1.9) & (X <= 2.2));
 
 
 % f) if your favorite player is within the shortest 20% of all players, what can his height be?
+% inv = inverse CDF
 q20 = norminv(0.20, mu, sigma);
 
 
