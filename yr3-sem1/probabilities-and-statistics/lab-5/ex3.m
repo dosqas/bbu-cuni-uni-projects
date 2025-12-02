@@ -28,6 +28,8 @@ grid on;
 
 lsline;
 
+p = polyfit(X, Y, 1);
+
 prediction_2026 = polyval(p, 2026);
 
 
