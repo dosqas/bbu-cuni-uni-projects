@@ -1,0 +1,94 @@
+Grammar Parser Documentation
+
+Overview
+This parser implements a recursive descent parsing algorithm with LL(1) parsing table construction for context-free grammars. It supports building parse trees and performing syntax analysis on input sequences.
+
+File Structure
+
+1. Input Files Required
+
+Lab7_SeminarGrammar.txt      Simple test grammar
+Lab7_SeminarSequence.txt     Test input sequence
+Lab7_MiniDSLGrammar.txt      Complex grammar for Mini DSL
+Lab7_MiniDSLPIF.txt          Tokenized input for Mini DSL
+
+
+2. Output
+- Parse tree structure printed as a table
+- Production rule sequence during parsing
+- Conflict detection in parsing table
+
+Grammar File Format
+
+- Grammar Definition Syntax
+
+N = S A B C D                           Non-terminals (space-separated)
+E = + * a ( )                           Terminals (space-separated)
+S = S                                   Start symbol
+P =                                     Production rules start
+S -> B A                                Production: Left -> Right
+A -> + B A                              Multiple symbols allowed
+A -> epsilon                            Empty production
+...
+
+
+Key Features
+- Case-sensitive symbol names
+- `epsilon` represents empty string
+- Auto-detects terminals from productions
+- Maintains order of productions for parsing
+
+Core Components
+
+1. Grammar Loading (`load_grammar_from_file`)
+- Parses grammar definition files
+- Extracts: NONTERMINALS, TERMINALS, STARTSYMBOL, PRODUCTIONS
+- Auto-adds terminals from production rules
+- Maintains ordered productions for reference
+
+2. First Set Computation (`generate_first`)
+- Computes FIRST sets for all non-terminals
+- Handles epsilon productions
+- Uses iterative fixed-point algorithm
+
+3. Follow Set Computation (`generate_follow`)
+- Computes FOLLOW sets using FIRST sets
+- Special handling for start symbol ($)
+- Considers right-hand context in productions
+
+4. Parsing Table Construction (`build_parsing_table`)
+- Builds LL(1) parsing table
+- Detects and reports conflicts
+- Maps (non-terminal, terminal) pairs to production indices
+
+5. Parser (`parse`)
+- Uses stack-based parsing algorithm
+- Accepts tokenized input sequence
+- Returns sequence of production indices
+- Error reporting for invalid input
+
+6. Parse Tree Construction (`build_tree`)
+- Builds abstract syntax tree from production sequence
+- Uses recursive descent construction
+- Node structure with parent/child relationships
+
+7. Tree Display (`print_tree_table`)
+- Prints parse tree in tabular format
+- Shows: Index, Symbol, Father, Sibling
+- Breadth-first traversal
+
+Error Handling
+
+1. Grammar Conflicts
+- Detected during table construction
+- Reported as: `[CONFLICT] Table[non_term, term] has X vs Y`
+- Program continues but indicates conflicts exist
+
+2. Parsing Errors
+- Invalid token detection
+- Stack mismatch reporting
+- Expected tokens display
+
+3. File Errors
+- Missing files handled gracefully
+- Invalid format detection

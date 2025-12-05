@@ -1,0 +1,192 @@
+Original problem
+
+dataset cities = [
+  {name: "Falticeni", population: 30000},
+  {name: "Ludus", population: 17000},
+  {name: "Boholt", population: 5000},
+  {name: "Tandarei", population: 32000}
+]
+
+filter cities where population > 20000
+sort cities desc
+select cities name
+output cities
+
+
+
+Conflicts? False
+Index     Symbol              Father    Sibling   
+-------------------------------------------------------
+1         PROGRAM             0         0
+2         STATEMENT_LIST      1         0
+3         STATEMENT           2         4
+4         STATEMENT_LIST_TAIL 2         0
+5         DATASET_INIT        3         0
+6         STATEMENT           4         7
+7         STATEMENT_LIST_TAIL 4         0
+8         dataset             5         9
+9         ID                  5         10
+10        =                   5         11
+11        DATASET_LITERAL     5         0
+12        FILTER_STMT         6         0
+13        STATEMENT           7         14
+14        STATEMENT_LIST_TAIL 7         0
+15        identifier          9         0
+16        [                   11        17
+17        RECORD_LIST_OPT     11        18
+18        ]                   11        0
+19        filter              12        20
+20        ID                  12        21
+21        where               12        22
+22        CONDITION           12        0
+23        SORT_STMT           13        0
+24        STATEMENT           14        25
+25        STATEMENT_LIST_TAIL 14        0
+26        RECORD              17        27
+27        RECORD_LIST_TAIL    17        0
+28        identifier          20        0
+29        EXPR                22        30
+30        CONDITION_PRIME     22        0
+31        sort                23        32
+32        ID                  23        33
+33        ORDER               23        0
+34        SELECT_STMT         24        0
+35        STATEMENT           25        36
+36        STATEMENT_LIST_TAIL 25        0
+37        {                   26        38
+38        FIELD_ASSIGNMENTS   26        39
+39        }                   26        0
+40        ,                   27        41
+41        RECORD              27        42
+42        RECORD_LIST_TAIL    27        0
+43        FIELD               29        0
+44        COMP_OP             30        45
+45        EXPR                30        46
+46        LOGICAL_CHAIN       30        0
+47        identifier          32        0
+48        desc                33        0
+49        select              34        50
+50        ID                  34        51
+51        FIELD_LIST          34        0
+52        OUTPUT_STMT         35        0
+53        epsilon             36        0
+54        FIELD               38        55
+55        :                   38        56
+56        VALUE               38        57
+57        FIELD_ASSIGNMENTS_TAIL38        0
+58        {                   41        59
+59        FIELD_ASSIGNMENTS   41        60
+60        }                   41        0
+61        ,                   42        62
+62        RECORD              42        63
+63        RECORD_LIST_TAIL    42        0
+64        ID                  43        65
+65        FIELD_TAIL          43        0
+66        >                   44        0
+67        VALUE               45        0
+68        epsilon             46        0
+69        identifier          50        0
+70        FIELD               51        71
+71        FIELD_LIST_TAIL     51        0
+72        output              52        73
+73        OUTPUT_TARGET       52        74
+74        OUTPUT_TAIL         52        0
+75        ID                  54        76
+76        FIELD_TAIL          54        0
+77        constant            56        0
+78        ,                   57        79
+79        FIELD               57        80
+80        :                   57        81
+81        VALUE               57        82
+82        FIELD_ASSIGNMENTS_TAIL57        0
+83        FIELD               59        84
+84        :                   59        85
+85        VALUE               59        86
+86        FIELD_ASSIGNMENTS_TAIL59        0
+87        {                   62        88
+88        FIELD_ASSIGNMENTS   62        89
+89        }                   62        0
+90        ,                   63        91
+91        RECORD              63        92
+92        RECORD_LIST_TAIL    63        0
+93        identifier          64        0
+94        epsilon             65        0
+95        constant            67        0
+96        ID                  70        97
+97        FIELD_TAIL          70        0
+98        epsilon             71        0
+99        ID                  73        100
+100       OUTPUT_TARGET_TAIL  73        0
+101       epsilon             74        0
+102       identifier          75        0
+103       epsilon             76        0
+104       ID                  79        105
+105       FIELD_TAIL          79        0
+106       constant            81        0
+107       epsilon             82        0
+108       ID                  83        109
+109       FIELD_TAIL          83        0
+110       constant            85        0
+111       ,                   86        112
+112       FIELD               86        113
+113       :                   86        114
+114       VALUE               86        115
+115       FIELD_ASSIGNMENTS_TAIL86        0
+116       FIELD               88        117
+117       :                   88        118
+118       VALUE               88        119
+119       FIELD_ASSIGNMENTS_TAIL88        0
+120       {                   91        121
+121       FIELD_ASSIGNMENTS   91        122
+122       }                   91        0
+123       epsilon             92        0
+124       identifier          96        0
+125       epsilon             97        0
+126       identifier          99        0
+127       epsilon             100       0
+128       identifier          104       0
+129       epsilon             105       0
+130       identifier          108       0
+131       epsilon             109       0
+132       ID                  112       133
+133       FIELD_TAIL          112       0
+134       constant            114       0
+135       epsilon             115       0
+136       ID                  116       137
+137       FIELD_TAIL          116       0
+138       constant            118       0
+139       ,                   119       140
+140       FIELD               119       141
+141       :                   119       142
+142       VALUE               119       143
+143       FIELD_ASSIGNMENTS_TAIL119       0
+144       FIELD               121       145
+145       :                   121       146
+146       VALUE               121       147
+147       FIELD_ASSIGNMENTS_TAIL121       0
+148       identifier          132       0
+149       epsilon             133       0
+150       identifier          136       0
+151       epsilon             137       0
+152       ID                  140       153
+153       FIELD_TAIL          140       0
+154       constant            142       0
+155       epsilon             143       0
+156       ID                  144       157
+157       FIELD_TAIL          144       0
+158       constant            146       0
+159       ,                   147       160
+160       FIELD               147       161
+161       :                   147       162
+162       VALUE               147       163
+163       FIELD_ASSIGNMENTS_TAIL147       0
+164       identifier          152       0
+165       epsilon             153       0
+166       identifier          156       0
+167       epsilon             157       0
+168       ID                  160       169
+169       FIELD_TAIL          160       0
+170       constant            162       0
+171       epsilon             163       0
+172       identifier          168       0
+173       epsilon             169       0
