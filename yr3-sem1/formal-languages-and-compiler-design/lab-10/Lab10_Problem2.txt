@@ -1,0 +1,10 @@
+dataset people = [
+  {name: "Alex"},
+  {name: "Ioan"},
+  {name: "Andreea"},
+  {name: "Stefan"}
+]
+
+sort people desc
+select people name
+output cities
