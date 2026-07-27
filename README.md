@@ -281,6 +281,15 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
       <details>
         <summary>🧪 Software Systems Verification and Validation – Grade: 10</summary>
         <strong>- Short Description:</strong> Learned software testing strategies (black-box, white-box, unit, integration, and web testing using Selenium WebDriver), continuous integration with Jenkins, and formal program verification methods (Hoare logic, Floyd's method).<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr3-sem2/software-systems-verification-and-validation">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li><strong>Lab 1:</strong> Initial code review and analysis documentation.</li>
+          <li><strong>Lab 2:</strong> Black-Box Testing (BBT) design, test cases, and Jenkins CI integration.</li>
+          <li><strong>Lab 3:</strong> White-Box Testing (WBT) design, JUnit testing, and Allure reporting.</li>
+          <li><strong>Lab 4:</strong> Session-Based Test Management (SBTM) session reports and automated tests.</li>
+          <li><strong>Lab 5:</strong> Web testing automation using Selenium WebDriver and Serenity BDD.</li>
+        </ul>
       </details>
     </li>
     <li>

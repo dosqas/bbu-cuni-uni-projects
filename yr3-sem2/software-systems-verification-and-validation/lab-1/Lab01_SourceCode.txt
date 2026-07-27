@@ -1,0 +1,126 @@
+/**
+ * Simple wrapper class to simulate Pass-By-Reference for Output parameters.
+ */
+class Reference {
+    int value;
+    Reference(int v) { this.value = v; }
+}
+
+public class LongestSequence {
+    // This set acts as the "memory" for the current sequence being checked
+    private static Set<Integer> currentUniqueValues = new HashSet<>();
+
+    /**
+     * Subalgorithm readSequence(nrE, valE)
+     * Reads the number of elements and the values from the console.
+     * @param valE array to store the values (1-based)
+     * @return nrE - the count of elements read
+     */
+    static int readSequence(int[] valE) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter nr of elements: ");
+        int nrE = sc.nextInt();
+        System.out.println("Enter " + nrE + " elements:");
+        for (int i = 1; i <= nrE; i++) {
+            valE[i] = sc.nextInt();
+        }
+        return nrE;
+    }
+
+    /**
+     * Subalgorithm Still3Values(val)
+     * Checks if adding this specific value exceeds the 3-unique-limit.
+     * @param val value to check
+     */
+    static boolean still3Values(int val) {
+        if (currentUniqueValues.contains(val)) {
+            return true; // Already in the set, doesn't increase count
+        }
+        if (currentUniqueValues.size() < 3) {
+            currentUniqueValues.add(val); // New value, but we have room
+            return true;
+        }
+        return false; // New value and we already have 3
+    }
+
+    /**
+     * Subalgorithm ComputeASequence(pozStart, nrE, valE, lungFinala)
+     * @param pozStart Input: current position in sequence
+     * @param nrE Input: total elements
+     * @param valE Input: values array
+     * @param lungFinala Output: calculated length
+     */
+    static void computeASequence(int pozStart, int nrE, int[] valE, Reference lungFinala) {
+        lungFinala.value = 0;
+	currentUniqueValues.clear();
+        
+        while (pozStart <= nrE && still3Values(valE[pozStart])) {
+            lungFinala.value = lungFinala.value + 1;
+            pozStart = pozStart + 1;
+        }
+    }
+
+    /**
+     * Subalgorithm ComputeMaxSeq(nrE, valE, pozF, lungF)
+     * @param nrE Input: total elements
+     * @param valE Input: values array
+     * @param pozF Output: first position of max sequence
+     * @param lungF Output: length of max sequence
+     */
+    static void computeMaxSeq(int nrE, int[] valE, Reference pozF, Reference lungF) {
+        int i = 1; 
+        pozF.value = 0; 
+        lungF.value = 0;
+        
+        Reference lungFinala = new Reference(0);
+
+        while (i <= nrE) {
+            computeASequence(i, nrE, valE, lungFinala);
+            
+            if (lungFinala.value > lungF.value) {
+                pozF.value = i;
+                lungF.value = lungFinala.value;
+            }
+
+            i = i + 1;
+        }
+    }
+
+    /**
+     * Subalgorithm printLongestSequence(pozF, lungF, valE)
+     * Iterates through the sequence array and prints the longest contiguous 
+     * segment found based on the starting position and length.
+     * @param pozF  the starting index (1-based) of the longest sequence found
+     * @param lungF the total number of elements in the longest sequence
+     * @param valE  the array containing the full sequence of numbers
+     */
+    static void printLongestSequence(int pozF, int lungF, int[] valE) {
+        System.out.println("--- Results ---");
+        if (lungF == 0) {
+            System.out.println("No valid sequence found.");
+        } else {
+            System.out.print("Longest sequence: ");
+            // The loop runs from the start position (pozF) for exactly 'lungF' steps
+            for (int k = pozF; k < pozF + lungF; k++) {
+                System.out.print(valE[k] + " ");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] valE = new int[1001]; // Adjust size as needed (since not specified)
+        
+        // Subalgorithm: Read
+        int nrE = readSequence(valE);
+        
+        // References for Output Parameters
+        Reference pozF = new Reference(0);
+        Reference lungF = new Reference(0);
+        
+        // Subalgorithm: Compute
+        computeMaxSeq(nrE, valE, pozF, lungF);
+        
+        // Subalgorithm: Print
+        printLongestSequence(pozF.value, lungF.value, valE);
+    }
+}
