@@ -199,6 +199,78 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
   </ul>
 </details>
 
+<details>
+  <summary>📘 3rd Year, 1st Semester – Avg: 9.8</summary>
+  <ul>
+    <li>
+      <details>
+        <summary>☁️ Cloud Applications Architectures – Grade: 10</summary>
+        <strong>- Short Description:</strong> Learned the fundamentals of cloud computing and AWS, covering core services, infrastructure as code, and cloud-native application design.<br>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>⚡ Parallel and Distributed Programming – Grade: 10</summary>
+        <strong>- Short Description:</strong> Explored multithreading, concurrency, and distributed systems concepts using C# and C++, with a focus on performance and parallel execution.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr3-sem1/parallel-and-distributed-programming">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Implemented parallel algorithms and multithreaded applications primarily in C# and C++.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>📊 Probabilities and Statistics – Grade: 9</summary>
+        <strong>- Short Description:</strong> Covered fundamental probability theory and statistical methods, with practical labs in MATLAB.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr3-sem1/probabilities-and-statistics">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>MATLAB lab work exploring probability distributions, statistical inference, and data analysis.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>📜 Formal Languages and Compiler Design – Grade: 10</summary>
+        <strong>- Short Description:</strong> Learned how compilers work, covering lexical analysis, parsing, syntax analysis, and code generation using Flex, Bison, and related tools. Designed a custom mini-language.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr3-sem1/formal-languages-and-compiler-design">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Labs using Flex and Bison for lexical and syntax analysis.</li>
+          <li>Designed and implemented a custom mini-language.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>📱 Mobile Applications – Grade: 10</summary>
+        <strong>- Short Description:</strong> Developed a full-featured mobile app for logging guitar practice sessions using Kotlin Multiplatform and Android, with offline support and real-time sync via REST/WebSockets and a Spring Boot backend.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/guitar-practice-log">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Built a mobile app with offline-first CRUD operations, Room, coroutines, WorkManager, and a Spring Boot + JPA backend with WebSocket real-time updates.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🎵 Team Project – Grade: 10</summary>
+        <strong>- Short Description:</strong> Mood-based playlist recommendation app. Built with Flutter, Spring Boot, Spotify API, Supabase, and Gemini AI.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/VibeCheck">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Flutter frontend with MVVM architecture.</li>
+          <li>Spring Boot backend with Supabase (PostgreSQL) persistence.</li>
+          <li>Gemini AI for mood-to-song translation with Spotify validation loop.</li>
+          <li>OAuth 2.0 via Supabase and deep linking for Spotify playback.</li>
+          <li>Agile methodology with GitHub Projects and story point estimation.</li>
+        </ul>
+      </details>
+    </li>
+  </ul>
+</details>
+
 
 ### Charles University (CUNI) – Erasmus Semester
 <details>
