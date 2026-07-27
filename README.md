@@ -26,14 +26,8 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
     </li>
     <li>
       <details>
-        <summary>📈 Mathematical Analysis – Grade: 10</summary>
-        <strong>- Short Description:</strong> Learned fundamental concepts of differential and integral calculus for functions of one or several real variables, with applications in optimization and data science.<br>
-        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr1-sem1/analysis">GitHub</a><br>
-        <strong>- Contents:</strong>
-        <ul>
-          <li>Implemented numerical methods, ML models, and visualizations (p-norms, trapezoidal integration, Ridge Regression).</li>
-          <li>Analyzed quadratic forms with gradient plots for minima, maxima, and saddle points.</li>
-        </ul>
+        <summary>📊 Computational Logic – Grade: 10</summary>
+        <strong>- Short Description:</strong> Studied number systems, logic (propositional & predicate), Boolean algebra, and design/simplification of logic circuits.<br>
       </details>
     </li>
     <li>
@@ -62,8 +56,14 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
     </li>
     <li>
       <details>
-        <summary>📊 Computational Logic – Grade: 10</summary>
-        <strong>- Short Description:</strong> Studied number systems, logic (propositional & predicate), Boolean algebra, and design/simplification of logic circuits.<br>
+        <summary>📈 Mathematical Analysis – Grade: 10</summary>
+        <strong>- Short Description:</strong> Learned fundamental concepts of differential and integral calculus for functions of one or several real variables, with applications in optimization and data science.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr1-sem1/analysis">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Implemented numerical methods, ML models, and visualizations (p-norms, trapezoidal integration, Ridge Regression).</li>
+          <li>Analyzed quadratic forms with gradient plots for minima, maxima, and saddle points.</li>
+        </ul>
       </details>
     </li>
   </ul>
@@ -107,6 +107,12 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
     </li>
     <li>
       <details>
+        <summary>📐 Geometry – Grade: 9</summary>
+        <strong>- Short Description:</strong> Studied vector algebra, analytic geometry, curves and surfaces, conics and quadrics, and plane/space transformations, including vector, dot, and cross products, projections, symmetries, and homogeneous coordinate transformations.<br>
+      </details>
+    </li>
+    <li>
+      <details>
         <summary>🌐 Graph Algorithms – Grade: 10</summary>
         <strong>- Short Description:</strong> Studied graph theory concepts, algorithms, and applications (connectivity, shortest paths, MSTs, NP-complete problems, flows, matchings).<br>
         <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr1-sem2/graph-algorithms">GitHub</a><br>
@@ -136,12 +142,6 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
         <ul>
           <li>Contains lab work related to processes, file management, grep, sed awk and Bash.</li>
         </ul>
-      </details>
-    </li>
-    <li>
-      <details>
-        <summary>📐 Geometry – Grade: 9</summary>
-        <strong>- Short Description:</strong> Studied vector algebra, analytic geometry, curves and surfaces, conics and quadrics, and plane/space transformations, including vector, dot, and cross products, projections, symmetries, and homogeneous coordinate transformations.<br>
       </details>
     </li>
   </ul>
@@ -175,17 +175,6 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
     </li>
     <li>
       <details>
-        <summary>🌎 Web Programming – Grade: 10</summary>
-        <strong>- Short Description:</strong> Introductory course to modern web development, covering WWW fundamentals, HTML, CSS, JavaScript (including libraries and frameworks), XML/JSON, and server-side technologies (PHP, JSP, ASP.NET).<br>
-        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr2-sem2/web-programming">GitHub</a><br>
-        <strong>- Contents:</strong>
-        <ul>
-          <li>Solved assignments related to CSS, HTML, JavaScript, JSP, ASP, PHP, and Angular.</li>
-        </ul>
-      </details>
-    </li>
-    <li>
-      <details>
         <summary>⚙️ Software Engineering – Grade: 10</summary>
         <strong>- Short Description:</strong> Completed a semester-long team project, developing a complex app over multiple iterations following software engineering principles. The project is available in the <a href="https://github.com/sebsop/se-hospital-duo" target="_blank">se-hospital-duo repository</a>.<br>
       </details>
@@ -194,6 +183,17 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
       <details>
         <summary>ⓘ Systems for Design and Implementation – Grade: 10</summary>
         <strong>- Short Description:</strong> Completed a semester-long individual project, developing a complex web app over multiple iterations following software engineering principles. The project is available in the <a href="https://github.com/sebsop/dosq.fm-lite" target="_blank">dosq.fm-lite repository</a>.<br>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🌎 Web Programming – Grade: 10</summary>
+        <strong>- Short Description:</strong> Introductory course to modern web development, covering WWW fundamentals, HTML, CSS, JavaScript (including libraries and frameworks), XML/JSON, and server-side technologies (PHP, JSP, ASP.NET).<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr2-sem2/web-programming">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Solved assignments related to CSS, HTML, JavaScript, JSP, ASP, PHP, and Angular.</li>
+        </ul>
       </details>
     </li>
   </ul>
@@ -206,28 +206,6 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
       <details>
         <summary>☁️ Cloud Applications Architectures – Grade: 10</summary>
         <strong>- Short Description:</strong> Learned the fundamentals of cloud computing and AWS, covering core services, infrastructure as code, and cloud-native application design.<br>
-      </details>
-    </li>
-    <li>
-      <details>
-        <summary>⚡ Parallel and Distributed Programming – Grade: 10</summary>
-        <strong>- Short Description:</strong> Explored multithreading, concurrency, and distributed systems concepts using C# and C++, with a focus on performance and parallel execution.<br>
-        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr3-sem1/parallel-and-distributed-programming">GitHub</a><br>
-        <strong>- Contents:</strong>
-        <ul>
-          <li>Implemented parallel algorithms and multithreaded applications primarily in C# and C++.</li>
-        </ul>
-      </details>
-    </li>
-    <li>
-      <details>
-        <summary>📊 Probabilities and Statistics – Grade: 9</summary>
-        <strong>- Short Description:</strong> Covered fundamental probability theory and statistical methods, with practical labs in MATLAB.<br>
-        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr3-sem1/probabilities-and-statistics">GitHub</a><br>
-        <strong>- Contents:</strong>
-        <ul>
-          <li>MATLAB lab work exploring probability distributions, statistical inference, and data analysis.</li>
-        </ul>
       </details>
     </li>
     <li>
@@ -255,17 +233,30 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
     </li>
     <li>
       <details>
-        <summary>🎵 Team Project – Grade: 10</summary>
-        <strong>- Short Description:</strong> Mood-based playlist recommendation app. Built with Flutter, Spring Boot, Spotify API, Supabase, and Gemini AI.<br>
-        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/VibeCheck">GitHub</a><br>
+        <summary>⚡ Parallel and Distributed Programming – Grade: 10</summary>
+        <strong>- Short Description:</strong> Explored multithreading, concurrency, and distributed systems concepts using C# and C++, with a focus on performance and parallel execution.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr3-sem1/parallel-and-distributed-programming">GitHub</a><br>
         <strong>- Contents:</strong>
         <ul>
-          <li>Flutter frontend with MVVM architecture.</li>
-          <li>Spring Boot backend with Supabase (PostgreSQL) persistence.</li>
-          <li>Gemini AI for mood-to-song translation with Spotify validation loop.</li>
-          <li>OAuth 2.0 via Supabase and deep linking for Spotify playback.</li>
-          <li>Agile methodology with GitHub Projects and story point estimation.</li>
+          <li>Implemented parallel algorithms and multithreaded applications primarily in C# and C++.</li>
         </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>📊 Probabilities and Statistics – Grade: 9</summary>
+        <strong>- Short Description:</strong> Covered fundamental probability theory and statistical methods, with practical labs in MATLAB.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr3-sem1/probabilities-and-statistics">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>MATLAB lab work exploring probability distributions, statistical inference, and data analysis.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🎵 Team Project – Grade: 10</summary>
+        <strong>- Short Description:</strong> Completed a semester-long team project, developing a mood-based playlist recommendation app built with Flutter, Spring Boot, Spotify API, Supabase, and Gemini AI. The project is available in the <a href="https://github.com/sebsop/VibeCheck" target="_blank">VibeCheck repository</a>.<br>
       </details>
     </li>
   </ul>
@@ -276,56 +267,6 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
 <details>
   <summary>📖 2nd Year, 1st Semester – Avg: 10</summary>
   <ul>
-    <li>
-      <details>
-        <summary>📗 Programming in C# Language – Grade: 10</summary>
-        <strong>- Short Description:</strong> In-depth C# course covering managed code, OOP, memory management, generics, delegates/events, and key .NET features.<br>
-        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr2-sem1/csharp-programming">GitHub</a><br>
-        <strong>- Contents:</strong>
-        <ul>
-          <li>Contains completed C# assignments, including console apps with complex algorithms and challenges that exercise different parts of the language.</li>
-        </ul>
-      </details>
-    </li>
-    <li>
-      <details>
-        <summary>🧬 Evolutionary Algorithms – Grade: 10</summary>
-        <strong>- Short Description:</strong> Covered evolutionary computation and genetic algorithms, including population models, selection, mutation, crossover, schema theorem, probabilistic analysis, and classifier systems with learning algorithms.<br>
-        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr2-sem1/evolutionary-algorithms">GitHub</a><br>
-        <strong>- Contents:</strong>
-        <ul>
-          <li>Contains only the first assignment: a Python implementation of a simple genetic algorithm, solving OneMax and alternating 1s/0s problems, with experiments on different mutation and crossover settings.</li>
-        </ul>
-      </details>
-    </li>
-    <li>
-      <details>
-        <summary>☕ Programming in Java Language – Grade: 10</summary>
-        <strong>- Short Description:</strong> Covers Java fundamentals: syntax, classes and inheritance, interfaces, exception handling, memory management, JVM, threads, and standard libraries for files, collections, and networking.<br>
-        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr2-sem1/java-programming">GitHub</a><br>
-        <strong>- Contents:</strong>
-        <ul>
-          <li>Contains Java applications built mainly with Maven, including a Brainfuck interpreter, exercises on threads, multithreading, ForkJoinPools, and various tasks exploring Java features.</li>
-        </ul>
-      </details>
-    </li>
-    <li>
-      <details>
-        <summary>🖧 Introduction to Networking – Grade: 10</summary>
-        <strong>- Short Description:</strong> Touched networking fundamentals in-depth, OSI/TCP-IP models, addressing and routing, transport and application protocols, network security, media layers (Ethernet/Wi-Fi), and basic web development (HTML/CSS).<br>
-        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr2-sem1/networking">GitHub</a><br>
-        <strong>- Contents:</strong>
-        <ul>
-          <li>Contains my simple static web project, which I completed on the topic of Prague.</li>
-        </ul>
-      </details>
-    </li>
-    <li>
-      <details>
-        <summary>🔗 Functional Programming – Grade: 10</summary>
-        <strong>- Short Description:</strong> Covers Haskell and functional programming: lambda calculus, types, higher-order and recursive functions, data structures, type inference, polymorphism, and monads.<br>
-      </details>
-    </li>
     <li>
       <details>
         <summary>🗄️ Database Systems – Grade: 10</summary>
@@ -342,6 +283,56 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
       <details>
         <summary>⚖️ Ethics of AI – Grade: 10</summary>
         <strong>- Short Description:</strong> Online course covering AI ethics, including non-maleficence, accountability, transparency, human rights, fairness, and practical applications.<br>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🧬 Evolutionary Algorithms – Grade: 10</summary>
+        <strong>- Short Description:</strong> Covered evolutionary computation and genetic algorithms, including population models, selection, mutation, crossover, schema theorem, probabilistic analysis, and classifier systems with learning algorithms.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr2-sem1/evolutionary-algorithms">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Contains only the first assignment: a Python implementation of a simple genetic algorithm, solving OneMax and alternating 1s/0s problems, with experiments on different mutation and crossover settings.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🔗 Functional Programming – Grade: 10</summary>
+        <strong>- Short Description:</strong> Covers Haskell and functional programming: lambda calculus, types, higher-order and recursive functions, data structures, type inference, polymorphism, and monads.<br>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🖧 Introduction to Networking – Grade: 10</summary>
+        <strong>- Short Description:</strong> Touched networking fundamentals in-depth, OSI/TCP-IP models, addressing and routing, transport and application protocols, network security, media layers (Ethernet/Wi-Fi), and basic web development (HTML/CSS).<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr2-sem1/networking">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Contains my simple static web project, which I completed on the topic of Prague.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>📗 Programming in C# Language – Grade: 10</summary>
+        <strong>- Short Description:</strong> In-depth C# course covering managed code, OOP, memory management, generics, delegates/events, and key .NET features.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr2-sem1/csharp-programming">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Contains completed C# assignments, including console apps with complex algorithms and challenges that exercise different parts of the language.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>☕ Programming in Java Language – Grade: 10</summary>
+        <strong>- Short Description:</strong> Covers Java fundamentals: syntax, classes and inheritance, interfaces, exception handling, memory management, JVM, threads, and standard libraries for files, collections, and networking.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr2-sem1/java-programming">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Contains Java applications built mainly with Maven, including a Brainfuck interpreter, exercises on threads, multithreading, ForkJoinPools, and various tasks exploring Java features.</li>
+        </ul>
       </details>
     </li>
   </ul>
