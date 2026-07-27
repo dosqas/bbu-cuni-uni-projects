@@ -223,12 +223,7 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
     <li>
       <details>
         <summary>📱 Mobile Applications – Grade: 10</summary>
-        <strong>- Short Description:</strong> Developed a full-featured mobile app for logging guitar practice sessions using Kotlin Multiplatform and Android, with offline support and real-time sync via REST/WebSockets and a Spring Boot backend.<br>
-        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/guitar-practice-log">GitHub</a><br>
-        <strong>- Contents:</strong>
-        <ul>
-          <li>Built a mobile app with offline-first CRUD operations, Room, coroutines, WorkManager, and a Spring Boot + JPA backend with WebSocket real-time updates.</li>
-        </ul>
+        <strong>- Short Description:</strong> Developed a full-featured mobile app for logging guitar practice sessions using Kotlin Multiplatform, Android, and Spring Boot. The project is available in the <a href="https://github.com/sebsop/guitar-practice-log" target="_blank">guitar-practice-log repository</a>.<br>
       </details>
     </li>
     <li>
@@ -256,7 +251,47 @@ Welcome! Here you’ll find all the projects and coursework I completed during m
     <li>
       <details>
         <summary>🎵 Team Project – Grade: 10</summary>
-        <strong>- Short Description:</strong> Completed a semester-long team project, developing a mood-based playlist recommendation app built with Flutter, Spring Boot, Spotify API, Supabase, and Gemini AI. The project is available in the <a href="https://github.com/sebsop/VibeCheck" target="_blank">VibeCheck repository</a>.<br>
+        <strong>- Short Description:</strong> Completed a semester-long team project, developing a mood-based playlist recommendation app built with Flutter, Spring Boot, Spotify API, Supabase, and Gemini AI. The project is available in the <a href="https://github.com/sebsop/vibecheck" target="_blank">vibecheck repository</a>.<br>
+      </details>
+    </li>
+  </ul>
+</details>
+
+<details>
+  <summary>🎓 3rd Year, 2nd Semester – Avg: 10.0</summary>
+  <ul>
+    <li>
+      <details>
+        <summary>🔢 Numerical Calculus – Grade: 10</summary>
+        <strong>- Short Description:</strong> Studied numerical algorithms, system solving methods, interpolation (Lagrange, Hermite, splines), numerical differentiation/integration, and nonlinear equations root-finding.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr3-sem2/numerical-calculus">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>MATLAB implementations of numerical approximations, interpolation formulas, linear system solvers, and integration methods.</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🎓 Preparation of Bachelor Thesis – Grade: 10</summary>
+        <strong>- Short Description:</strong> Focused on the research, design, implementation, and writing of the bachelor's thesis.<br>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🧪 Software Systems Verification and Validation – Grade: 10</summary>
+        <strong>- Short Description:</strong> Learned software testing strategies (black-box, white-box, unit, integration, and web testing using Selenium WebDriver), continuous integration with Jenkins, and formal program verification methods (Hoare logic, Floyd's method).<br>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary>🤖 Understanding and Developing Large Language Models (LLMs) – Grade: 10</summary>
+        <strong>- Short Description:</strong> Explored transformer architectures, attention mechanisms, prompt engineering, PEFT/LoRA fine-tuning, RLHF, and LangChain/RAG frameworks.<br>
+        <strong>- Coursework:</strong> <a href="https://github.com/sebsop/bbu-cuni-uni-projects/tree/master/yr3-sem2/understanding-and-developing-llms/lab-1">GitHub</a><br>
+        <strong>- Contents:</strong>
+        <ul>
+          <li>Introductory laboratory work focusing on basic LLM text generation operations.</li>
+        </ul>
       </details>
     </li>
   </ul>
